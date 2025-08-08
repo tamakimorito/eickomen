@@ -1,3 +1,4 @@
+
 export const INITIAL_FORM_DATA = {
   product: 'SoftBank光1G',
   housingType: '',
@@ -15,7 +16,7 @@ export const INITIAL_FORM_DATA = {
   address: '',
   buildingInfo: '',
   moveInDate: '',
-  mailingOption: '新居',
+  mailingOption: '現住所',
   currentPostalCode: '',
   currentAddress: '',
   serviceFee: '',
