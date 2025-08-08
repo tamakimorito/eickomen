@@ -18,6 +18,8 @@
   }
 }
 </script>
+<!-- JSXをブラウザで変換するためにBabelを追加 -->
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <style>
   body {
     font-family: 'M PLUS Rounded 1c', sans-serif;
@@ -27,7 +29,8 @@
 </head>
   <body class="bg-blue-50">
     <div id="root"></div>
-    <script type="module" src="./index.jsx"></script>
+    <!-- typeを"module"から"text/babel"に変更 -->
+    <script type="text/babel" src="./index.jsx"></script>
   <script type="module" src="/index.tsx"></script>
 </body>
 </html>
