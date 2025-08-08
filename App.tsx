@@ -1,6 +1,4 @@
-
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { FormData, RadioOption } from './types';
 import { 
     INITIAL_FORM_DATA, PRODUCTS, 
     HOUSING_TYPES_1G, HOUSING_TYPES_10G, HOUSING_TYPES_AIR, HOUSING_TYPES_CHINTAI, HOUSING_TYPES_CHINTAI_FREE,
@@ -10,35 +8,24 @@ import {
     EXISTING_LINE_STATUS_OPTIONS, MOBILE_CARRIERS, 
     DISCOUNT_OPTIONS, DISCOUNT_OPTIONS_10G_NEW, ROUTER_OPTIONS,
     PAYMENT_METHOD_OPTIONS, CROSS_PATH_ROUTER_OPTIONS
-} from './constants';
-import { FormInput, FormSelect, FormRadioGroup, FormTextArea, FormDateInput } from './components/FormControls';
-import GeneratedComment from './components/GeneratedComment';
-import OwnerInfo from './components/OwnerInfo';
-import Header from './components/Header';
-import { Toast } from './components/Toast';
-import { Modal } from './components/Modal';
-import ManualModal from './components/ManualModal';
+} from './constants.js';
+import { FormInput, FormSelect, FormRadioGroup, FormTextArea, FormDateInput } from './components/FormControls.jsx';
+import GeneratedComment from './components/GeneratedComment.jsx';
+import OwnerInfo from './components/OwnerInfo.jsx';
+import Header from './components/Header.jsx';
+import { Toast } from './components/Toast.jsx';
+import { Modal } from './components/Modal.jsx';
+import ManualModal from './components/ManualModal.jsx';
 import { ArrowPathIcon } from '@heroicons/react/24/outline';
 
-interface ModalState {
-  isOpen: boolean;
-  title: string;
-  message: string;
-  onConfirm: () => void;
-  onCancel: () => void;
-  confirmText: string;
-  cancelText: string;
-  type?: 'default' | 'warning';
-}
-
-const App: React.FC = () => {
-  const [formData, setFormData] = useState<FormData>(INITIAL_FORM_DATA);
-  const [generatedComment, setGeneratedComment] = useState<string>('');
-  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
-  const [invalidFields, setInvalidFields] = useState<string[]>([]);
-  const resetTimerRef = useRef<number | null>(null);
+const App = () => {
+  const [formData, setFormData] = useState(INITIAL_FORM_DATA);
+  const [generatedComment, setGeneratedComment] = useState('');
+  const [toast, setToast] = useState(null);
+  const [invalidFields, setInvalidFields] = useState([]);
+  const resetTimerRef = useRef(null);
   const [isManualOpen, setIsManualOpen] = useState(false);
-  const [modalState, setModalState] = useState<ModalState>({
+  const [modalState, setModalState] = useState({
     isOpen: false,
     title: '',
     message: '',
@@ -68,7 +55,7 @@ const App: React.FC = () => {
     }
     
     // Determine base options for other products
-    let baseOptions: RadioOption[];
+    let baseOptions;
     if (isChintai) {
         baseOptions = formData.housingType === '10G' ? RACK_OPTIONS_10G : RACK_OPTIONS_1G;
     } else if (is10G) {
@@ -104,7 +91,7 @@ const App: React.FC = () => {
 
   const closeModal = () => setModalState(prev => ({ ...prev, isOpen: false }));
 
-  const showConfirmationModal = useCallback((title: string, message: string, onCancelAction: () => void) => {
+  const showConfirmationModal = useCallback((title, message, onCancelAction) => {
       setModalState({
           isOpen: true,
           title,
@@ -120,13 +107,13 @@ const App: React.FC = () => {
       });
   }, []);
 
-  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleInputChange = useCallback((e) => {
     const { name, type } = e.target;
     
     setInvalidFields(prev => prev.filter(item => item !== name));
 
     if (type === 'checkbox') {
-        const { checked } = e.target as HTMLInputElement;
+        const { checked } = e.target;
         setFormData(prev => ({ ...prev, [name]: checked }));
     } else {
         let { value } = e.target;
@@ -137,7 +124,7 @@ const App: React.FC = () => {
     }
   }, []);
 
-    const handleDateBlur = useCallback((e: React.FocusEvent<HTMLInputElement>) => {
+    const handleDateBlur = useCallback((e) => {
         const { name, value } = e.target;
         if (!value) return;
 
@@ -211,7 +198,7 @@ const App: React.FC = () => {
         }
     }, [showConfirmationModal]);
 
-    const handleNameBlur = useCallback((e: React.FocusEvent<HTMLInputElement>) => {
+    const handleNameBlur = useCallback((e) => {
         const { name, value } = e.target;
         if (!value || !/\d/.test(value)) return;
 
@@ -253,7 +240,7 @@ const App: React.FC = () => {
     } else if (isAir) {
         setFormData(prev => ({ ...prev, serviceFee: '3カ月1485円、2年4950円、3年以降5368円' }));
     } else if (isChintai) {
-        let updates: Partial<FormData> = {};
+        let updates: Partial<typeof INITIAL_FORM_DATA> = {};
         switch (formData.housingType) {
             case 'マンション':
                 updates = { serviceFee: '3960' };
@@ -273,7 +260,7 @@ const App: React.FC = () => {
         }
         setFormData(prev => ({...prev, ...updates}));
     } else if (isChintaiFree) {
-        let updates: Partial<FormData> = {};
+        let updates: Partial<typeof INITIAL_FORM_DATA> = {};
         switch (formData.housingType) {
             case 'マンション':
                 updates = { serviceFee: '初月無料→3960', crossPathRouter: '無料施策プレゼント' };
@@ -300,7 +287,7 @@ const App: React.FC = () => {
     }
   }, [formData.product, formData.housingType, is10G, isAir, isChintai, isChintaiFree]);
 
-  const resetForm = useCallback((message?: string) => {
+  const resetForm = useCallback((message) => {
     if (resetTimerRef.current) {
         clearTimeout(resetTimerRef.current);
         resetTimerRef.current = null;
@@ -323,7 +310,7 @@ const App: React.FC = () => {
   }, []);
   
   useEffect(() => {
-    const formatPhoneNumber = (phone: string): string => {
+    const formatPhoneNumber = (phone) => {
         const digits = phone.replace(/\D/g, '');
         if (digits.length === 11) {
             return `${digits.substring(0, 3)}-${digits.substring(3, 7)}-${digits.substring(7)}`;
@@ -334,7 +321,7 @@ const App: React.FC = () => {
         return phone;
     };
 
-    const formatDateToYYYYMMDD = (dateStr: string): string => {
+    const formatDateToYYYYMMDD = (dateStr) => {
         if (!dateStr) return dateStr;
         const date = new Date(dateStr);
         if (!isNaN(date.getTime()) && date.getFullYear() > 1900) {
@@ -579,7 +566,7 @@ const App: React.FC = () => {
   }, [formData, is10G, isAir, isChintai, isChintaiFree]);
 
   const validateAndCopy = useCallback(() => {
-    let requiredFields: string[] = [];
+    let requiredFields = [];
     
     if (isChintai) {
         requiredFields = [
@@ -613,7 +600,7 @@ const App: React.FC = () => {
             'campaign', 'existingLineStatus', 'mobileCarrier',
         ];
 
-        let specificRequiredFields: string[] = [];
+        let specificRequiredFields = [];
         if (isAir) {
           // No specific fields needed
         } else if (is10G) {
@@ -624,7 +611,7 @@ const App: React.FC = () => {
         requiredFields = [...baseRequiredFields, ...specificRequiredFields];
     }
     
-    const missingFields = requiredFields.filter(field => !formData[field as keyof FormData]);
+    const missingFields = requiredFields.filter(field => !formData[field]);
     
     if (formData.mailingOption === '現住所') {
         if (!formData.currentPostalCode) missingFields.push('currentPostalCode');
@@ -1193,6 +1180,7 @@ const App: React.FC = () => {
                             value={formData.remarks}
                             onChange={handleInputChange}
                             rows={3}
+                            isInvalid={invalidFields.includes('remarks')}
                         />
                     </div>
                     

@@ -1,24 +1,18 @@
-
 import React from 'react';
 import { BookOpenIcon, XMarkIcon } from '@heroicons/react/24/solid';
 
-interface ManualModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
-
-const ManualModal: React.FC<ManualModalProps> = ({ isOpen, onClose }) => {
+const ManualModal = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
-  const SectionTitle: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  const SectionTitle = ({ children }) => (
     <h3 className="text-lg font-bold text-blue-700 mt-4 mb-2 border-b-2 border-blue-200 pb-1">{children}</h3>
   );
 
-  const ListItem: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  const ListItem = ({ children }) => (
     <li className="text-gray-700 mb-1">{children}</li>
   );
   
-  const SubTitle: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  const SubTitle = ({ children }) => (
     <h4 className="font-bold text-gray-800 mt-3 mb-1">{children}</h4>
   );
 

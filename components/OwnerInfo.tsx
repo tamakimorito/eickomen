@@ -1,17 +1,8 @@
-
 import React from 'react';
-import { FormData } from '../types';
-import { FormInput, FormCheckbox } from './FormControls';
+import { FormInput, FormCheckbox } from './FormControls.jsx';
 import { HomeModernIcon } from '@heroicons/react/24/outline';
 
-interface Props {
-  formData: FormData;
-  onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => void;
-  invalidFields: string[];
-  isChintai: boolean;
-}
-
-const OwnerInfo: React.FC<Props> = ({ formData, onChange, invalidFields, isChintai }) => {
+const OwnerInfo = ({ formData, onChange, invalidFields, isChintai }) => {
   return (
     <div className="border-t-2 border-dashed border-blue-300 pt-6 mt-6 space-y-4">
       <h3 className="text-lg font-bold text-blue-700 flex items-center gap-2">
@@ -90,12 +81,16 @@ const OwnerInfo: React.FC<Props> = ({ formData, onChange, invalidFields, isChint
                     name="noDrilling"
                     checked={formData.noDrilling}
                     onChange={onChange}
+                    isInvalid={invalidFields.includes('noDrilling')}
+                    description=""
                 />
                 <FormCheckbox
                     label="図面提出あり"
                     name="drawingSubmission"
                     checked={formData.drawingSubmission}
                     onChange={onChange}
+                    isInvalid={invalidFields.includes('drawingSubmission')}
+                    description=""
                 />
                  {formData.drawingSubmission && (
                     <FormInput

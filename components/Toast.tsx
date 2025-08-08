@@ -1,14 +1,7 @@
-
 import React, { useEffect } from 'react';
 import { CheckCircleIcon, XCircleIcon, XMarkIcon } from '@heroicons/react/24/solid';
 
-interface ToastProps {
-  message: string;
-  type: 'success' | 'error';
-  onClose: () => void;
-}
-
-export const Toast: React.FC<ToastProps> = ({ message, type, onClose }) => {
+export const Toast = ({ message, type, onClose }) => {
   useEffect(() => {
     const timer = setTimeout(() => {
       onClose();

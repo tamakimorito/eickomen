@@ -1,13 +1,7 @@
 import React from 'react';
 import { ClipboardDocumentIcon, PencilSquareIcon } from '@heroicons/react/24/outline';
 
-interface Props {
-  comment: string;
-  onCommentChange: (value: string) => void;
-  onCopy: () => void;
-}
-
-const GeneratedComment: React.FC<Props> = ({ comment, onCommentChange, onCopy }) => {
+const GeneratedComment = ({ comment, onCommentChange, onCopy }) => {
 
   return (
     <div className="bg-white p-6 rounded-2xl shadow-xl border border-gray-200">

@@ -1,23 +1,7 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { CalendarIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
-import type { RadioGroupOption, RadioOption } from '../types';
 
-// Common props for form elements
-export interface BaseProps {
-  label: string;
-  name: string;
-  className?: string;
-  isInvalid?: boolean;
-}
-
-// Props for Input element
-export type InputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'name' | 'value' | 'onChange'> & BaseProps & {
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-};
-
-export const FormInput: React.FC<InputProps> = ({ label, name, value, onChange, className = '', isInvalid, ...props }) => {
+export const FormInput = ({ label, name, value, onChange, className = '', isInvalid, ...props }) => {
     const labelClasses = `block text-sm font-bold mb-1 ${isInvalid ? 'text-red-600' : 'text-gray-700'}`;
     const inputClasses = `block w-full px-3 py-2 bg-white border rounded-lg shadow-sm placeholder-gray-400 focus:outline-none sm:text-sm ${isInvalid ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'}`;
     return (
@@ -35,15 +19,7 @@ export const FormInput: React.FC<InputProps> = ({ label, name, value, onChange, 
     );
 };
 
-// Props for Select element
-type SelectProps = Omit<React.SelectHTMLAttributes<HTMLSelectElement>, 'name' | 'value' | 'onChange'> & BaseProps & {
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
-  options: RadioOption[];
-};
-
-
-export const FormSelect: React.FC<SelectProps> = ({ label, name, value, onChange, options, className = '', isInvalid, ...props }) => {
+export const FormSelect = ({ label, name, value, onChange, options, className = '', isInvalid, ...props }) => {
     const labelClasses = `block text-sm font-bold mb-1 ${isInvalid ? 'text-red-600' : 'text-gray-700'}`;
     const selectClasses = `block w-full px-3 py-2 bg-white border rounded-lg shadow-sm focus:outline-none sm:text-sm ${isInvalid ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'}`;
 
@@ -67,14 +43,7 @@ export const FormSelect: React.FC<SelectProps> = ({ label, name, value, onChange
     );
 };
 
-// Props for Radio Group
-interface RadioGroupProps extends BaseProps {
-    value: string;
-    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    options: RadioGroupOption[];
-}
-
-export const FormRadioGroup: React.FC<RadioGroupProps> = ({ label, name, value, onChange, options, className = '', isInvalid }) => {
+export const FormRadioGroup = ({ label, name, value, onChange, options, className = '', isInvalid }) => {
     const legendClasses = `block text-sm font-bold mb-2 ${isInvalid ? 'text-red-600' : 'text-gray-700'}`;
     return (
         <fieldset className={className}>
@@ -84,7 +53,7 @@ export const FormRadioGroup: React.FC<RadioGroupProps> = ({ label, name, value, 
                     if ('type' in option && option.type === 'break') {
                         return <div key={`break-${index}`} className="basis-full h-0"></div>;
                     }
-                    const radioOption = option as RadioOption;
+                    const radioOption = option;
                     return (
                         <div key={radioOption.value} className="flex items-center">
                             <input
@@ -107,14 +76,7 @@ export const FormRadioGroup: React.FC<RadioGroupProps> = ({ label, name, value, 
     );
 };
 
-
-// Props for TextArea
-type TextAreaProps = Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'name' | 'value' | 'onChange'> & BaseProps & {
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
-};
-
-export const FormTextArea: React.FC<TextAreaProps> = ({ label, name, value, onChange, className = '', isInvalid, ...props }) => {
+export const FormTextArea = ({ label, name, value, onChange, className = '', isInvalid, ...props }) => {
     const labelClasses = `block text-sm font-bold mb-1 ${isInvalid ? 'text-red-600' : 'text-gray-700'}`;
     const textareaClasses = `block w-full px-3 py-2 bg-white border rounded-lg shadow-sm placeholder-gray-400 focus:outline-none sm:text-sm ${isInvalid ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'}`;
 
@@ -133,14 +95,7 @@ export const FormTextArea: React.FC<TextAreaProps> = ({ label, name, value, onCh
     );
 };
 
-// Props for Checkbox
-type CheckboxProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'name' | 'checked' | 'onChange'> & BaseProps & {
-  checked: boolean;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  description?: string;
-};
-
-export const FormCheckbox: React.FC<CheckboxProps> = ({ label, name, checked, onChange, description, className = '', isInvalid, ...props }) => {
+export const FormCheckbox = ({ label, name, checked, onChange, description, className = '', isInvalid, ...props }) => {
     const labelClasses = `font-bold ${isInvalid ? 'text-red-600' : 'text-gray-700'}`;
     return (
         <div className={`relative flex items-start ${className}`}>
@@ -163,10 +118,7 @@ export const FormCheckbox: React.FC<CheckboxProps> = ({ label, name, checked, on
     );
 };
 
-const CalendarPopover: React.FC<{
-  onDateSelect: (date: Date) => void;
-  initialDate: Date | null;
-}> = ({ onDateSelect, initialDate }) => {
+const CalendarPopover = ({ onDateSelect, initialDate }) => {
     const [viewDate, setViewDate] = useState(initialDate || new Date());
     const month = viewDate.getMonth();
     const year = viewDate.getFullYear();
@@ -217,11 +169,11 @@ const CalendarPopover: React.FC<{
     );
 };
 
-export const FormDateInput: React.FC<InputProps & { onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void; }> = ({ label, name, value, onChange, isInvalid, onBlur, className = '', ...props }) => {
+export const FormDateInput = ({ label, name, value, onChange, isInvalid, onBlur, className = '', ...props }) => {
   const [isCalendarOpen, setCalendarOpen] = useState(false);
-  const wrapperRef = useRef<HTMLDivElement>(null);
+  const wrapperRef = useRef(null);
 
-  const handleDateSelect = (date: Date) => {
+  const handleDateSelect = (date) => {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
@@ -229,7 +181,7 @@ export const FormDateInput: React.FC<InputProps & { onBlur?: (e: React.FocusEven
     
     const syntheticEvent = {
         target: { name, value: formattedDate, type: 'text' },
-    } as React.ChangeEvent<HTMLInputElement>;
+    };
     
     onChange(syntheticEvent);
     setCalendarOpen(false);
@@ -238,8 +190,8 @@ export const FormDateInput: React.FC<InputProps & { onBlur?: (e: React.FocusEven
   const selectedDate = value && !isNaN(new Date(value).getTime()) ? new Date(value) : null;
 
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
+    function handleClickOutside(event) {
+      if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
         setCalendarOpen(false);
       }
     }

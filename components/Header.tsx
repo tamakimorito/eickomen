@@ -1,11 +1,7 @@
 import React from 'react';
 import { BellIcon, QuestionMarkCircleIcon } from '@heroicons/react/24/solid';
 
-interface HeaderProps {
-    onManualOpen: () => void;
-}
-
-const Header: React.FC<HeaderProps> = ({ onManualOpen }) => {
+const Header = ({ onManualOpen }) => {
   return (
     <header className="bg-blue-700 shadow-lg sticky top-0 z-20">
       <div className="max-w-7xl mx-auto py-3 px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4 text-white">
