@@ -1,0 +1,118 @@
+
+import React from 'react';
+import { FormData } from '../types';
+import { FormInput, FormCheckbox } from './FormControls';
+import { HomeModernIcon } from '@heroicons/react/24/outline';
+
+interface Props {
+  formData: FormData;
+  onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => void;
+  invalidFields: string[];
+  isChintai: boolean;
+}
+
+const OwnerInfo: React.FC<Props> = ({ formData, onChange, invalidFields, isChintai }) => {
+  return (
+    <div className="border-t-2 border-dashed border-blue-300 pt-6 mt-6 space-y-4">
+      <h3 className="text-lg font-bold text-blue-700 flex items-center gap-2">
+        <HomeModernIcon className="h-6 w-6" />
+        {isChintai ? '管理会社情報' : 'オーナー情報（ファミリープラン用）'}
+      </h3>
+      {isChintai ? (
+        <div className="p-4 bg-blue-50/50 rounded-lg border border-blue-200 space-y-4">
+           <p className="text-sm text-red-600 font-bold">ファミリータイプはオーナー確認①②③必須！</p>
+            <FormInput
+              label="①管理会社名"
+              name="managementCompany"
+              value={formData.managementCompany}
+              onChange={onChange}
+              isInvalid={invalidFields.includes('managementCompany')}
+              required
+            />
+            <FormInput
+              label="②管理連絡先"
+              name="managementContact"
+              value={formData.managementContact}
+              onChange={onChange}
+              isInvalid={invalidFields.includes('managementContact')}
+              required
+            />
+            <FormInput
+              label="③担当者名"
+              name="contactPerson"
+              value={formData.contactPerson}
+              onChange={onChange}
+              isInvalid={invalidFields.includes('contactPerson')}
+              required
+            />
+            <FormInput
+              label="④ビル調査希望"
+              name="buildingSurveyRequest"
+              value={formData.buildingSurveyRequest}
+              onChange={onChange}
+              isInvalid={invalidFields.includes('buildingSurveyRequest')}
+            />
+            <FormInput
+              label="⑤図面提出方法と送付先"
+              name="drawingSubmissionContact"
+              value={formData.drawingSubmissionContact}
+              onChange={onChange}
+              isInvalid={invalidFields.includes('drawingSubmissionContact')}
+            />
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-blue-50/50 rounded-lg border border-blue-200">
+            <FormInput
+              label="管理会社"
+              name="managementCompany"
+              value={formData.managementCompany}
+              onChange={onChange}
+              isInvalid={invalidFields.includes('managementCompany')}
+            />
+            <FormInput
+              label="管理番号"
+              name="managementNumber"
+              value={formData.managementNumber}
+              onChange={onChange}
+              isInvalid={invalidFields.includes('managementNumber')}
+            />
+            <FormInput
+              label="担当者"
+              name="contactPerson"
+              value={formData.contactPerson}
+              onChange={onChange}
+              className="md:col-span-2"
+              isInvalid={invalidFields.includes('contactPerson')}
+            />
+            <div className="md:col-span-2 space-y-4">
+                <FormCheckbox
+                    label="穴あけ・ビス止めNG"
+                    name="noDrilling"
+                    checked={formData.noDrilling}
+                    onChange={onChange}
+                />
+                <FormCheckbox
+                    label="図面提出あり"
+                    name="drawingSubmission"
+                    checked={formData.drawingSubmission}
+                    onChange={onChange}
+                />
+                 {formData.drawingSubmission && (
+                    <FormInput
+                        label="FAX番号または郵送先"
+                        name="drawingSubmissionContact"
+                        value={formData.drawingSubmissionContact}
+                        onChange={onChange}
+                        placeholder="FAX: 03-XXXX-XXXX または 郵送先住所"
+                        required={formData.drawingSubmission}
+                        isInvalid={invalidFields.includes('drawingSubmissionContact')}
+                    />
+                )}
+            </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default OwnerInfo;

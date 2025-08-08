@@ -1,0 +1,1 @@
+// This file has been cleared as requested to remove all spreadsheet-related functionality.
