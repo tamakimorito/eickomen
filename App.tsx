@@ -8,14 +8,14 @@ import {
     EXISTING_LINE_STATUS_OPTIONS, MOBILE_CARRIERS, 
     DISCOUNT_OPTIONS, DISCOUNT_OPTIONS_10G_NEW, ROUTER_OPTIONS,
     PAYMENT_METHOD_OPTIONS, CROSS_PATH_ROUTER_OPTIONS
-} from './constants.js';
-import { FormInput, FormSelect, FormRadioGroup, FormTextArea, FormDateInput } from './components/FormControls.jsx';
-import GeneratedComment from './components/GeneratedComment.jsx';
-import OwnerInfo from './components/OwnerInfo.jsx';
-import Header from './components/Header.jsx';
-import { Toast } from './components/Toast.jsx';
-import { Modal } from './components/Modal.jsx';
-import ManualModal from './components/ManualModal.jsx';
+} from './constants.ts';
+import { FormInput, FormSelect, FormRadioGroup, FormTextArea, FormDateInput } from './components/FormControls.tsx';
+import GeneratedComment from './components/GeneratedComment.tsx';
+import OwnerInfo from './components/OwnerInfo.tsx';
+import Header from './components/Header.tsx';
+import { Toast } from './components/Toast.tsx';
+import { Modal } from './components/Modal.tsx';
+import ManualModal from './components/ManualModal.tsx';
 import { ArrowPathIcon } from '@heroicons/react/24/outline';
 
 const App = () => {

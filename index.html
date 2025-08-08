@@ -14,11 +14,12 @@
     "react/": "https://esm.sh/react@^19.1.0/",
     "react": "https://esm.sh/react@^19.1.0",
     "react-dom/": "https://esm.sh/react-dom@^19.1.0/",
+    "react-dom/client": "https://esm.sh/react-dom@^19.1.0/client",
     "@heroicons/react/": "https://esm.sh/@heroicons/react@^2.2.0/"
   }
 }
 </script>
-<!-- JSXをブラウザで変換するためにBabelを追加 -->
+<!-- JSX/TSXをブラウザで変換するためにBabelを追加 -->
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <style>
   body {
@@ -29,8 +30,8 @@
 </head>
   <body class="bg-blue-50">
     <div id="root"></div>
-    <!-- typeを"module"から"text/babel"に変更 -->
-    <script type="text/babel" src="./index.jsx"></script>
+    <!-- BabelにTSXをモジュールとして処理するように指示 -->
+    <script type="text/babel" data-presets="react,typescript" data-type="module" src="./index.tsx"></script>
   <script type="module" src="/index.tsx"></script>
 </body>
 </html>

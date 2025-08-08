@@ -1,5 +1,5 @@
 import React from 'react';
-import { FormInput, FormCheckbox } from './FormControls.jsx';
+import { FormInput, FormCheckbox } from './FormControls.tsx';
 import { HomeModernIcon } from '@heroicons/react/24/outline';
 
 const OwnerInfo = ({ formData, onChange, invalidFields, isChintai }) => {
