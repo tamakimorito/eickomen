@@ -22,10 +22,12 @@
   }
 }
 </script>
+<link rel="stylesheet" href="/index.css">
 </head>
   <body class="bg-blue-50">
     <div id="root"></div>
     <!-- BabelにTSXをモジュールとして処理するように指示 -->
     <script type="text/babel" data-presets="react,typescript" data-type="module" src="./index.tsx"></script>
-  </body>
+  <script type="module" src="/index.tsx"></script>
+</body>
 </html>
