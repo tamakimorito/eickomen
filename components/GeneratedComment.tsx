@@ -1,5 +1,5 @@
-import React from 'react';
-import { ClipboardDocumentIcon, PencilSquareIcon } from '@heroicons/react/24/outline';
+import React from 'https://esm.sh/react@^19.1.0';
+import { ClipboardDocumentIcon, PencilSquareIcon } from 'https://esm.sh/@heroicons/react@^2.2.0/24/outline';
 
 const GeneratedComment = ({ comment, onCommentChange, onCopy }) => {
 

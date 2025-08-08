@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'https://esm.sh/react@^19.1.0';
 import { 
     INITIAL_FORM_DATA, PRODUCTS, 
     HOUSING_TYPES_1G, HOUSING_TYPES_10G, HOUSING_TYPES_AIR, HOUSING_TYPES_CHINTAI, HOUSING_TYPES_CHINTAI_FREE,
@@ -16,7 +16,7 @@ import Header from './components/Header.tsx';
 import { Toast } from './components/Toast.tsx';
 import { Modal } from './components/Modal.tsx';
 import ManualModal from './components/ManualModal.tsx';
-import { ArrowPathIcon } from '@heroicons/react/24/outline';
+import { ArrowPathIcon } from 'https://esm.sh/@heroicons/react@^2.2.0/24/outline';
 
 const App = () => {
   const [formData, setFormData] = useState(INITIAL_FORM_DATA);

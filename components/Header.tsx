@@ -1,5 +1,5 @@
-import React from 'react';
-import { BellIcon, QuestionMarkCircleIcon } from '@heroicons/react/24/solid';
+import React from 'https://esm.sh/react@^19.1.0';
+import { BellIcon, QuestionMarkCircleIcon } from 'https://esm.sh/@heroicons/react@^2.2.0/24/solid';
 
 const Header = ({ onManualOpen }) => {
   return (

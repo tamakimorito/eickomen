@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { CalendarIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
+import React, { useState, useRef, useEffect } from 'https://esm.sh/react@^19.1.0';
+import { CalendarIcon, ChevronLeftIcon, ChevronRightIcon } from 'https://esm.sh/@heroicons/react@^2.2.0/24/outline';
 
 export const FormInput = ({ label, name, value, onChange, className = '', isInvalid, ...props }) => {
     const labelClasses = `block text-sm font-bold mb-1 ${isInvalid ? 'text-red-600' : 'text-gray-700'}`;

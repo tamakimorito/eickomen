@@ -1,6 +1,6 @@
-import React from 'react';
+import React from 'https://esm.sh/react@^19.1.0';
 import { FormInput, FormCheckbox } from './FormControls.tsx';
-import { HomeModernIcon } from '@heroicons/react/24/outline';
+import { HomeModernIcon } from 'https://esm.sh/@heroicons/react@^2.2.0/24/outline';
 
 const OwnerInfo = ({ formData, onChange, invalidFields, isChintai }) => {
   return (

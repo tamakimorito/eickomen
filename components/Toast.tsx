@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { CheckCircleIcon, XCircleIcon, XMarkIcon } from '@heroicons/react/24/solid';
+import React, { useEffect } from 'https://esm.sh/react@^19.1.0';
+import { CheckCircleIcon, XCircleIcon, XMarkIcon } from 'https://esm.sh/@heroicons/react@^2.2.0/24/solid';
 
 export const Toast = ({ message, type, onClose }) => {
   useEffect(() => {
