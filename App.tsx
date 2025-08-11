@@ -1,30 +1,56 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'https://esm.sh/react@^19.1.0';
-import { 
-    INITIAL_FORM_DATA, PRODUCTS, 
-    HOUSING_TYPES_1G, HOUSING_TYPES_10G, HOUSING_TYPES_AIR, HOUSING_TYPES_CHINTAI, HOUSING_TYPES_CHINTAI_FREE,
-    RACK_OPTIONS_1G, RACK_OPTIONS_10G, RACK_OPTIONS_CHINTAI_FREE_MANSION, RACK_OPTIONS_CHINTAI_FREE_10G,
-    CAMPAIGNS_1G, CAMPAIGNS_10G_NEW, CAMPAIGNS_AIR_NEW,
-    GENDERS, MAILING_OPTIONS, RENTAL_OPTIONS, 
-    EXISTING_LINE_STATUS_OPTIONS, MOBILE_CARRIERS, 
-    DISCOUNT_OPTIONS, DISCOUNT_OPTIONS_10G_NEW, ROUTER_OPTIONS,
-    PAYMENT_METHOD_OPTIONS, CROSS_PATH_ROUTER_OPTIONS
-} from './constants.ts';
-import { FormInput, FormSelect, FormRadioGroup, FormTextArea, FormDateInput } from './components/FormControls.tsx';
+import { INITIAL_FORM_DATA, ELEC_ID_PREFIX_OPTIONS, GAS_ID_PREFIX_OPTIONS, BUG_REPORT_SCRIPT_URL } from './constants.ts';
+import type { FormData } from './types.ts';
+import InternetTab from './components/InternetTab.tsx';
+import ElectricityTab from './components/ElectricityTab.tsx';
+import GasTab from './components/GasTab.tsx';
+import WtsTab from './components/WtsTab.tsx';
 import GeneratedComment from './components/GeneratedComment.tsx';
-import OwnerInfo from './components/OwnerInfo.tsx';
 import Header from './components/Header.tsx';
 import { Toast } from './components/Toast.tsx';
 import { Modal } from './components/Modal.tsx';
 import ManualModal from './components/ManualModal.tsx';
-import { ArrowPathIcon } from 'https://esm.sh/@heroicons/react@^2.2.0/24/outline';
+import BugReportModal from './components/BugReportModal.tsx';
+import { FormInput, FormCheckbox } from './components/FormControls.tsx';
+import { BoltIcon, FireIcon, WifiIcon, CloudIcon, ExclamationTriangleIcon, ChatBubbleBottomCenterTextIcon } from 'https://esm.sh/@heroicons/react@^2.2.0/24/solid';
+import { generateElectricityCommentLogic } from './commentLogic/electricity.ts';
+import { generateGasCommentLogic } from './commentLogic/gas.ts';
+import { generateWtsCommentLogic } from './commentLogic/wts.ts';
+
+const TABS = [
+  { id: 'electricity', label: '電気', icon: BoltIcon },
+  { id: 'gas', label: 'ガス', icon: FireIcon },
+  { id: 'internet', label: 'インターネット', icon: WifiIcon },
+  { id: 'wts', label: 'ウォーターサーバー', icon: CloudIcon },
+];
+
+const Tab = ({ id, label, icon: Icon, activeTab, onTabChange }) => (
+    <button
+        onClick={() => onTabChange(id)}
+        className={`flex items-center gap-2 px-3 sm:px-4 py-3 text-sm sm:text-base font-bold transition-colors duration-200 ease-in-out focus:outline-none -mb-px ${
+            activeTab === id
+            ? 'text-blue-700 border-b-4 border-blue-700'
+            : 'text-gray-500 hover:text-blue-600 border-b-4 border-transparent'
+        }`}
+    >
+        <Icon className="h-5 w-5"/>
+        <span className="hidden sm:inline">{label}</span>
+    </button>
+);
+
 
 const App = () => {
-  const [formData, setFormData] = useState(INITIAL_FORM_DATA);
+  const [activeTab, setActiveTab] = useState('electricity');
+  const [formData, setFormData] = useState<FormData>(INITIAL_FORM_DATA);
   const [generatedComment, setGeneratedComment] = useState('');
   const [toast, setToast] = useState(null);
   const [invalidFields, setInvalidFields] = useState([]);
   const resetTimerRef = useRef(null);
   const [isManualOpen, setIsManualOpen] = useState(false);
+  const [isBugReportOpen, setIsBugReportOpen] = useState(false);
+  const [bugReportText, setBugReportText] = useState('');
+  const [isBugReportTextInvalid, setIsBugReportTextInvalid] = useState(false);
+  const [isSubmittingReport, setIsSubmittingReport] = useState(false);
   const [modalState, setModalState] = useState({
     isOpen: false,
     title: '',
@@ -35,59 +61,6 @@ const App = () => {
     cancelText: 'キャンセル',
     type: 'default',
   });
-
-  const productOptions = useMemo(() => PRODUCTS, []);
-
-  const is10G = formData.product === 'SoftBank光10G';
-  const isAir = formData.product === 'SB Air';
-  const isChintai = formData.product === '賃貸ねっと';
-  const isChintaiFree = formData.product === '賃貸ねっと【無料施策】';
-  const is1G = !is10G && !isAir && !isChintai && !isChintaiFree;
-
-  const housingTypeOptions = isAir ? HOUSING_TYPES_AIR : is10G ? HOUSING_TYPES_10G : isChintai ? HOUSING_TYPES_CHINTAI : isChintaiFree ? HOUSING_TYPES_CHINTAI_FREE : HOUSING_TYPES_1G;
-  
-  const currentRackOptions = useMemo(() => {
-    // Special logic for 賃貸ねっと【無料施策】 should be handled first.
-    if (isChintaiFree) {
-        if (formData.housingType === 'マンション10G') return RACK_OPTIONS_CHINTAI_FREE_10G;
-        if (formData.housingType === 'マンション') return RACK_OPTIONS_CHINTAI_FREE_MANSION;
-        return [];
-    }
-    
-    // Determine base options for other products
-    let baseOptions;
-    if (isChintai) {
-        baseOptions = formData.housingType === '10G' ? RACK_OPTIONS_10G : RACK_OPTIONS_1G;
-    } else if (is10G) {
-        baseOptions = RACK_OPTIONS_10G;
-    } else if (is1G) {
-        baseOptions = RACK_OPTIONS_1G;
-    } else {
-        // For SB Air or any other unhandled case, return empty
-        return [];
-    }
-
-    // Apply filtering for Mansion/Family types
-    const housingType = formData.housingType;
-    const isMansionType = housingType.includes('マンション') || housingType === '10G';
-    const isFamilyType = housingType.includes('ファミリー');
-    
-    if (isMansionType) {
-        return baseOptions.filter(option => option.value !== '無し');
-    }
-    
-    if (isFamilyType) {
-        const noneOption = baseOptions.find(option => option.value === '無し');
-        return noneOption ? [noneOption] : [];
-    }
-
-    // If it's not mansion or family (e.g., housingType is empty), return the full base options.
-    return baseOptions;
-  }, [isChintai, isChintaiFree, is10G, is1G, formData.housingType]);
-
-  const campaignOptions = isAir ? CAMPAIGNS_AIR_NEW : is10G ? CAMPAIGNS_10G_NEW : CAMPAIGNS_1G;
-  const discountOptions = is10G ? DISCOUNT_OPTIONS_10G_NEW : DISCOUNT_OPTIONS;
-
 
   const closeModal = () => setModalState(prev => ({ ...prev, isOpen: false }));
 
@@ -114,23 +87,73 @@ const App = () => {
 
     if (type === 'checkbox') {
         const { checked } = e.target;
-        setFormData(prev => ({ ...prev, [name]: checked }));
-    } else {
-        let { value } = e.target;
-        if (name === 'apName') {
-            value = value.replace(/\s/g, '');
+        
+        if (name === 'isSakaiRoute') {
+            const updates: { [key: string]: any } = {
+                isSakaiRoute: checked,
+                recordId: '',
+                customerId: '', // レコードIDと顧客IDは同じ意味なので両方クリア
+            };
+            if (checked) {
+                if (activeTab === 'electricity') updates.elecRecordIdPrefix = 'サカイ';
+                else if (activeTab === 'gas') updates.gasRecordIdPrefix = 'サカイ';
+            } else {
+                if (activeTab === 'electricity') updates.elecRecordIdPrefix = 'それ以外';
+                else if (activeTab === 'gas') updates.gasRecordIdPrefix = 'それ以外';
+            }
+            setFormData(prev => ({ ...prev, ...updates }));
+            return;
         }
-        setFormData(prev => ({ ...prev, [name]: value }));
-    }
-  }, []);
 
+        setFormData(prev => ({ ...prev, [name]: checked }));
+        return;
+    }
+    
+    let { value } = e.target;
+    if (name === 'apName') {
+        value = value.replace(/\s/g, '');
+    }
+    
+    const updates: { [key: string]: any } = { [name]: value };
+
+    if (name === 'recordId' && !formData.isSakaiRoute) {
+        let prefix = 'それ以外'; // Default
+
+        if (value.startsWith('STJP:')) {
+            prefix = 'STJP:';
+        } else if (value.startsWith('SR')) {
+            prefix = 'SR';
+        } else if (value.startsWith('code:')) {
+            prefix = 'code:';
+        } else if (value.startsWith('ID:')) {
+            prefix = 'ID:';
+        } else if (value.startsWith('S')) {
+            prefix = 'S';
+        }
+
+        if (activeTab === 'electricity') {
+            if (ELEC_ID_PREFIX_OPTIONS.some(opt => opt.value === prefix)) {
+                updates.elecRecordIdPrefix = prefix;
+            }
+        } else if (activeTab === 'gas') {
+             if (GAS_ID_PREFIX_OPTIONS.some(opt => opt.value === prefix)) {
+                updates.gasRecordIdPrefix = prefix;
+            }
+        }
+    }
+
+    setFormData(prev => ({ ...prev, ...updates }));
+  }, [activeTab, formData.isSakaiRoute]);
+  
     const handleDateBlur = useCallback((e) => {
         const { name, value } = e.target;
         if (!value) return;
 
         let processedValue = value;
+        const targetDate = new Date(value);
 
-        if (name === 'moveInDate') {
+        // If it's not a valid date, maybe it's M/D format
+        if (isNaN(targetDate.getTime())) {
             const match = value.match(/^(?<month>\d{1,2})\/(?<day>\d{1,2})$/);
             if (match?.groups) {
                 const { month, day } = match.groups;
@@ -158,7 +181,7 @@ const App = () => {
                     const finalDay = String(bestDate.getDate()).padStart(2, '0');
                     
                     processedValue = `${finalYear}/${finalMonth}/${finalDay}`;
-                    setFormData(prev => ({...prev, moveInDate: processedValue}));
+                    setFormData(prev => ({...prev, [name]: processedValue}));
                 }
             }
         }
@@ -185,14 +208,14 @@ const App = () => {
                     () => { setFormData(prev => ({ ...prev, dob: '' })); }
                 );
             }
-        } else if (name === 'moveInDate') {
+        } else if (['moveInDate', 'gasOpeningDate'].includes(name)) {
             const fiveYearsAgo = new Date(today.getFullYear() - 5, today.getMonth(), today.getDate());
 
             if (date < fiveYearsAgo) {
                  showConfirmationModal(
                     '日付の確認',
-                    '入居予定日が5年以上前の日付に設定されています。よろしいですか？',
-                    () => { setFormData(prev => ({ ...prev, moveInDate: '' })); }
+                    '利用開始日/開栓日が5年以上前の日付に設定されています。よろしいですか？',
+                    () => { setFormData(prev => ({ ...prev, [name]: '' })); }
                 );
             }
         }
@@ -214,92 +237,31 @@ const App = () => {
         }
     }, [showConfirmationModal]);
 
-  useEffect(() => {
-    setFormData(prev => ({
-        ...prev,
-        housingType: '',
-        rackType: '',
-        campaign: '',
-        serviceFee: '',
-        homeDiscount: '',
-        crossPathRouter: '',
-    }));
-  }, [formData.product]);
-  
-  useEffect(() => {
-    // When housingType changes, the rack options might change.
-    // If the currently selected rackType is no longer in the list of valid options, reset it.
-    if (formData.rackType && !currentRackOptions.some(opt => opt.value === formData.rackType)) {
-        setFormData(prev => ({ ...prev, rackType: '' }));
-    }
-  }, [formData.housingType, currentRackOptions, formData.rackType]);
-
-  useEffect(() => {
-    if (is10G) {
-        setFormData(prev => ({ ...prev, serviceFee: '3カ月0円→6930円' }));
-    } else if (isAir) {
-        setFormData(prev => ({ ...prev, serviceFee: '3カ月1485円、2年4950円、3年以降5368円' }));
-    } else if (isChintai) {
-        let updates: Partial<typeof INITIAL_FORM_DATA> = {};
-        switch (formData.housingType) {
-            case 'マンション':
-                updates = { serviceFee: '3960' };
-                break;
-            case 'ファミリー':
-                updates = { serviceFee: '5060' };
-                break;
-            case '10G':
-                updates = { serviceFee: '6160', crossPathRouter: '10Gレンタル' };
-                break;
-            default:
-                updates = { serviceFee: '', crossPathRouter: '' };
-                break;
-        }
-        if (formData.housingType !== '10G' && formData.crossPathRouter === '10Gレンタル') {
-            updates.crossPathRouter = '';
-        }
-        setFormData(prev => ({...prev, ...updates}));
-    } else if (isChintaiFree) {
-        let updates: Partial<typeof INITIAL_FORM_DATA> = {};
-        switch (formData.housingType) {
-            case 'マンション':
-                updates = { serviceFee: '初月無料→3960', crossPathRouter: '無料施策プレゼント' };
-                if (formData.rackType === '光配線クロス') {
-                    updates.rackType = '';
-                }
-                break;
-            case 'マンション10G':
-                updates = { serviceFee: '初月無料→6160', crossPathRouter: '10Gレンタル', rackType: '光配線クロス' };
-                break;
-            default:
-                 updates = { serviceFee: '', crossPathRouter: '', rackType: '' };
-                 break;
-        }
-        setFormData(prev => ({...prev, ...updates}));
-    } else { // 1G
-        if (formData.housingType === 'マンション') {
-            setFormData(prev => ({ ...prev, serviceFee: '4180' }));
-        } else if (formData.housingType === 'ファミリー') {
-            setFormData(prev => ({ ...prev, serviceFee: '5720' }));
-        } else {
-            setFormData(prev => ({ ...prev, serviceFee: '' }));
-        }
-    }
-  }, [formData.product, formData.housingType, is10G, isAir, isChintai, isChintaiFree]);
-
   const resetForm = useCallback((message) => {
     if (resetTimerRef.current) {
         clearTimeout(resetTimerRef.current);
         resetTimerRef.current = null;
     }
     const currentProduct = formData.product;
-    setFormData({...INITIAL_FORM_DATA, product: currentProduct});
+    const currentApName = formData.apName;
+    const currentIsSakaiRoute = formData.isSakaiRoute;
+    
+    // Keep apName and isSakaiRoute, reset everything else
+    setFormData({
+        ...INITIAL_FORM_DATA, 
+        product: currentProduct, 
+        apName: currentApName,
+        isSakaiRoute: currentIsSakaiRoute,
+        elecRecordIdPrefix: currentIsSakaiRoute ? 'サカイ' : 'それ以外',
+        gasRecordIdPrefix: currentIsSakaiRoute ? 'サカイ' : 'それ以外',
+    });
+
     setGeneratedComment('');
     setInvalidFields([]);
     if (message) {
       setToast({ message, type: 'success' });
     }
-  }, [formData.product]);
+  }, [formData.product, formData.apName, formData.isSakaiRoute]);
 
   useEffect(() => {
     return () => {
@@ -308,366 +270,456 @@ const App = () => {
         }
     };
   }, []);
+
+  const formatDateToYYYYMMDD = (dateStr) => {
+    if (!dateStr) return dateStr;
+    const date = new Date(dateStr);
+    if (!isNaN(date.getTime()) && date.getFullYear() > 1900) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}/${month}/${day}`;
+    }
+    return dateStr;
+  };
   
-  useEffect(() => {
-    const formatPhoneNumber = (phone) => {
-        const digits = phone.replace(/\D/g, '');
-        if (digits.length === 11) {
-            return `${digits.substring(0, 3)}-${digits.substring(3, 7)}-${digits.substring(7)}`;
+    const generateInternetComment = useCallback(() => {
+        const is10G = formData.product === 'SoftBank光10G';
+        const isAir = formData.product === 'SB Air';
+        const isChintai = formData.product === '賃貸ねっと';
+        const isChintaiFree = formData.product === '賃貸ねっと【無料施策】';
+
+        const {
+            product, customerId, housingType, apName, greeting,
+            rackType, contractorName, contractorNameKana, gender, dob, phone,
+            postalCode, address, buildingInfo, moveInDate, mailingOption,
+            currentPostalCode, currentAddress, serviceFee, campaign, preActivationRental,
+            existingLineStatus, existingLineCompany, mobileCarrier, homeDiscount, wifiRouter, remarks,
+            managementCompany, managementContact, contactPerson, noDrilling,
+            email, paymentMethod, bankName, crossPathRouter, buildingSurveyRequest, drawingSubmissionContact
+        } = formData;
+
+        const formatPhoneNumber = (phone) => {
+            const digits = phone.replace(/\D/g, '');
+            if (digits.length === 11) {
+                return `${digits.substring(0, 3)}-${digits.substring(3, 7)}-${digits.substring(7)}`;
+            }
+            if (digits.length === 10) {
+                return `${digits.substring(0, 3)}-${digits.substring(3, 6)}-${digits.substring(6)}`;
+            }
+            return phone;
+        };
+
+        if (isChintaiFree) {
+            const header = '【ちんむりょ賃貸ねっと無料施策】250808';
+            let comment = `${header}\n`;
+            comment += `タイプ：${housingType || ''}\n`;
+            comment += `AP名：${apName || ''}\n`;
+            comment += `顧客ID：${customerId || ''}\n`;
+            comment += `名乗り：${greeting || ''}\n`;
+            comment += `ラック：${rackType || ''}\n`;
+            comment += `メアド：${email || ''}\n`;
+            comment += `契約者名義（漢字）：${contractorName || ''}\n`;
+            comment += `契約者名義（フリガナ）：${contractorNameKana || ''}\n`;
+            comment += `生年月日(西暦)：${formatDateToYYYYMMDD(dob) || ''}\n`;
+            comment += `電話番号(ハイフン無し)：${(phone || '').replace(/\D/g, '')}\n`;
+            comment += `➤設置先\n`;
+            comment += `郵便番号(〒・ハイフン無し)：${(postalCode || '').replace(/-/g, '')}\n`;
+            comment += `住所：${address || ''}\n`;
+            comment += `物件名＋部屋番号：${buildingInfo || ''}\n`;
+            comment += `利用開始日(必ず引っ越し日を記載)：${formatDateToYYYYMMDD(moveInDate) || ''}\n`;
+            let mailingOptionText = mailingOption;
+            if (mailingOption === '新居') {
+                mailingOptionText = '新居(設置先と同じ)';
+            }
+            comment += `■書面発送先：${mailingOptionText || ''}\n`;
+            if (mailingOption === '現住所') {
+                comment += `現住所の場合郵便番号(〒・ハイフン無し)：${(currentPostalCode || '').replace(/-/g, '')}\n`;
+                comment += `住所・物件名・部屋番号：${currentAddress || ''}\n`;
+            }
+            comment += `案内料金：${serviceFee || ''}\n`;
+            let paymentInfo = paymentMethod;
+            if (paymentMethod === '口座' && bankName) {
+                paymentInfo = `口座（銀行名：${bankName}）※外国人は口座NG`;
+            } else if (paymentMethod === '口座') {
+                paymentInfo = `口座 ※外国人は口座NG`;
+            }
+            comment += `支払方法：${paymentInfo || ''}\n`;
+            comment += `クロスパス無線ルーター：${crossPathRouter || ''}\n`;
+            comment += `備考：${remarks || ''}\n`;
+            setGeneratedComment(comment);
+            return;
         }
-        if (digits.length === 10) {
-            return `${digits.substring(0, 3)}-${digits.substring(3, 6)}-${digits.substring(6)}`;
-        }
-        return phone;
-    };
-
-    const formatDateToYYYYMMDD = (dateStr) => {
-        if (!dateStr) return dateStr;
-        const date = new Date(dateStr);
-        if (!isNaN(date.getTime()) && date.getFullYear() > 1900) {
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const day = String(date.getDate()).padStart(2, '0');
-            return `${year}/${month}/${day}`;
-        }
-        return dateStr;
-    };
-      
-    const generateComment = () => {
-      const {
-        product, customerId, housingType, apName, greeting,
-        rackType, contractorName, contractorNameKana, gender, dob, phone,
-        postalCode, address, buildingInfo, moveInDate, mailingOption,
-        currentPostalCode, currentAddress, serviceFee, campaign, preActivationRental,
-        existingLineStatus, existingLineCompany, mobileCarrier, homeDiscount, wifiRouter, remarks,
-        managementCompany, managementContact, contactPerson, noDrilling,
-        email, paymentMethod, bankName, crossPathRouter, buildingSurveyRequest, drawingSubmissionContact
-      } = formData;
-
-      if (isChintaiFree) {
-          const header = '【ちんむりょ賃貸ねっと無料施策】250808';
-          let comment = `${header}\n`;
-          comment += `タイプ：${housingType || ''}\n`;
-          comment += `AP名：${apName || ''}\n`;
-          comment += `顧客ID：${customerId || ''}\n`;
-          comment += `名乗り：${greeting || ''}\n`;
-          comment += `ラック：${rackType || ''}\n`;
-          comment += `メアド：${email || ''}\n`;
-          comment += `契約者名義（漢字）：${contractorName || ''}\n`;
-          comment += `契約者名義（フリガナ）：${contractorNameKana || ''}\n`;
-          comment += `生年月日(西暦)：${formatDateToYYYYMMDD(dob) || ''}\n`;
-          comment += `電話番号(ハイフン無し)：${(phone || '').replace(/\D/g, '')}\n`;
-          comment += `➤設置先\n`;
-          comment += `郵便番号(〒・ハイフン無し)：${(postalCode || '').replace(/-/g, '')}\n`;
-          comment += `住所：${address || ''}\n`;
-          comment += `物件名＋部屋番号：${buildingInfo || ''}\n`;
-          comment += `利用開始日(必ず引っ越し日を記載)：${formatDateToYYYYMMDD(moveInDate) || ''}\n`;
-           let mailingOptionText = mailingOption;
-          if (mailingOption === '新居') {
-              mailingOptionText = '新居(設置先と同じ)';
-          }
-          comment += `■書面発送先：${mailingOptionText || ''}\n`;
-
-          if (mailingOption === '現住所') {
-              comment += `現住所の場合郵便番号(〒・ハイフン無し)：${(currentPostalCode || '').replace(/-/g, '')}\n`;
-              comment += `住所・物件名・部屋番号：${currentAddress || ''}\n`;
-          }
-          comment += `案内料金：${serviceFee || ''}\n`;
-          let paymentInfo = paymentMethod;
-          if (paymentMethod === '口座' && bankName) {
-              paymentInfo = `口座（銀行名：${bankName}）※外国人は口座NG`;
-          } else if (paymentMethod === '口座') {
-              paymentInfo = `口座 ※外国人は口座NG`;
-          }
-          comment += `支払方法：${paymentInfo || ''}\n`;
-          comment += `クロスパス無線ルーター：${crossPathRouter || ''}\n`;
-          comment += `備考：${remarks || ''}\n`;
-
-          setGeneratedComment(comment);
-          return;
-      }
-      
-      if (isChintai) {
-          const header = '【賃貸ねっと】250808';
-          let comment = `${header}\n`;
-          comment += `タイプ：${housingType || ''}\n`;
-          comment += `AP名：${apName || ''}\n`;
-          comment += `顧客ID：${customerId || ''}\n`;
-          comment += `名乗り：${greeting || ''}\n`;
-          let zenigameInfo = existingLineStatus;
-          if (existingLineStatus === 'あり' && existingLineCompany) {
-              zenigameInfo = `あり（現状回線：${existingLineCompany}）`;
-          }
-          comment += `ゼニガメ：${zenigameInfo || ''}\n`;
-          comment += `ラック：${rackType || ''}\n`;
-          comment += `メアド：${email || ''}\n`;
-          comment += `契約者名義（漢字）：${contractorName || ''}\n`;
-          comment += `契約者名義（フリガナ）：${contractorNameKana || ''}\n`;
-          comment += `生年月日(西暦)：${formatDateToYYYYMMDD(dob) || ''}\n`;
-          comment += `電話番号(ハイフン無し)：${(phone || '').replace(/\D/g, '')}\n`;
-          comment += `➤設置先\n`;
-          comment += `郵便番号(〒・ハイフン無し)：${(postalCode || '').replace(/-/g, '')}\n`;
-          comment += `住所：${address || ''}\n`;
-          comment += `物件名＋部屋番号：${buildingInfo || ''}\n`;
-          comment += `利用開始日(必ず引っ越し日を記載)：${formatDateToYYYYMMDD(moveInDate) || ''}\n`;
-           let mailingOptionText = mailingOption;
-          if (mailingOption === '新居') {
-              mailingOptionText = '新居(設置先と同じ)';
-          }
-          comment += `■書面発送先：${mailingOptionText || ''}\n`;
-
-          if (mailingOption === '現住所') {
-              comment += `現住所の場合郵便番号(〒・ハイフン無し)：${(currentPostalCode || '').replace(/-/g, '')}\n`;
-              comment += `住所・物件名・部屋番号：${currentAddress || ''}\n`;
-          }
-          comment += `案内料金：${serviceFee || ''}\n`;
-          let paymentInfo = paymentMethod;
-          if (paymentMethod === '口座' && bankName) {
-              paymentInfo = `口座（銀行名：${bankName}）※外国人は口座NG`;
-          } else if (paymentMethod === '口座') {
-              paymentInfo = `口座 ※外国人は口座NG`;
-          }
-          comment += `支払方法：${paymentInfo || ''}\n`;
-          comment += `クロスパス無線ルーター：${crossPathRouter || ''}\n`;
-          comment += `備考：${remarks || ''}\n`;
-          
-          if (housingType === 'ファミリー') {
-            comment += "\nファミリータイプはオーナー確認①②③必須！\n";
-            comment += "図面提出ある場合は④を「有」にして⑤を記載\n\n";
-            comment += "管理会社情報\n";
-            comment += `①管理会社名：${managementCompany || ''}\n`;
-            comment += `②管理連絡先：${managementContact || ''}\n`;
-            comment += `③担当者名：${contactPerson || ''}\n`;
-            comment += `④ビル調査希望：${buildingSurveyRequest || '無'}\n`;
-            comment += `⑤図面提出方法と送付先：${drawingSubmissionContact || '無'}\n`;
-          }
-
-          setGeneratedComment(comment);
-          return;
-      }
-
-      if (isAir) {
-          const header = '〓SB Air〓250808';
-          let comment = `${header}\n`;
-          comment += `タイプ：${housingType || ''}\n`;
-          comment += `AP名：${apName || ''}\n`;
-          comment += `顧客ID：${customerId || ''}\n`;
-          comment += `名乗り（SMS届くので正確に）：${greeting || ''}\n`;
-          comment += `契約者名義（漢字）：${contractorName || ''}\n`;
-          comment += `契約者名義（フリガナ）：${contractorNameKana || ''}\n`;
-          comment += `性別：${gender || ''}\n`;
-          comment += `生年月日(西暦)：${formatDateToYYYYMMDD(dob) || ''}\n`;
-          comment += `電話番号(ハイフンあり)：${formatPhoneNumber(phone) || ''}\n`;
-          comment += `➤設置先\n`;
-          comment += `郵便番号(〒・ハイフン無し)：${(postalCode || '').replace(/-/g, '')}\n`;
-          comment += `住所：${address || ''}\n`;
-          comment += `物件名＋部屋番号：${buildingInfo || ''}\n`;
-          comment += `入居予定日：${formatDateToYYYYMMDD(moveInDate) || ''}\n`;
-
-          let mailingOptionText = mailingOption;
-          if (mailingOption === '新居') {
-              mailingOptionText = '新居(設置先と同じ)';
-          }
-          comment += `■書面発送先：${mailingOptionText || ''}\n`;
-
-          if (mailingOption === '現住所') {
-              comment += `現住所の場合郵便番号(〒・ハイフン無し)：${(currentPostalCode || '').replace(/-/g, '')}\n`;
-              comment += `住所・物件名・部屋番号：${currentAddress || ''}\n`;
-          }
-
-          comment += `案内料金：${serviceFee || ''}\n`;
-          comment += `ＣＰ：${campaign || ''}\n`;
-          
-          let existingLineInfo = existingLineStatus;
-          if (existingLineStatus === 'あり' && existingLineCompany) {
-              existingLineInfo = `あり（回線会社：${existingLineCompany}）`;
-          }
-          comment += `既存回線：${existingLineInfo || ''}\n`;
-
-          comment += `携帯キャリア：${mobileCarrier || ''}\n`;
-          comment += `備考：${remarks || ''}\n`;
-          
-          setGeneratedComment(comment);
-          return;
-      }
-      
-      const isFamily = housingType.includes('ファミリー');
-
-      const header = is10G ? '〓SoftBank光10ギガ〓250808' : `〓${product}〓250808`;
-      let comment = `${header}\n`;
-      comment += `タイプ：${housingType || ''}\n`;
-      comment += `AP名：${apName || ''}\n`;
-      comment += `顧客ID：${customerId || ''}\n`;
-      comment += `名乗り（SMS届くので正確に）：${greeting || ''}\n`;
-      comment += `ラック：${rackType || ''}\n`;
-      comment += `契約者名義（漢字）：${contractorName || ''}\n`;
-      comment += `契約者名義（フリガナ）：${contractorNameKana || ''}\n`;
-      comment += `性別：${gender || ''}\n`;
-      comment += `生年月日(西暦)：${formatDateToYYYYMMDD(dob) || ''}\n`;
-      comment += `電話番号(ハイフンあり)：${formatPhoneNumber(phone) || ''}\n`;
-      comment += `➤設置先\n`;
-      comment += `郵便番号(〒・ハイフン無し)：${(postalCode || '').replace(/-/g, '')}\n`;
-      comment += `住所：${address || ''}\n`;
-      comment += `物件名＋部屋番号：${buildingInfo || ''}\n`;
-      comment += `入居予定日：${formatDateToYYYYMMDD(moveInDate) || ''}\n`;
-      
-      let mailingOptionText = mailingOption;
-      if (mailingOption === '新居') {
-          mailingOptionText = '新居(設置先と同じ)';
-      }
-      comment += `■書面発送先：${mailingOptionText || ''}\n`;
-
-      if (mailingOption === '現住所') {
-        comment += `現住所の場合郵便番号(〒・ハイフン無し)：${(currentPostalCode || '').replace(/-/g, '')}\n`;
-        comment += `住所・物件名・部屋番号：${currentAddress || ''}\n`;
-      }
-      
-      comment += is10G 
-        ? `案内料金：3カ月0円→6930円\n`
-        : `案内料金：${serviceFee || ''}\n`;
         
-      comment += is10G
-        ? `ＣＰ：${campaign === '10ギガめちゃトク割+あんしん乗り換え' ? '10ギガめちゃトク割／＋あんしん乗り換え' : campaign || ''}\n`
-        : `ＣＰ：${campaign || ''}\n`;
-        
-      comment += `開通前レンタル：${preActivationRental || ''}\n`;
-      
-      let existingLineInfo = existingLineStatus;
-      if (existingLineStatus === 'あり' && existingLineCompany) {
-        existingLineInfo = `あり（回線会社：${existingLineCompany}）`;
-      }
-      comment += `既存回線：${existingLineInfo || ''}\n`;
-
-      comment += `携帯キャリア：${mobileCarrier || ''}\n`;
-      
-      comment += is10G
-        ? `おうち割：${homeDiscount === 'あり▲インポート注意!!!▲' ? 'あり▲インポート注意!!!▲' : '無し'}\n`
-        : `おうち割：${homeDiscount || ''}\n`;
-        
-      if (!is10G) {
-        comment += `無線ルーター購入：${wifiRouter || ''}\n`;
-      }
-      comment += `備考：${remarks || ''}\n`;
-
-      if (isFamily) {
-        comment += "\nオーナー情報\n";
-        comment += `・管理会社：${managementCompany || ''}\n`;
-        comment += `・管理番号：${formData.managementNumber || ''}\n`;
-        comment += `・担当者：${contactPerson || ''}\n`;
-        if (noDrilling) {
-          comment += `穴あけ・ビス止めNG\n`;
+        if (isChintai) {
+            const header = '【賃貸ねっと】250808';
+            let comment = `${header}\n`;
+            comment += `タイプ：${housingType || ''}\n`;
+            comment += `AP名：${apName || ''}\n`;
+            comment += `顧客ID：${customerId || ''}\n`;
+            comment += `名乗り：${greeting || ''}\n`;
+            let zenigameInfo = existingLineStatus;
+            if (existingLineStatus === 'あり' && existingLineCompany) {
+                zenigameInfo = `あり（現状回線：${existingLineCompany}）`;
+            }
+            comment += `ゼニガメ：${zenigameInfo || ''}\n`;
+            comment += `ラック：${rackType || ''}\n`;
+            comment += `メアド：${email || ''}\n`;
+            comment += `契約者名義（漢字）：${contractorName || ''}\n`;
+            comment += `契約者名義（フリガナ）：${contractorNameKana || ''}\n`;
+            comment += `生年月日(西暦)：${formatDateToYYYYMMDD(dob) || ''}\n`;
+            comment += `電話番号(ハイフン無し)：${(phone || '').replace(/\D/g, '')}\n`;
+            comment += `➤設置先\n`;
+            comment += `郵便番号(〒・ハイフン無し)：${(postalCode || '').replace(/-/g, '')}\n`;
+            comment += `住所：${address || ''}\n`;
+            comment += `物件名＋部屋番号：${buildingInfo || ''}\n`;
+            comment += `利用開始日(必ず引っ越し日を記載)：${formatDateToYYYYMMDD(moveInDate) || ''}\n`;
+            let mailingOptionText = mailingOption;
+            if (mailingOption === '新居') {
+                mailingOptionText = '新居(設置先と同じ)';
+            }
+            comment += `■書面発送先：${mailingOptionText || ''}\n`;
+            if (mailingOption === '現住所') {
+                comment += `現住所の場合郵便番号(〒・ハイフン無し)：${(currentPostalCode || '').replace(/-/g, '')}\n`;
+                comment += `住所・物件名・部屋番号：${currentAddress || ''}\n`;
+            }
+            comment += `案内料金：${serviceFee || ''}\n`;
+            let paymentInfo = paymentMethod;
+            if (paymentMethod === '口座' && bankName) {
+                paymentInfo = `口座（銀行名：${bankName}）※外国人は口座NG`;
+            } else if (paymentMethod === '口座') {
+                paymentInfo = `口座 ※外国人は口座NG`;
+            }
+            comment += `支払方法：${paymentInfo || ''}\n`;
+            comment += `クロスパス無線ルーター：${crossPathRouter || ''}\n`;
+            comment += `備考：${remarks || ''}\n`;
+            if (housingType === 'ファミリー') {
+              comment += "\nファミリータイプはオーナー確認①②③必須！\n";
+              comment += "図面提出ある場合は④を「有」にして⑤を記載\n\n";
+              comment += "管理会社情報\n";
+              comment += `①管理会社名：${managementCompany || ''}\n`;
+              comment += `②管理連絡先：${managementContact || ''}\n`;
+              comment += `③担当者名：${contactPerson || ''}\n`;
+              comment += `④ビル調査希望：${buildingSurveyRequest || '無'}\n`;
+              comment += `⑤図面提出方法と送付先：${drawingSubmissionContact || '無'}\n`;
+            }
+            setGeneratedComment(comment);
+            return;
         }
-      }
-      
-      setGeneratedComment(comment);
-    };
 
-    generateComment();
-  }, [formData, is10G, isAir, isChintai, isChintaiFree]);
-
-  const validateAndCopy = useCallback(() => {
-    let requiredFields = [];
-    
-    if (isChintai) {
-        requiredFields = [
-            'housingType', 'apName', 'customerId', 'greeting', 'existingLineStatus',
-            'rackType', 'email', 'contractorName', 'contractorNameKana', 'dob', 'phone',
-            'postalCode', 'address', 'buildingInfo', 'moveInDate', 'mailingOption',
-            'serviceFee', 'paymentMethod', 'crossPathRouter'
-        ];
-        if (formData.paymentMethod === '口座' && !formData.bankName) {
-            requiredFields.push('bankName');
-        }
-        if (formData.housingType === 'ファミリー') {
-            if (!formData.managementCompany) requiredFields.push('managementCompany');
-            if (!formData.managementContact) requiredFields.push('managementContact');
-            if (!formData.contactPerson) requiredFields.push('contactPerson');
-        }
-    } else if (isChintaiFree) {
-        requiredFields = [
-            'housingType', 'apName', 'customerId', 'greeting', 'rackType', 'email', 'contractorName',
-            'contractorNameKana', 'dob', 'phone', 'postalCode', 'address', 'buildingInfo', 'moveInDate',
-            'mailingOption', 'serviceFee', 'paymentMethod', 'crossPathRouter'
-        ];
-        if (formData.paymentMethod === '口座' && !formData.bankName) {
-            requiredFields.push('bankName');
-        }
-    } else {
-        const baseRequiredFields = [
-            'housingType', 'apName', 'customerId', 'greeting', 'contractorName',
-            'contractorNameKana', 'gender', 'dob', 'phone', 'postalCode',
-            'address', 'buildingInfo', 'moveInDate', 'mailingOption',
-            'campaign', 'existingLineStatus', 'mobileCarrier',
-        ];
-
-        let specificRequiredFields = [];
         if (isAir) {
-          // No specific fields needed
-        } else if (is10G) {
-            specificRequiredFields = ['rackType', 'preActivationRental', 'homeDiscount'];
-        } else { // 1G
-            specificRequiredFields = ['rackType', 'preActivationRental', 'homeDiscount', 'wifiRouter', 'serviceFee'];
+            const header = '〓SB Air〓250808';
+            let comment = `${header}\n`;
+            comment += `タイプ：${housingType || ''}\n`;
+            comment += `AP名：${apName || ''}\n`;
+            comment += `顧客ID：${customerId || ''}\n`;
+            comment += `名乗り（SMS届くので正確に）：${greeting || ''}\n`;
+            comment += `契約者名義（漢字）：${contractorName || ''}\n`;
+            comment += `契約者名義（フリガナ）：${contractorNameKana || ''}\n`;
+            comment += `性別：${gender || ''}\n`;
+            comment += `生年月日(西暦)：${formatDateToYYYYMMDD(dob) || ''}\n`;
+            comment += `電話番号(ハイフンあり)：${formatPhoneNumber(phone) || ''}\n`;
+            comment += `➤設置先\n`;
+            comment += `郵便番号(〒・ハイフン無し)：${(postalCode || '').replace(/-/g, '')}\n`;
+            comment += `住所：${address || ''}\n`;
+            comment += `物件名＋部屋番号：${buildingInfo || ''}\n`;
+            comment += `入居予定日：${formatDateToYYYYMMDD(moveInDate) || ''}\n`;
+            let mailingOptionText = mailingOption;
+            if (mailingOption === '新居') {
+                mailingOptionText = '新居(設置先と同じ)';
+            }
+            comment += `■書面発送先：${mailingOptionText || ''}\n`;
+            if (mailingOption === '現住所') {
+                comment += `現住所の場合郵便番号(〒・ハイフン無し)：${(currentPostalCode || '').replace(/-/g, '')}\n`;
+                comment += `住所・物件名・部屋番号：${currentAddress || ''}\n`;
+            }
+            comment += `案内料金：${serviceFee || ''}\n`;
+            comment += `ＣＰ：${campaign || ''}\n`;
+            let existingLineInfo = existingLineStatus;
+            if (existingLineStatus === 'あり' && existingLineCompany) {
+                existingLineInfo = `あり（回線会社：${existingLineCompany}）`;
+            }
+            comment += `既存回線：${existingLineInfo || ''}\n`;
+            comment += `携帯キャリア：${mobileCarrier || ''}\n`;
+            comment += `備考：${remarks || ''}\n`;
+            setGeneratedComment(comment);
+            return;
         }
-        requiredFields = [...baseRequiredFields, ...specificRequiredFields];
-    }
-    
-    const missingFields = requiredFields.filter(field => !formData[field]);
-    
-    if (formData.mailingOption === '現住所') {
-        if (!formData.currentPostalCode) missingFields.push('currentPostalCode');
-        if (!formData.currentAddress) missingFields.push('currentAddress');
-    }
-
-    if (!isChintaiFree && formData.existingLineStatus === 'あり') {
-        if (!formData.existingLineCompany) missingFields.push('existingLineCompany');
-    }
-
-    setInvalidFields(missingFields);
-    
-    if (missingFields.length > 0) {
-        setToast({ message: '未入力の必須項目があります。', type: 'error' });
-        document.querySelector('.border-red-500, .text-red-600')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        return;
-    }
-
-    navigator.clipboard.writeText(generatedComment).then(() => {
-        setToast({ message: 'コピーしました！10分後にフォームがリセットされます。', type: 'success' });
-        if (resetTimerRef.current) {
-            clearTimeout(resetTimerRef.current);
+        
+        const isFamily = housingType.includes('ファミリー');
+        const header = is10G ? '〓SoftBank光10ギガ〓250808' : `〓${product}〓250808`;
+        let comment = `${header}\n`;
+        comment += `タイプ：${housingType || ''}\n`;
+        comment += `AP名：${apName || ''}\n`;
+        comment += `顧客ID：${customerId || ''}\n`;
+        comment += `名乗り（SMS届くので正確に）：${greeting || ''}\n`;
+        comment += `ラック：${rackType || ''}\n`;
+        comment += `契約者名義（漢字）：${contractorName || ''}\n`;
+        comment += `契約者名義（フリガナ）：${contractorNameKana || ''}\n`;
+        comment += `性別：${gender || ''}\n`;
+        comment += `生年月日(西暦)：${formatDateToYYYYMMDD(dob) || ''}\n`;
+        comment += `電話番号(ハイフンあり)：${formatPhoneNumber(phone) || ''}\n`;
+        comment += `➤設置先\n`;
+        comment += `郵便番号(〒・ハイフン無し)：${(postalCode || '').replace(/-/g, '')}\n`;
+        comment += `住所：${address || ''}\n`;
+        comment += `物件名＋部屋番号：${buildingInfo || ''}\n`;
+        comment += `入居予定日：${formatDateToYYYYMMDD(moveInDate) || ''}\n`;
+        let mailingOptionText = mailingOption;
+        if (mailingOption === '新居') {
+            mailingOptionText = '新居(設置先と同じ)';
         }
-        resetTimerRef.current = window.setTimeout(() => {
-            resetForm('10分経過したためフォームをリセットしました。');
-        }, 10 * 60 * 1000); // 10 minutes
-    }, () => {
-        setToast({ message: 'コピーに失敗しました。', type: 'error' });
-    });
-  }, [formData, generatedComment, resetForm, is10G, isAir, isChintai, isChintaiFree]);
-  
-  const checkMansionRoomNumber = useCallback(() => {
-    if (isChintai || isChintaiFree) { // Skip this check for Chintai products
-        validateAndCopy();
-        return;
-    }
-    const isMansion = formData.housingType.includes('マンション');
-    if (isMansion && formData.buildingInfo && !/\d/.test(formData.buildingInfo)) {
-        setModalState({
-            isOpen: true,
-            title: '入力内容の確認',
-            message: '「物件名＋部屋番号」に部屋番号と思われる数字が含まれていません。このままコピーしてよろしいですか？',
-            onConfirm: () => { setModalState(prev => ({ ...prev, isOpen: false })); validateAndCopy(); },
-            onCancel: () => {
-                setInvalidFields(prev => [...new Set([...prev, 'buildingInfo'])]);
-                (document.querySelector('[name="buildingInfo"]') as HTMLElement)?.focus();
-                setModalState(prev => ({ ...prev, isOpen: false }));
-            },
-            confirmText: 'はい、コピーする',
-            cancelText: '修正する',
-            type: 'warning',
+        comment += `■書面発送先：${mailingOptionText || ''}\n`;
+        if (mailingOption === '現住所') {
+          comment += `現住所の場合郵便番号(〒・ハイフン無し)：${(currentPostalCode || '').replace(/-/g, '')}\n`;
+          comment += `住所・物件名・部屋番号：${currentAddress || ''}\n`;
+        }
+        comment += is10G 
+          ? `案内料金：3カ月0円→6930円\n`
+          : `案内料金：${serviceFee || ''}\n`;
+        comment += is10G
+          ? `ＣＰ：${campaign === '10ギガめちゃトク割+あんしん乗り換え' ? '10ギガめちゃトク割／＋あんしん乗り換え' : campaign || ''}\n`
+          : `ＣＰ：${campaign || ''}\n`;
+        comment += `開通前レンタル：${preActivationRental || ''}\n`;
+        let existingLineInfo = existingLineStatus;
+        if (existingLineStatus === 'あり' && existingLineCompany) {
+          existingLineInfo = `あり（回線会社：${existingLineCompany}）`;
+        }
+        comment += `既存回線：${existingLineInfo || ''}\n`;
+        comment += `携帯キャリア：${mobileCarrier || ''}\n`;
+        comment += is10G
+          ? `おうち割：${homeDiscount === 'あり▲インポート注意!!!▲' ? 'あり▲インポート注意!!!▲' : '無し'}\n`
+          : `おうち割：${homeDiscount || ''}\n`;
+        if (!is10G) {
+          comment += `無線ルーター購入：${wifiRouter || ''}\n`;
+        }
+        comment += `備考：${remarks || ''}\n`;
+        if (isFamily) {
+          comment += "\nオーナー情報\n";
+          comment += `・管理会社：${managementCompany || ''}\n`;
+          comment += `・管理番号：${formData.managementNumber || ''}\n`;
+          comment += `・担当者：${contactPerson || ''}\n`;
+          if (noDrilling) {
+            comment += `穴あけ・ビス止めNG\n`;
+          }
+        }
+        setGeneratedComment(comment);
+    }, [formData]);
+
+    const generateElectricityComment = useCallback(() => {
+        const comment = generateElectricityCommentLogic(formData);
+        setGeneratedComment(comment);
+    }, [formData]);
+
+    const generateGasComment = useCallback(() => {
+        const comment = generateGasCommentLogic(formData);
+        setGeneratedComment(comment);
+    }, [formData]);
+    
+    const generateWtsComment = useCallback(() => {
+        const comment = generateWtsCommentLogic(formData);
+        setGeneratedComment(comment);
+    }, [formData]);
+
+    useEffect(() => {
+        if (activeTab === 'internet') {
+            generateInternetComment();
+        } else if (activeTab === 'electricity') {
+            generateElectricityComment();
+        } else if (activeTab === 'gas') {
+            generateGasComment();
+        } else if (activeTab === 'wts') {
+            generateWtsComment();
+        } else {
+            setGeneratedComment('');
+        }
+    }, [formData, activeTab, generateInternetComment, generateElectricityComment, generateGasComment, generateWtsComment]);
+
+    const isElecGasSetSelected = useMemo(() => {
+      const { elecProvider, isGasSet } = formData;
+      const elecSetProviders = ['ニチガス電気セット', '東京ガス電気セット', '東邦ガスセット', '大阪ガス電気セット'];
+      if (elecSetProviders.includes(elecProvider)) return true;
+      if (elecProvider === 'すまいのでんき（ストエネ）' && isGasSet === 'セット') return true;
+      return false;
+    }, [formData.elecProvider, formData.isGasSet]);
+
+    const validateAndCopy = useCallback(() => {
+        let requiredFields = [];
+
+        // Email validation helper
+        const checkEmailIfNeeded = (needsEmail: boolean) => {
+            if (needsEmail) {
+                requiredFields.push('email');
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (formData.email && !emailRegex.test(formData.email)) {
+                    setToast({ message: '有効なメールアドレス形式ではありません。', type: 'error' });
+                    setInvalidFields(prev => [...prev, 'email']);
+                    return false; // validation failed
+                }
+            }
+            return true; // validation passed or not needed
+        };
+
+        if (activeTab === 'internet') {
+            const isChintai = formData.product === '賃貸ねっと';
+            const isChintaiFree = formData.product === '賃貸ねっと【無料施策】';
+            const isAir = formData.product === 'SB Air';
+            const is10G = formData.product === 'SoftBank光10G';
+
+            if (!formData.isSakaiRoute) {
+                requiredFields.push('customerId');
+            }
+
+            if (isChintai || isChintaiFree) {
+                if(!checkEmailIfNeeded(true)) return;
+            }
+
+            if (isChintai) {
+                requiredFields.push(
+                    'housingType', 'apName', 'greeting', 'existingLineStatus',
+                    'rackType', 'contractorName', 'contractorNameKana', 'dob', 'phone',
+                    'postalCode', 'address', 'buildingInfo', 'moveInDate', 'mailingOption',
+                    'serviceFee', 'paymentMethod', 'crossPathRouter'
+                );
+                if (formData.paymentMethod === '口座') requiredFields.push('bankName');
+                if (formData.housingType === 'ファミリー') requiredFields.push('managementCompany', 'managementContact', 'contactPerson');
+            } else if (isChintaiFree) {
+                 requiredFields.push(
+                    'housingType', 'apName', 'greeting', 'rackType', 'contractorName',
+                    'contractorNameKana', 'dob', 'phone', 'postalCode', 'address', 'buildingInfo', 'moveInDate',
+                    'mailingOption', 'serviceFee', 'paymentMethod', 'crossPathRouter'
+                );
+                if (formData.paymentMethod === '口座') requiredFields.push('bankName');
+            } else {
+                const baseRequiredFields = [
+                    'housingType', 'apName', 'greeting', 'contractorName',
+                    'contractorNameKana', 'gender', 'dob', 'phone', 'postalCode',
+                    'address', 'buildingInfo', 'moveInDate', 'mailingOption',
+                    'campaign', 'existingLineStatus', 'mobileCarrier',
+                ];
+                let specificRequiredFields = [];
+                if (is10G) {
+                    specificRequiredFields = ['rackType', 'preActivationRental', 'homeDiscount'];
+                } else if (!isAir) {
+                    specificRequiredFields = ['rackType', 'preActivationRental', 'homeDiscount', 'wifiRouter', 'serviceFee'];
+                }
+                requiredFields.push(...baseRequiredFields, ...specificRequiredFields);
+            }
+            if (formData.mailingOption === '現住所') requiredFields.push('currentPostalCode', 'currentAddress');
+            if (!isChintaiFree && formData.existingLineStatus === 'あり') requiredFields.push('existingLineCompany');
+        
+        } else if (activeTab === 'electricity') {
+            const commonFields = ['apName', 'contractorName', 'contractorNameKana', 'dob', 'phone', 'postalCode', 'address', 'buildingInfo', 'moveInDate'];
+            requiredFields = ['elecProvider', ...commonFields];
+            if (!formData.isSakaiRoute) requiredFields.push('recordId');
+
+            if (isElecGasSetSelected) {
+              requiredFields.push('gasOpeningDate', 'gasOpeningTimeSlot');
+              if (formData.elecProvider === 'ニチガス電気セット') {
+                requiredFields.push('gasArea', 'gasWitness', 'gasPreContact');
+              }
+            }
+            
+            const needsEmail = ['キューエネスでんき', 'HTBエナジー', 'ユーパワー UPOWER', 'ループでんき'].includes(formData.elecProvider);
+            if (!checkEmailIfNeeded(needsEmail)) return;
+
+            if (formData.elecProvider === '東京ガス電気セット' || formData.elecProvider === '東邦ガスセット') {
+                requiredFields.push('currentAddress');
+            }
+             if (formData.mailingOption === '現住所' && ['すまいのでんき（ストエネ）', 'プラチナでんき（ジャパン）', 'キューエネスでんき', 'ニチガス電気セット', '東邦ガスセット', '大阪ガス電気セット'].includes(formData.elecProvider)) {
+                 requiredFields.push('currentPostalCode', 'currentAddress');
+            }
+
+        } else if (activeTab === 'gas') {
+            const commonFields = ['apName', 'contractorName', 'contractorNameKana', 'dob', 'phone', 'postalCode', 'address', 'buildingInfo', 'moveInDate'];
+            requiredFields = ['gasProvider', ...commonFields];
+            if (!formData.isSakaiRoute) requiredFields.push('recordId');
+            
+            const needsEmail = formData.gasProvider === '東急ガス';
+            if (!checkEmailIfNeeded(needsEmail)) return;
+
+            if(formData.gasProvider === '東急ガス' || formData.gasProvider === '東邦ガス単品') {
+                requiredFields.push('currentAddress');
+            }
+            if (formData.mailingOption === '現住所' && ['すまいのでんき（ストエネ）', 'ニチガス単品', '大阪ガス単品'].includes(formData.gasProvider)) {
+                 requiredFields.push('currentPostalCode', 'currentAddress');
+            }
+        } else if (activeTab === 'wts') {
+            const { wtsCustomerType } = formData;
+            requiredFields = [
+                'apName', 'contractorName', 'dob', 'phone', 'wtsShippingDestination',
+                'wtsServerColor', 'wtsFiveYearPlan', 'wtsFreeWater', 'wtsCreditCard', 'wtsCarrier',
+                'moveInDate', 'wtsWaterPurifier', 'wtsMultipleUnits'
+            ];
+
+            if (!formData.isSakaiRoute) requiredFields.push('customerId');
+
+            if(wtsCustomerType === 'U-20') {
+                requiredFields.push('wtsU20HighSchool', 'wtsU20ParentalConsent');
+            }
+             if(wtsCustomerType === '法人') {
+                requiredFields.push('wtsCorporateInvoice');
+            }
+        }
+
+
+        const missingFields = requiredFields.filter(field => !formData[field]);
+        setInvalidFields(missingFields);
+        
+        if (missingFields.length > 0) {
+            setToast({ message: '未入力の必須項目があります。', type: 'error' });
+            document.querySelector('.border-red-500, .text-red-600')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return;
+        }
+
+        if (!generatedComment.trim() || generatedComment.includes("該当するテンプレートがありません。")) {
+            setToast({ message: '条件に合うコメントがありません。入力を確認してください。', type: 'error' });
+            return;
+        }
+
+        navigator.clipboard.writeText(generatedComment).then(() => {
+            setToast({ message: 'コピーしました！15分後にフォームがリセットされます。', type: 'success' });
+            
+            if (['internet', 'wts'].includes(activeTab)) {
+                setFormData(prev => ({...prev, primaryProductStatus: 'あり'}));
+            }
+
+            if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
+            resetTimerRef.current = window.setTimeout(() => {
+                resetForm('15分経過したためフォームをリセットしました。');
+            }, 15 * 60 * 1000);
+        }, () => {
+            setToast({ message: 'コピーに失敗しました。', type: 'error' });
         });
-    } else {
-        validateAndCopy();
-    }
-  }, [formData, validateAndCopy, isChintai, isChintaiFree]);
+    }, [formData, generatedComment, resetForm, activeTab, isElecGasSetSelected]);
+  
+    const checkMansionRoomNumber = useCallback(() => {
+        const isInternetTab = activeTab === 'internet';
+        const isChintai = formData.product === '賃貸ねっと' || formData.product === '賃貸ねっと【無料施策】';
+        if (!isInternetTab || isChintai) {
+            validateAndCopy();
+            return;
+        }
+
+        const isMansion = formData.housingType.includes('マンション');
+        if (isMansion && formData.buildingInfo && !/\d/.test(formData.buildingInfo)) {
+            setModalState({
+                isOpen: true,
+                title: '入力内容の確認',
+                message: '「物件名＋部屋番号」に部屋番号と思われる数字が含まれていません。このままコピーしてよろしいですか？',
+                onConfirm: () => { setModalState(p => ({ ...p, isOpen: false })); validateAndCopy(); },
+                onCancel: () => {
+                    setInvalidFields(p => [...new Set([...p, 'buildingInfo'])]);
+                    (document.querySelector('[name="buildingInfo"]') as HTMLElement)?.focus();
+                    setModalState(p => ({ ...p, isOpen: false }));
+                },
+                confirmText: 'はい、コピーする',
+                cancelText: '修正する',
+                type: 'warning',
+            });
+        } else {
+            validateAndCopy();
+        }
+    }, [formData, validateAndCopy, activeTab]);
 
   const checkMailingAddress = useCallback(() => {
     if (
@@ -691,518 +743,264 @@ const App = () => {
     }
   }, [formData, checkMansionRoomNumber]);
 
-  const checkAddressNumber = useCallback(() => {
-    if (
-        formData.address &&
-        !/\d/.test(formData.address)
-    ) {
+  const checkAddressNumber = useCallback((nextCheck) => {
+    if (formData.address && !/\d/.test(formData.address)) {
         setModalState({
             isOpen: true,
             title: '入力内容の確認',
             message: '住所に丁目・番地が含まれていないようです。このままでよろしいですか？',
-            onConfirm: () => {
-                setModalState(prev => ({ ...prev, isOpen: false }));
-                checkMailingAddress();
-            },
+            onConfirm: () => { setModalState(p => ({ ...p, isOpen: false })); nextCheck(); },
             onCancel: () => {
-                setInvalidFields(prev => [...new Set([...prev, 'address'])]);
+                setInvalidFields(p => [...new Set([...p, 'address'])]);
                 (document.querySelector('[name="address"]') as HTMLElement)?.focus();
-                setModalState(prev => ({ ...prev, isOpen: false }));
+                setModalState(p => ({ ...p, isOpen: false }));
             },
             confirmText: 'このままにする',
             cancelText: '修正する',
             type: 'warning',
         });
     } else {
-        checkMailingAddress();
+        nextCheck();
     }
-  }, [formData, checkMailingAddress]);
+  }, [formData.address]);
 
   const checkCurrentAddressNumber = useCallback(() => {
-    if (
-        formData.mailingOption === '現住所' &&
-        formData.currentAddress &&
-        !/\d/.test(formData.currentAddress)
-    ) {
+    const nextCheck = () => checkAddressNumber(checkMailingAddress);
+    if (formData.mailingOption === '現住所' && formData.currentAddress && !/\d/.test(formData.currentAddress)) {
         setModalState({
             isOpen: true,
             title: '入力内容の確認',
             message: '現住所に丁目・番地が含まれていないようです。このままでよろしいですか？',
-            onConfirm: () => {
-                setModalState(prev => ({ ...prev, isOpen: false }));
-                checkAddressNumber();
-            },
+            onConfirm: () => { setModalState(p => ({ ...p, isOpen: false })); nextCheck(); },
             onCancel: () => {
-                setInvalidFields(prev => [...new Set([...prev, 'currentAddress'])]);
+                setInvalidFields(p => [...new Set([...p, 'currentAddress'])]);
                 (document.querySelector('[name="currentAddress"]') as HTMLElement)?.focus();
-                setModalState(prev => ({ ...prev, isOpen: false }));
+                setModalState(p => ({ ...p, isOpen: false }));
             },
             confirmText: 'このままにする',
             cancelText: '修正する',
             type: 'warning',
         });
     } else {
-        checkAddressNumber();
+        nextCheck();
     }
-  }, [formData, checkAddressNumber]);
-
+  }, [formData.mailingOption, formData.currentAddress, checkAddressNumber, checkMailingAddress]);
+  
   const checkFurigana = useCallback(() => {
     const katakanaRegex = /^[ァ-ヶー\s　]*$/;
+    const nextCheck = activeTab === 'internet' ? checkCurrentAddressNumber : () => checkAddressNumber(validateAndCopy);
     if (formData.contractorNameKana && !katakanaRegex.test(formData.contractorNameKana)) {
         setModalState({
             isOpen: true,
             title: 'フリガナの確認',
             message: '契約者名義（フリガナ）にカタカナ以外の文字が含まれているようです。このままコピーしますか？',
-            onConfirm: () => { setModalState(prev => ({ ...prev, isOpen: false })); checkCurrentAddressNumber(); },
+            onConfirm: () => { setModalState(p => ({ ...p, isOpen: false })); nextCheck(); },
             onCancel: () => {
-                setInvalidFields(prev => [...new Set([...prev, 'contractorNameKana'])]);
+                setInvalidFields(p => [...new Set([...p, 'contractorNameKana'])]);
                 (document.querySelector('[name="contractorNameKana"]') as HTMLElement)?.focus();
-                setModalState(prev => ({ ...prev, isOpen: false }));
+                setModalState(p => ({ ...p, isOpen: false }));
             },
             confirmText: 'はい、コピーする',
             cancelText: '修正する',
             type: 'warning',
         });
     } else {
-        checkCurrentAddressNumber();
+        nextCheck();
     }
-  }, [formData, checkCurrentAddressNumber]);
+  }, [formData.contractorNameKana, checkCurrentAddressNumber, activeTab, validateAndCopy, checkAddressNumber]);
 
   const startCopyProcess = useCallback(() => {
     checkFurigana();
   }, [checkFurigana]);
 
+  const showResetConfirmationModal = useCallback(() => {
+    setModalState({
+      isOpen: true,
+      title: 'フォームのリセット確認',
+      message: '本当に入力内容をすべてリセットしますか？\n「担当者/AP名」「サカイ販路」以外の情報はすべて消去されます。',
+      onConfirm: () => {
+        resetForm('フォームをリセットしました。');
+        closeModal();
+      },
+      onCancel: closeModal,
+      confirmText: 'はい、リセットする',
+      cancelText: 'キャンセル',
+      type: 'danger',
+    });
+  }, [resetForm]);
+  
+  const handleTabChange = useCallback((tabId) => {
+    setActiveTab(tabId);
+    
+    if (formData.isSakaiRoute) {
+        if (tabId === 'electricity') {
+            setFormData(prev => ({...prev, elecRecordIdPrefix: 'サカイ', gasRecordIdPrefix: ''}));
+        } else if (tabId === 'gas') {
+            setFormData(prev => ({...prev, gasRecordIdPrefix: 'サカイ', elecRecordIdPrefix: ''}));
+        } else {
+            setFormData(prev => ({...prev, elecRecordIdPrefix: '', gasRecordIdPrefix: ''}));
+        }
+    }
+
+    if (resetTimerRef.current) {
+      clearTimeout(resetTimerRef.current);
+      resetTimerRef.current = null;
+      setToast({ message: '作業を継続したため、自動リセットタイマーを解除しました。', type: 'info' });
+    }
+  }, [formData.isSakaiRoute]);
+
+  const handleBugReportSubmit = useCallback(async () => {
+    if (!formData.apName) {
+        setToast({ message: '報告するには「担当者/AP名」を入力してください。', type: 'error' });
+        return;
+    }
+    if (!bugReportText.trim()) {
+        setToast({ message: '報告内容を入力してください。', type: 'error' });
+        setIsBugReportTextInvalid(true);
+        return;
+    }
+
+    if (BUG_REPORT_SCRIPT_URL.includes('YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE')) {
+        setToast({ message: '管理者：報告用URLが設定されていません。', type: 'error' });
+        return;
+    }
+
+    setIsSubmittingReport(true);
+    try {
+        const payload = {
+            apName: formData.apName,
+            reportText: bugReportText,
+            currentFormData: JSON.stringify(formData, null, 2),
+        };
+
+        const response = await fetch(BUG_REPORT_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors', // Apps Script requires no-cors for simple requests if not configured otherwise
+            cache: 'no-cache',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload),
+        });
+
+        // no-cors means we can't read the response, but we can assume success if no network error
+        setToast({ message: '報告を送信しました。ご協力ありがとうございます！', type: 'success' });
+        setIsBugReportOpen(false);
+        setBugReportText('');
+        setIsBugReportTextInvalid(false);
+
+    } catch (error) {
+        console.error('Bug report submission error:', error);
+        setToast({ message: '報告の送信に失敗しました。ネットワーク接続を確認してください。', type: 'error' });
+    } finally {
+        setIsSubmittingReport(false);
+    }
+}, [formData, bugReportText]);
+
+
+  const commonProps = {
+    formData,
+    setFormData,
+    handleInputChange,
+    handleDateBlur,
+    handleNameBlur,
+    invalidFields,
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
         <Header onManualOpen={() => setIsManualOpen(true)} />
         <Modal {...modalState} />
         <ManualModal isOpen={isManualOpen} onClose={() => setIsManualOpen(false)} />
+        <BugReportModal 
+            isOpen={isBugReportOpen}
+            onClose={() => {
+                setIsBugReportOpen(false);
+                setIsBugReportTextInvalid(false);
+            }}
+            reportText={bugReportText}
+            onReportTextChange={(e) => {
+                setBugReportText(e.target.value);
+                setIsBugReportTextInvalid(false);
+            }}
+            onSubmit={handleBugReportSubmit}
+            isSubmitting={isSubmittingReport}
+            isInvalid={isBugReportTextInvalid}
+        />
         {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
         
         <main className="w-full max-w-7xl mx-auto p-4 md:p-8 flex-grow">
+            <div className="flex justify-between items-center pb-4">
+                <h2 className="text-2xl font-bold text-gray-700">情報入力フォーム</h2>
+            </div>
+            
+            <div className="bg-white p-4 rounded-t-2xl shadow-lg grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 items-center border-b border-gray-200">
+                <FormInput
+                    label="担当者/AP名"
+                    name="apName"
+                    value={formData.apName}
+                    onChange={handleInputChange}
+                    isInvalid={invalidFields.includes('apName')}
+                    required
+                    placeholder="入力内容はリセット後も保持されます"
+                />
+                 <FormCheckbox
+                    label="サカイ販路"
+                    name="isSakaiRoute"
+                    checked={formData.isSakaiRoute}
+                    onChange={handleInputChange}
+                    isInvalid={invalidFields.includes('isSakaiRoute')}
+                    description="チェックするとレコードID/顧客IDが不要になります"
+                />
+            </div>
+            
+             <div className="bg-white rounded-b-xl shadow-lg border-b border-gray-200 sticky top-[72px] z-10">
+                <nav className="flex justify-around sm:justify-start sm:space-x-2 sm:px-4">
+                    {TABS.map(tab => (
+                        <Tab key={tab.id} {...tab} activeTab={activeTab} onTabChange={handleTabChange} />
+                    ))}
+                </nav>
+            </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-                <div className="bg-white p-6 rounded-2xl shadow-xl border border-gray-200 space-y-6">
-                    <div className="flex justify-between items-center border-b-2 border-dashed border-gray-200 pb-4">
-                        <h2 className="text-2xl font-bold text-gray-700">情報入力フォーム</h2>
-                        <button 
-                          onClick={() => resetForm('フォームをリセットしました。')}
-                          className="flex items-center gap-2 text-sm text-gray-600 hover:text-blue-700 transition-colors"
-                          aria-label="フォームをリセット"
-                        >
-                            <ArrowPathIcon className="h-5 w-5" />
-                            <span>リセット</span>
-                        </button>
-                    </div>
-
-                    <FormRadioGroup
-                        label="商材"
-                        name="product"
-                        value={formData.product}
-                        onChange={handleInputChange}
-                        options={productOptions}
-                        isInvalid={invalidFields.includes('product')}
-                    />
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <FormSelect
-                            label="タイプ"
-                            name="housingType"
-                            value={formData.housingType}
-                            onChange={handleInputChange}
-                            options={housingTypeOptions}
-                            isInvalid={invalidFields.includes('housingType')}
-                            required
-                        />
-                         {(!isAir) && (
-                            <FormSelect
-                                label="ラック"
-                                name="rackType"
-                                value={formData.rackType}
-                                onChange={handleInputChange}
-                                options={currentRackOptions}
-                                isInvalid={invalidFields.includes('rackType')}
-                                required
-                                disabled={isChintaiFree && formData.housingType === 'マンション10G'}
-                            />
-                         )}
-                        <FormInput
-                            label="AP名"
-                            name="apName"
-                            value={formData.apName}
-                            onChange={handleInputChange}
-                            isInvalid={invalidFields.includes('apName')}
-                            required
-                        />
-                        <FormInput
-                            label="顧客ID"
-                            name="customerId"
-                            value={formData.customerId}
-                            onChange={handleInputChange}
-                            isInvalid={invalidFields.includes('customerId')}
-                            required
-                        />
-                        <FormInput
-                            label={(isChintai || isChintaiFree) ? "名乗り" : "名乗り（SMS届くので正確に）"}
-                            name="greeting"
-                            value={formData.greeting}
-                            onChange={handleInputChange}
-                            className="md:col-span-2"
-                            isInvalid={invalidFields.includes('greeting')}
-                            required
-                        />
-                    </div>
-                    
-                    <div className="border-t-2 border-dashed border-blue-300 pt-6 space-y-4">
-                        <h3 className="text-lg font-bold text-blue-700">契約者情報</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <FormInput
-                                label="契約者名義（漢字）"
-                                name="contractorName"
-                                value={formData.contractorName}
-                                onChange={handleInputChange}
-                                onBlur={handleNameBlur}
-                                isInvalid={invalidFields.includes('contractorName')}
-                                required
-                            />
-                            <FormInput
-                                label="契約者名義（フリガナ）"
-                                name="contractorNameKana"
-                                value={formData.contractorNameKana}
-                                onChange={handleInputChange}
-                                onBlur={handleNameBlur}
-                                isInvalid={invalidFields.includes('contractorNameKana')}
-                                required
-                            />
-                            {(!isChintai && !isChintaiFree) &&
-                            <FormSelect
-                                label="性別"
-                                name="gender"
-                                value={formData.gender}
-                                onChange={handleInputChange}
-                                options={GENDERS}
-                                isInvalid={invalidFields.includes('gender')}
-                                required
-                            />
-                            }
-                            <FormInput
-                                label="生年月日（西暦）"
-                                name="dob"
-                                type="text"
-                                value={formData.dob}
-                                onChange={handleInputChange}
-                                onBlur={handleDateBlur}
-                                placeholder="例: 1990/01/01"
-                                isInvalid={invalidFields.includes('dob')}
-                                required
-                            />
-                            <FormInput
-                                label="電話番号"
-                                name="phone"
-                                value={formData.phone}
-                                onChange={handleInputChange}
-                                isInvalid={invalidFields.includes('phone')}
-                                required
-                            />
-                            {(isChintai || isChintaiFree) && (
-                                <FormInput
-                                    label="メアド"
-                                    name="email"
-                                    type="email"
-                                    value={formData.email}
-                                    onChange={handleInputChange}
-                                    isInvalid={invalidFields.includes('email')}
-                                    required
-                                />
-                            )}
-                        </div>
-                    </div>
-
-                    <div className="border-t-2 border-dashed border-blue-300 pt-6 space-y-4">
-                        <h3 className="text-lg font-bold text-blue-700">設置先情報</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <FormInput
-                                label="郵便番号"
-                                name="postalCode"
-                                value={formData.postalCode}
-                                onChange={handleInputChange}
-                                isInvalid={invalidFields.includes('postalCode')}
-                                className="md:col-span-2"
-                                required
-                            />
-                            <FormInput
-                                label="住所"
-                                name="address"
-                                value={formData.address}
-                                onChange={handleInputChange}
-                                className="md:col-span-2"
-                                isInvalid={invalidFields.includes('address')}
-                                required
-                            />
-                             <FormInput
-                                label="物件名＋部屋番号"
-                                name="buildingInfo"
-                                value={formData.buildingInfo}
-                                onChange={handleInputChange}
-                                className="md:col-span-2"
-                                placeholder="例: 〇〇マンション101号室"
-                                isInvalid={invalidFields.includes('buildingInfo')}
-                                required
-                            />
-                             <FormDateInput
-                                label={(isChintai || isChintaiFree) ? "利用開始日(必ず引っ越し日を記載)" : "入居予定日"}
-                                name="moveInDate"
-                                type="text"
-                                value={formData.moveInDate}
-                                onChange={handleInputChange}
-                                onBlur={handleDateBlur}
-                                placeholder="例: 2024/08/01 または 8/1"
-                                isInvalid={invalidFields.includes('moveInDate')}
-                                className="md:col-span-2"
-                                required
-                            />
-                        </div>
-                    </div>
-                    
-                    <div className="border-t-2 border-dashed border-blue-300 pt-6 space-y-4">
-                        <h3 className="text-lg font-bold text-blue-700">その他詳細</h3>
-                         <FormRadioGroup
-                            label="書面発送先"
-                            name="mailingOption"
-                            value={formData.mailingOption}
-                            onChange={handleInputChange}
-                            options={MAILING_OPTIONS}
-                            isInvalid={invalidFields.includes('mailingOption')}
-                        />
-                        {formData.mailingOption === '現住所' && (
-                            <div className="p-4 bg-blue-50/50 rounded-lg border border-blue-200 grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <FormInput
-                                    label="現住所の郵便番号"
-                                    name="currentPostalCode"
-                                    value={formData.currentPostalCode}
-                                    onChange={handleInputChange}
-                                    isInvalid={invalidFields.includes('currentPostalCode')}
-                                    required
-                                />
-                                <FormInput
-                                    label="現住所・物件名・部屋番号"
-                                    name="currentAddress"
-                                    value={formData.currentAddress}
-                                    onChange={handleInputChange}
-                                    className="md:col-span-2"
-                                    isInvalid={invalidFields.includes('currentAddress')}
-                                    required
-                                />
+                 <div className="bg-white p-6 rounded-b-2xl shadow-xl border border-t-0 border-gray-200 space-y-6">
+                    {activeTab === 'internet' && <InternetTab {...commonProps} />}
+                    {activeTab === 'electricity' && <ElectricityTab {...commonProps} isElecGasSetSelected={isElecGasSetSelected} />}
+                    {activeTab === 'gas' && (
+                        isElecGasSetSelected ? (
+                            <div className="text-center py-8">
+                                <ExclamationTriangleIcon className="mx-auto h-12 w-12 text-yellow-400" />
+                                <p className="mt-4 text-lg font-bold text-yellow-700">
+                                    電気セットプランが選択されています
+                                </p>
+                                <p className="text-gray-600 mt-2">
+                                    ガスに関する情報は「電気」タブで入力してください。
+                                </p>
                             </div>
-                        )}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                           {(!isChintai && !isChintaiFree) &&
-                            <FormInput
-                                label="案内料金"
-                                name="serviceFee"
-                                value={formData.serviceFee}
-                                onChange={handleInputChange}
-                                isInvalid={invalidFields.includes('serviceFee')}
-                                disabled={is10G || isAir}
-                                required
-                            />
-                           }
-                           {(isChintai || isChintaiFree) &&
-                             <FormInput
-                                label="案内料金"
-                                name="serviceFee"
-                                value={formData.serviceFee}
-                                onChange={handleInputChange}
-                                isInvalid={invalidFields.includes('serviceFee')}
-                                disabled={true}
-                                required
-                            />
-                           }
-                            {(!isChintai && !isChintaiFree) &&
-                                <FormSelect
-                                    label="CP"
-                                    name="campaign"
-                                    value={formData.campaign}
-                                    onChange={handleInputChange}
-                                    options={campaignOptions}
-                                    isInvalid={invalidFields.includes('campaign')}
-                                    required
-                                />
-                            }
-                            {isChintai && (
-                                <>
-                                     <FormSelect
-                                        label="支払方法"
-                                        name="paymentMethod"
-                                        value={formData.paymentMethod}
-                                        onChange={handleInputChange}
-                                        options={PAYMENT_METHOD_OPTIONS}
-                                        isInvalid={invalidFields.includes('paymentMethod')}
-                                        required
-                                    />
-                                    {formData.paymentMethod === '口座' && (
-                                        <FormInput
-                                            label="銀行名"
-                                            name="bankName"
-                                            value={formData.bankName}
-                                            onChange={handleInputChange}
-                                            isInvalid={invalidFields.includes('bankName')}
-                                            required
-                                        />
-                                    )}
-                                    {formData.housingType === '10G' ? (
-                                        <FormInput
-                                            label="クロスパス無線ルーター"
-                                            name="crossPathRouter"
-                                            value={formData.crossPathRouter}
-                                            onChange={handleInputChange}
-                                            isInvalid={invalidFields.includes('crossPathRouter')}
-                                            className="md:col-span-2"
-                                            disabled
-                                            required
-                                        />
-                                    ) : (
-                                        <FormSelect
-                                            label="クロスパス無線ルーター"
-                                            name="crossPathRouter"
-                                            value={formData.crossPathRouter}
-                                            onChange={handleInputChange}
-                                            options={CROSS_PATH_ROUTER_OPTIONS}
-                                            isInvalid={invalidFields.includes('crossPathRouter')}
-                                            className="md:col-span-2"
-                                            required
-                                        />
-                                    )}
-                                </>
-                            )}
-                            {isChintaiFree && (
-                                <>
-                                     <FormSelect
-                                        label="支払方法"
-                                        name="paymentMethod"
-                                        value={formData.paymentMethod}
-                                        onChange={handleInputChange}
-                                        options={PAYMENT_METHOD_OPTIONS}
-                                        isInvalid={invalidFields.includes('paymentMethod')}
-                                        required
-                                    />
-                                    {formData.paymentMethod === '口座' && (
-                                        <FormInput
-                                            label="銀行名"
-                                            name="bankName"
-                                            value={formData.bankName}
-                                            onChange={handleInputChange}
-                                            isInvalid={invalidFields.includes('bankName')}
-                                            required
-                                        />
-                                    )}
-                                    <FormInput
-                                        label="クロスパス無線ルーター"
-                                        name="crossPathRouter"
-                                        value={formData.crossPathRouter}
-                                        onChange={handleInputChange}
-                                        isInvalid={invalidFields.includes('crossPathRouter')}
-                                        className="md:col-span-2"
-                                        disabled
-                                        required
-                                    />
-                                </>
-                            )}
-                            {!isAir && !isChintai && !isChintaiFree && (
-                                <FormSelect
-                                    label="開通前レンタル"
-                                    name="preActivationRental"
-                                    value={formData.preActivationRental}
-                                    onChange={handleInputChange}
-                                    options={RENTAL_OPTIONS}
-                                    isInvalid={invalidFields.includes('preActivationRental')}
-                                    required
-                                />
-                            )}
-                           { !isChintaiFree &&
-                               <FormSelect
-                                    label={isChintai ? "ゼニガメ" : "既存回線"}
-                                    name="existingLineStatus"
-                                    value={formData.existingLineStatus}
-                                    onChange={handleInputChange}
-                                    options={EXISTING_LINE_STATUS_OPTIONS}
-                                    isInvalid={invalidFields.includes('existingLineStatus')}
-                                    required
-                                />
-                           }
-                             { !isChintaiFree && formData.existingLineStatus === 'あり' && (
-                                <FormInput
-                                    label={isChintai ? "現状回線" : "回線会社"}
-                                    name="existingLineCompany"
-                                    value={formData.existingLineCompany}
-                                    onChange={handleInputChange}
-                                    isInvalid={invalidFields.includes('existingLineCompany')}
-                                    required
-                                />
-                            )}
-                            {(!isChintai && !isChintaiFree) &&
-                             <FormSelect
-                                label="携帯キャリア"
-                                name="mobileCarrier"
-                                value={formData.mobileCarrier}
-                                onChange={handleInputChange}
-                                options={MOBILE_CARRIERS}
-                                isInvalid={invalidFields.includes('mobileCarrier')}
-                                required
-                            />
-                            }
-                            {!isAir && !isChintai && !isChintaiFree && (
-                                <FormSelect
-                                    label="おうち割"
-                                    name="homeDiscount"
-                                    value={formData.homeDiscount}
-                                    onChange={handleInputChange}
-                                    options={discountOptions}
-                                    isInvalid={invalidFields.includes('homeDiscount')}
-                                    required
-                                />
-                            )}
-                            {!is10G && !isAir && !isChintai && !isChintaiFree && (
-                                <FormSelect
-                                    label="無線ルーター購入"
-                                    name="wifiRouter"
-                                    value={formData.wifiRouter}
-                                    onChange={handleInputChange}
-                                    options={ROUTER_OPTIONS}
-                                    isInvalid={invalidFields.includes('wifiRouter')}
-                                    required
-                                />
-                            )}
-                        </div>
-                         <FormTextArea
-                            label="備考"
-                            name="remarks"
-                            value={formData.remarks}
-                            onChange={handleInputChange}
-                            rows={3}
-                            isInvalid={invalidFields.includes('remarks')}
-                        />
-                    </div>
-                    
-                     {((!isAir && !isChintai && !isChintaiFree && formData.housingType.includes('ファミリー')) || (isChintai && formData.housingType === 'ファミリー')) && (
-                        <OwnerInfo 
-                            formData={formData} 
-                            onChange={handleInputChange} 
-                            invalidFields={invalidFields}
-                            isChintai={isChintai}
-                        />
+                        ) : (
+                            <GasTab {...commonProps} />
+                        )
                     )}
-
-                </div>
-                <div className="sticky top-[88px]">
+                    {activeTab === 'wts' && <WtsTab {...commonProps} />}
+                 </div>
+                <div className="sticky top-[198px] lg:top-[140px]">
                    <GeneratedComment
                         comment={generatedComment}
                         onCommentChange={setGeneratedComment}
                         onCopy={startCopyProcess}
+                        onResetRequest={showResetConfirmationModal}
                     />
                 </div>
             </div>
         </main>
+        <div className="w-full max-w-7xl mx-auto px-4 md:px-8 mt-4 mb-4">
+             <button
+                onClick={() => setIsBugReportOpen(true)}
+                className="w-full flex items-center justify-center gap-2 bg-red-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-red-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 shadow-md hover:shadow-lg"
+            >
+                <ChatBubbleBottomCenterTextIcon className="h-6 w-6" />
+                <span>不具合・要望を報告</span>
+            </button>
+        </div>
         <footer className="text-center py-5 text-sm text-gray-500">
             タマシステム2025
         </footer>

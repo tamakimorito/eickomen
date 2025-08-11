@@ -43,11 +43,11 @@ export const FormSelect = ({ label, name, value, onChange, options, className = 
     );
 };
 
-export const FormRadioGroup = ({ label, name, value, onChange, options, className = '', isInvalid }) => {
+export const FormRadioGroup = ({ label, name, value, onChange, options, className = '', isInvalid, ...props }) => {
     const legendClasses = `block text-sm font-bold mb-2 ${isInvalid ? 'text-red-600' : 'text-gray-700'}`;
     return (
         <fieldset className={className}>
-            {label && <legend className={legendClasses}>{label}</legend>}
+            {label && <legend className={legendClasses}>{label}{props.required && <span className="text-red-500 ml-1">*</span>}</legend>}
             <div className="flex flex-wrap gap-x-4 gap-y-2">
                 {options.map((option, index) => {
                     if ('type' in option && option.type === 'break') {

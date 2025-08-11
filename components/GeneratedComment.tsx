@@ -1,7 +1,7 @@
 import React from 'https://esm.sh/react@^19.1.0';
-import { ClipboardDocumentIcon, PencilSquareIcon } from 'https://esm.sh/@heroicons/react@^2.2.0/24/outline';
+import { ClipboardDocumentIcon, PencilSquareIcon, ArrowPathIcon } from 'https://esm.sh/@heroicons/react@^2.2.0/24/outline';
 
-const GeneratedComment = ({ comment, onCommentChange, onCopy }) => {
+const GeneratedComment = ({ comment, onCommentChange, onCopy, onResetRequest }) => {
 
   return (
     <div className="bg-white p-6 rounded-2xl shadow-xl border border-gray-200">
@@ -10,13 +10,23 @@ const GeneratedComment = ({ comment, onCommentChange, onCopy }) => {
             <PencilSquareIcon className="h-7 w-7 text-blue-700"/>
             <h2 className="text-2xl font-bold text-gray-700">生成コメント</h2>
         </div>
-        <button
-          onClick={onCopy}
-          className="flex items-center gap-2 bg-yellow-400 text-white font-bold py-2 px-4 rounded-lg hover:bg-yellow-500 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-400 shadow-md hover:shadow-lg"
-        >
-          <ClipboardDocumentIcon className="h-5 w-5" />
-          <span>コピー</span>
-        </button>
+        <div className="flex items-center gap-2">
+           <button
+              onClick={onResetRequest}
+              className="flex items-center gap-2 bg-white text-gray-600 font-bold py-2 px-3 rounded-lg border border-gray-300 hover:bg-gray-100 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 shadow-sm hover:shadow-md"
+              aria-label="フォームをリセット（終話）"
+            >
+              <ArrowPathIcon className="h-5 w-5" />
+              <span className="hidden sm:inline">リセット(終話)</span>
+            </button>
+            <button
+              onClick={onCopy}
+              className="flex items-center gap-2 bg-yellow-400 text-white font-bold py-2 px-4 rounded-lg hover:bg-yellow-500 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-400 shadow-md hover:shadow-lg"
+            >
+              <ClipboardDocumentIcon className="h-5 w-5" />
+              <span>コピー</span>
+            </button>
+        </div>
       </div>
       <textarea
         value={comment}

@@ -1,11 +1,14 @@
 import React from 'https://esm.sh/react@^19.1.0';
-import { BookOpenIcon, XMarkIcon } from 'https://esm.sh/@heroicons/react@^2.2.0/24/solid';
+import { BookOpenIcon, XMarkIcon, ShareIcon, BoltIcon, BellAlertIcon, ArrowPathIcon } from 'https://esm.sh/@heroicons/react@^2.2.0/24/solid';
 
 const ManualModal = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
-  const SectionTitle = ({ children }) => (
-    <h3 className="text-lg font-bold text-blue-700 mt-4 mb-2 border-b-2 border-blue-200 pb-1">{children}</h3>
+  const SectionTitle = ({ children, icon: Icon }) => (
+    <h3 className="text-lg font-bold text-blue-700 mt-6 mb-2 border-b-2 border-blue-200 pb-1 flex items-center gap-2">
+      {Icon && <Icon className="h-5 w-5" />}
+      {children}
+    </h3>
   );
 
   const ListItem = ({ children }) => (
@@ -36,50 +39,55 @@ const ManualModal = ({ isOpen, onClose }) => {
         </div>
         
         <div className="text-sm max-h-[70vh] overflow-y-auto pr-2">
-          <SectionTitle>基本操作</SectionTitle>
+          <SectionTitle icon={BookOpenIcon}>基本操作</SectionTitle>
           <ul className="list-disc list-inside space-y-1">
-            <ListItem>このツールは「回線営業コメント作成ツール～エイコメン～」という名前です。</ListItem>
+            <ListItem>画面上部のタブ（電気、ガス、インターネット...）で商材を切り替えます。</ListItem>
             <ListItem>フォームの各項目を上から順に入力してください。</ListItem>
             <ListItem>必須項目には赤いアスタリスク（*）が付いています。</ListItem>
             <ListItem>入力内容は右側の「生成コメント」エリアにリアルタイムで反映されます。</ListItem>
+            <ListItem>「担当者/AP名」は一度入力すると、フォームをリセットしても内容は保持されます。</ListItem>
           </ul>
 
-          <SectionTitle>便利機能</SectionTitle>
+          <SectionTitle icon={ShareIcon}>情報共有機能</SectionTitle>
+          <p className="text-gray-700">
+            一度入力した名前、住所、電話番号などの共通情報は、他のタブに切り替えても自動で引き継がれます。これにより、何度も同じ情報を入力する手間が省けます。
+          </p>
+
+          <SectionTitle icon={BoltIcon}>商材ごとの入力フォーム</SectionTitle>
+          <SubTitle>・電気</SubTitle>
+          <p className="text-gray-700 ml-4">
+            「商材選択」でプランを選ぶと、そのプランに必要な入力フォームが自動で表示されます。
+          </p>
+
+          <SubTitle>・インターネット</SubTitle>
+          <p className="text-gray-700 ml-4">
+              従来のインターネット契約用のフォームです。「商材」を選択すると、そのプラン（1G, 10G, Air, 賃貸ねっと等）に合わせて入力項目が最適化されます。
+          </p>
+          
+           <SubTitle>・ガス / ウォーターサーバー</SubTitle>
+          <p className="text-gray-700 ml-4">
+              これらの機能は現在準備中です。
+          </p>
+
+          <SectionTitle icon={BellAlertIcon}>便利機能</SectionTitle>
           <ul className="list-none">
             <li>
                 <SubTitle>・日付入力の補助機能</SubTitle>
-                <p className="text-gray-700 ml-4">「入居予定日」などの日付フィールドでは、「8/1」のように入力すると最も近い将来の日付（例: 2024/08/01）に自動整形されます。カレンダーアイコンから日付を選択することも可能です。</p>
+                <p className="text-gray-700 ml-4">日付フィールドで「8/1」と入力すると、最も近い未来の日付（例: 2024/08/01）に自動整形されます。カレンダーアイコンからも選択可能です。</p>
             </li>
              <li>
                 <SubTitle>・入力内容のチェック機能</SubTitle>
-                <p className="text-gray-700 ml-4">名前に数字が含まれていたり、生年月日が未来の日付になっているなど、入力ミスの可能性がある場合に確認のメッセージが表示されます。</p>
+                <p className="text-gray-700 ml-4">名前に数字が含まれるなど、入力ミス可能性がある場合に確認メッセージが表示されます。</p>
             </li>
           </ul>
 
-          <SectionTitle>コピーとリセット</SectionTitle>
+          <SectionTitle icon={ArrowPathIcon}>コピーとリセット</SectionTitle>
           <ul className="list-disc list-inside space-y-1">
-            <ListItem>右上の「コピー」ボタンをクリックすると、生成されたコメント全文がクリップボードにコピーされます。</ListItem>
-            <ListItem>コピーが完了すると、10分後にフォームが自動でリセットされるタイマーが作動します。</ListItem>
-            <ListItem>フォーム右上のリセットボタンを押すと、いつでもフォームを初期状態に戻せます。</ListItem>
+            <ListItem>右下の「コピー」ボタンをクリックすると、生成されたコメント全文がクリップボードにコピーされます。</ListItem>
+            <ListItem>コピーが完了すると、**15分後**にフォームを自動リセットするタイマーが起動します。</ListItem>
+            <ListItem>作業中に**他のタブに切り替える**と、このタイマーは自動で解除され、入力内容が保持されます。</ListItem>
+            <ListItem>右下の「リセット(終話)」ボタンで、いつでもフォームを初期状態に戻せます。(安全のため、確認画面が表示されます)</ListItem>
           </ul>
-          
-          <SectionTitle>商材ごとの違い</SectionTitle>
-           <ul className="list-disc list-inside space-y-1">
-            <ListItem>最初に利用する「商材」を選択すると、入力フォームの内容がその商品に合わせて最適化されます。</ListItem>
-          </ul>
-
-          <SubTitle>・SoftBank光 / SB Air</SubTitle>
-          <p className="text-gray-700 ml-4">従来のSoftBank光やSB Airのプランです。1Gか10Gかなど、正しいものを選択するとCP等の選択肢が切り替わります。</p>
-
-          <SubTitle>・賃貸ねっと</SubTitle>
-          <p className="text-gray-700 ml-4">
-              「タイプ」を選択すると「案内料金」が自動で入力されます。また、「10G」タイプを選ぶと「クロスパス無線ルーター」が自動で設定されます。「ファミリー」タイプの場合は、必須となる管理会社情報の入力欄が表示されます。
-          </p>
-
-          <SubTitle>・賃貸ねっと【無料施策】</SubTitle>
-          <p className="text-gray-700 ml-4">
-              こちらは更に賢い入力補助が働きます。例えば「タイプ」で「マンション10G」を選ぶと、「ラック」が自動的に「光配線クロス」に設定・固定されます。これにより、入力ミスを未然に防ぎます。
-          </p>
         </div>
         
         <div className="mt-6 text-right">

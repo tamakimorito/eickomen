@@ -18,11 +18,29 @@ export const Modal = ({
 
   const blueButtonClasses = "w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold";
   const grayButtonClasses = "w-full px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors font-semibold";
+  const redButtonClasses = "w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold";
 
-  // For warnings, the 'cancel' button ('修正する') is the primary action (blue).
-  const cancelButtonClasses = type === 'warning' ? blueButtonClasses : grayButtonClasses;
-  // The 'confirm' button ('このまま進む') is the secondary action (gray).
-  const confirmButtonClasses = type === 'warning' ? grayButtonClasses : blueButtonClasses;
+  let confirmButtonClasses = blueButtonClasses;
+  let cancelButtonClasses = grayButtonClasses;
+  
+  switch(type) {
+      case 'warning':
+          // For warnings, the 'cancel' button ('修正する') is the primary action (blue).
+          confirmButtonClasses = grayButtonClasses; // 'このまま進む' is secondary
+          cancelButtonClasses = blueButtonClasses;
+          break;
+      case 'danger':
+           // For danger, the 'confirm' button ('はい、リセットする') is the danger action (red).
+          confirmButtonClasses = redButtonClasses;
+          cancelButtonClasses = grayButtonClasses;
+          break;
+      default:
+           // Default behavior
+          confirmButtonClasses = blueButtonClasses;
+          cancelButtonClasses = grayButtonClasses;
+          break;
+  }
+
 
   return (
     <div className="fixed inset-0 bg-gray-600 bg-opacity-75 overflow-y-auto h-full w-full z-50 flex justify-center items-center p-4" id="my-modal">

@@ -10,7 +10,7 @@ const Header = ({ onManualOpen }) => {
             <BellIcon className="h-8 w-8 text-blue-800" />
             </div>
             <div>
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-wider">回線営業コメント作成ツール～エイコメン～</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-wider">営業コメント作成ツール～エイコメン～</h1>
             </div>
         </div>
         <button 
