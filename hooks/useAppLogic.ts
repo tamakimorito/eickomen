@@ -30,7 +30,7 @@ export const useAppLogic = ({ formData, resetForm }) => {
         type: 'default',
     });
 
-    const closeModal = () => setModalState(prev => ({ ...prev, isOpen: false }));
+    const closeModal = useCallback(() => setModalState(prev => ({ ...prev, isOpen: false })), []);
     
     // Comment Generation Logic
     useEffect(() => {
@@ -62,22 +62,64 @@ export const useAppLogic = ({ formData, resetForm }) => {
     
     // Copy and Reset Logic
     const handleCopy = useCallback(() => {
-        if (!generatedComment) {
-            setToast({ message: 'コメントが空です', type: 'error' });
-            return;
+        const { moveInDate, dob } = formData;
+        const errors = [];
+    
+        if (moveInDate) {
+            const moveIn = new Date(moveInDate);
+            const today = new Date();
+            // Compare dates only, ignoring time
+            moveIn.setHours(0, 0, 0, 0);
+            today.setHours(0, 0, 0, 0);
+            if (!isNaN(moveIn.getTime()) && moveIn < today) {
+                errors.push('・利用開始日が過去の日付になっています。');
+            }
         }
-        navigator.clipboard.writeText(generatedComment).then(() => {
-            setToast({ message: 'コメントをコピーしました！20分後にフォームはリセットされます。', type: 'success' });
-            if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
-            resetTimerRef.current = setTimeout(() => {
-                resetForm();
-                setToast({ message: 'フォームが自動リセットされました。', type: 'info' });
-            }, 20 * 60 * 1000); // 20 minutes
-        }).catch(err => {
-            setToast({ message: 'コピーに失敗しました', type: 'error' });
-            console.error('Copy failed', err);
-        });
-    }, [generatedComment, resetForm]);
+    
+        if (dob) {
+            const birthDate = new Date(dob);
+            const today = new Date();
+            if (!isNaN(birthDate.getTime()) && birthDate > today) {
+                errors.push('・生年月日が未来の日付になっています。');
+            }
+        }
+    
+        const performCopy = () => {
+            if (!generatedComment) {
+                setToast({ message: 'コメントが空です', type: 'error' });
+                return;
+            }
+            navigator.clipboard.writeText(generatedComment).then(() => {
+                setToast({ message: 'コメントをコピーしました！20分後にフォームはリセットされます。', type: 'success' });
+                if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
+                resetTimerRef.current = setTimeout(() => {
+                    resetForm();
+                    setToast({ message: 'フォームが自動リセットされました。', type: 'info' });
+                }, 20 * 60 * 1000); // 20 minutes
+            }).catch(err => {
+                setToast({ message: 'コピーに失敗しました', type: 'error' });
+                console.error('Copy failed', err);
+            });
+        };
+
+        if (errors.length > 0) {
+            setModalState({
+                isOpen: true,
+                title: '入力内容の確認',
+                message: `以下の問題が見つかりました。このままコピーしますか？\n\n${errors.join('\n')}`,
+                onConfirm: () => {
+                    closeModal();
+                    performCopy();
+                },
+                onCancel: closeModal,
+                confirmText: 'このままコピー',
+                cancelText: '修正する',
+                type: 'warning',
+            });
+        } else {
+            performCopy();
+        }
+    }, [generatedComment, formData, resetForm, closeModal, setToast]);
 
     const handleResetRequest = useCallback(() => {
         setModalState({
@@ -94,7 +136,7 @@ export const useAppLogic = ({ formData, resetForm }) => {
             cancelText: 'キャンセル',
             type: 'danger',
         });
-    }, [resetForm]);
+    }, [resetForm, closeModal]);
     
     // Tab Change Logic
     const onTabChange = useCallback((newTab) => {

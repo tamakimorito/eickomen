@@ -254,6 +254,7 @@ const generateGmoComment = (formData: FormData): string => {
         housingType, apName, customerId, gmoConstructionSplit, gmoCompensation, gmoRouter, greeting,
         contractorName, phone, gmoIsDocomoOwnerSame, gmoDocomoOwnerName, gmoDocomoOwnerPhone,
         existingLineCompany, gmoCallback1, gmoCallback2, gmoCallback3,
+        gmoCallbackDate1, gmoCallbackDate2, gmoCallbackDate3,
         gmoNoPairIdType, mobileCarrier, paymentMethod,
         managementCompany, managementNumber, contactPerson, noDrilling
     } = formData;
@@ -309,9 +310,9 @@ const generateGmoComment = (formData: FormData): string => {
     }
     
     commentLines.push('後確希望時間枠');
-    commentLines.push(`第一希望：${gmoCallback1 || ''}`);
-    commentLines.push(`第二希望：${gmoCallback2 || ''}`);
-    commentLines.push(`第三希望：${gmoCallback3 || ''}`);
+    commentLines.push(`第一希望：${formatDate(gmoCallbackDate1) || ''} ${gmoCallback1 || ''}`.trim());
+    commentLines.push(`第二希望：${formatDate(gmoCallbackDate2) || ''} ${gmoCallback2 || ''}`.trim());
+    commentLines.push(`第三希望：${formatDate(gmoCallbackDate3) || ''} ${gmoCallback3 || ''}`.trim());
 
     if (isFamily) {
         commentLines.push('\nオーナー確認');

@@ -171,26 +171,46 @@ const GasTab = () => {
                 </div>
             </div>
             
-            {needsWitness && (
-                <div className="border-t-2 border-dashed border-blue-300 pt-6 space-y-4">
-                    <h3 className="text-lg font-bold text-blue-700">ガス開栓情報</h3>
-                    <div className="p-4 bg-blue-50/50 rounded-lg border border-blue-200 space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                             <FormInput label="ガス開栓日" name="moveInDate" value={formData.moveInDate} onChange={()=>{}} disabled isInvalid={invalidFields.includes('moveInDate')} />
-                             <FormSelect label="立会時間枠" name="gasOpeningTimeSlot" value={formData.gasOpeningTimeSlot} onChange={handleInputChange} options={gasTimeSlotOptions} isInvalid={invalidFields.includes('gasOpeningTimeSlot')} required />
-                        </div>
-                         {(isNichi || isTokyo) && (
+            <div className="border-t-2 border-dashed border-blue-300 pt-6 space-y-4">
+                <h3 className="text-lg font-bold text-blue-700">ガス利用開始情報</h3>
+                <div className="p-4 bg-blue-50/50 rounded-lg border border-blue-200 space-y-4">
+                     <FormDateInput
+                        label="ガス利用開始日"
+                        name="moveInDate"
+                        value={formData.moveInDate}
+                        onChange={handleInputChange}
+                        onBlur={handleDateBlur}
+                        isInvalid={invalidFields.includes('moveInDate')}
+                        placeholder="例: 2024/08/01"
+                        required
+                    />
+                    {needsWitness && (
+                         <div className="pt-4 mt-4 border-t border-blue-200">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <FormInput label={isTokyo ? "立ち合い担当者フルネーム" : "立会者"} name="gasWitness" value={formData.gasWitness} onChange={handleInputChange} isInvalid={invalidFields.includes('gasWitness')} required />
-                                <FormInput label={isTokyo ? "立ち合い連絡先" : "ガス事前連絡先"} name="gasPreContact" value={formData.gasPreContact} onChange={handleInputChange} isInvalid={invalidFields.includes('gasPreContact')} required />
+                                <FormSelect
+                                    label="立会時間枠"
+                                    name="gasOpeningTimeSlot"
+                                    value={formData.gasOpeningTimeSlot}
+                                    onChange={handleInputChange}
+                                    options={gasTimeSlotOptions}
+                                    isInvalid={invalidFields.includes('gasOpeningTimeSlot')}
+                                    required
+                                    className="md:col-span-2"
+                                />
+                                {(isNichi || isTokyo) && (
+                                    <>
+                                        <FormInput label={isTokyo ? "立ち合い担当者フルネーム" : "立会者"} name="gasWitness" value={formData.gasWitness} onChange={handleInputChange} isInvalid={invalidFields.includes('gasWitness')} required />
+                                        <FormInput label={isTokyo ? "立ち合い連絡先" : "ガス事前連絡先"} name="gasPreContact" value={formData.gasPreContact} onChange={handleInputChange} isInvalid={invalidFields.includes('gasPreContact')} required />
+                                    </>
+                                )}
+                                {isNichi && (
+                                    <FormInput label="ガスエリア" name="gasArea" value={formData.gasArea} onChange={handleInputChange} placeholder="例: 東京ガス" isInvalid={invalidFields.includes('gasArea')} required />
+                                )}
                             </div>
-                        )}
-                        {isNichi && (
-                             <FormInput label="ガスエリア" name="gasArea" value={formData.gasArea} onChange={handleInputChange} placeholder="例: 東京ガス" isInvalid={invalidFields.includes('gasArea')} required />
-                        )}
-                    </div>
+                        </div>
+                    )}
                 </div>
-            )}
+            </div>
 
             <div className="border-t-2 border-dashed border-blue-300 pt-6 space-y-4">
                 <h3 className="text-lg font-bold text-blue-700">契約者情報</h3>
@@ -208,8 +228,7 @@ const GasTab = () => {
             <div className="border-t-2 border-dashed border-blue-300 pt-6 space-y-4">
                 <h3 className="text-lg font-bold text-blue-700">設置先情報</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormInput label="郵便番号" name="postalCode" value={formData.postalCode} onChange={handleInputChange} isInvalid={invalidFields.includes('postalCode')} required />
-                    <FormDateInput label="ガス利用開始日" name="moveInDate" value={formData.moveInDate} onChange={handleInputChange} onBlur={handleDateBlur} isInvalid={invalidFields.includes('moveInDate')} placeholder="例: 2024/08/01" required />
+                    <FormInput label="郵便番号" name="postalCode" value={formData.postalCode} onChange={handleInputChange} isInvalid={invalidFields.includes('postalCode')} required className="md:col-span-2" />
                     <FormInput label="住所" name="address" value={formData.address} onChange={handleInputChange} className="md:col-span-2" isInvalid={invalidFields.includes('address')} required />
                     <FormInput label="物件名＋部屋番号" name="buildingInfo" value={formData.buildingInfo} onChange={handleInputChange} className="md:col-span-2" isInvalid={invalidFields.includes('buildingInfo')} required />
                 </div>

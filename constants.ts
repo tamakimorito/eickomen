@@ -59,6 +59,9 @@ export const INITIAL_FORM_DATA: FormData = {
   gmoCallback1: '',
   gmoCallback2: '',
   gmoCallback3: '',
+  gmoCallbackDate1: '',
+  gmoCallbackDate2: '',
+  gmoCallbackDate3: '',
   gmoNoPairIdType: '',
   
   // --- AU Hikari Specific ---
@@ -514,5 +517,6 @@ export const WTS_CARRIER_OPTIONS = [
     { value: 'アハモ', label: 'アハモ' },
     { value: 'UQモバイル', label: 'UQモバイル' },
     { value: 'Yモバイル', label: 'Yモバイル' },
+    { value: '聞いてない', label: '聞いてない' },
     { value: 'その他', label: 'その他' },
 ];

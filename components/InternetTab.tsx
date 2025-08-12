@@ -274,7 +274,7 @@ const DefaultInternetForm = () => {
 }
 
 const GmoForm = () => {
-    const { formData, handleInputChange, invalidFields } = useContext(AppContext);
+    const { formData, handleInputChange, handleDateBlur, invalidFields } = useContext(AppContext);
     const { housingType, gmoIsDocomoOwnerSame } = formData;
     
     const isNoPair = housingType.includes('ペアなし');
@@ -377,19 +377,64 @@ const GmoForm = () => {
 
              <div className="border-t-2 border-dashed border-blue-300 pt-6 space-y-4">
                 <h3 className="text-lg font-bold text-blue-700">後確希望時間枠</h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <FormSelect
-                        label="第一希望" name="gmoCallback1" value={formData.gmoCallback1} onChange={handleInputChange}
-                        options={GMO_CALLBACK_TIME_SLOTS} isInvalid={invalidFields.includes('gmoCallback1')}
-                    />
-                     <FormSelect
-                        label="第二希望" name="gmoCallback2" value={formData.gmoCallback2} onChange={handleInputChange}
-                        options={GMO_CALLBACK_TIME_SLOTS} isInvalid={invalidFields.includes('gmoCallback2')}
-                    />
-                     <FormSelect
-                        label="第三希望" name="gmoCallback3" value={formData.gmoCallback3} onChange={handleInputChange}
-                        options={GMO_CALLBACK_TIME_SLOTS} isInvalid={invalidFields.includes('gmoCallback3')}
-                    />
+                <div className="space-y-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-3 bg-gray-50 rounded-lg border">
+                        <FormDateInput
+                            label="第一希望 日付"
+                            name="gmoCallbackDate1"
+                            value={formData.gmoCallbackDate1}
+                            onChange={handleInputChange}
+                            onBlur={handleDateBlur}
+                            isInvalid={invalidFields.includes('gmoCallbackDate1')}
+                            placeholder="例: 2024/08/15"
+                        />
+                        <FormSelect
+                            label="第一希望 時間"
+                            name="gmoCallback1"
+                            value={formData.gmoCallback1}
+                            onChange={handleInputChange}
+                            options={GMO_CALLBACK_TIME_SLOTS}
+                            isInvalid={invalidFields.includes('gmoCallback1')}
+                        />
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-3 bg-gray-50 rounded-lg border">
+                        <FormDateInput
+                            label="第二希望 日付"
+                            name="gmoCallbackDate2"
+                            value={formData.gmoCallbackDate2}
+                            onChange={handleInputChange}
+                            onBlur={handleDateBlur}
+                            isInvalid={invalidFields.includes('gmoCallbackDate2')}
+                            placeholder="例: 2024/08/16"
+                        />
+                        <FormSelect
+                            label="第二希望 時間"
+                            name="gmoCallback2"
+                            value={formData.gmoCallback2}
+                            onChange={handleInputChange}
+                            options={GMO_CALLBACK_TIME_SLOTS}
+                            isInvalid={invalidFields.includes('gmoCallback2')}
+                        />
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-3 bg-gray-50 rounded-lg border">
+                        <FormDateInput
+                            label="第三希望 日付"
+                            name="gmoCallbackDate3"
+                            value={formData.gmoCallbackDate3}
+                            onChange={handleInputChange}
+                            onBlur={handleDateBlur}
+                            isInvalid={invalidFields.includes('gmoCallbackDate3')}
+                            placeholder="例: 2024/08/17"
+                        />
+                        <FormSelect
+                            label="第三希望 時間"
+                            name="gmoCallback3"
+                            value={formData.gmoCallback3}
+                            onChange={handleInputChange}
+                            options={GMO_CALLBACK_TIME_SLOTS}
+                            isInvalid={invalidFields.includes('gmoCallback3')}
+                        />
+                    </div>
                 </div>
             </div>
             

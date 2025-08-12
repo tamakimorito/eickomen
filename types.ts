@@ -57,6 +57,9 @@ export type FormData = {
   gmoCallback1: string;
   gmoCallback2: string;
   gmoCallback3: string;
+  gmoCallbackDate1: string;
+  gmoCallbackDate2: string;
+  gmoCallbackDate3: string;
   gmoNoPairIdType: string;
   
   // --- AU Hikari Specific ---

@@ -252,7 +252,7 @@ const ElectricityTab = () => {
                     <FormSelect label="支払い方法" name="paymentMethod" value={formData.paymentMethod} onChange={handleInputChange} options={PAYMENT_METHOD_OPTIONS_EXTENDED} isInvalid={invalidFields.includes('paymentMethod')} />
                     {isSakaiRoute && (
                         <>
-                            <FormInput label="FM取込社名" name="elecImportCompanyName" value={formData.elecImportCompanyName} onChange={handleInputChange} isInvalid={invalidFields.includes('elecImportCompanyName')} />
+                            <FormInput label="FM取込社名" name="elecImportCompanyName" value={formData.elecImportCompanyName} onChange={handleInputChange} isInvalid={invalidFields.includes('elecImportCompanyName')} disabled={isSakaiRoute} />
                             <FormInput label="後確希望日/時間" name="elecPostConfirmationDateTime" value={formData.elecPostConfirmationDateTime} onChange={handleInputChange} isInvalid={invalidFields.includes('elecPostConfirmationDateTime')} />
                         </>
                     )}

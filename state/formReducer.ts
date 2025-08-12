@@ -61,9 +61,11 @@ export const formReducer = (state: FormData, action: FormAction): FormData => {
           if (value) { // value is the boolean 'checked'
               newState.elecRecordIdPrefix = 'サカイ';
               newState.gasRecordIdPrefix = 'サカイ';
+              newState.elecImportCompanyName = 'サカイ販路';
           } else {
               newState.elecRecordIdPrefix = 'それ以外';
               newState.gasRecordIdPrefix = 'それ以外';
+              newState.elecImportCompanyName = '';
           }
       }
 
@@ -106,7 +108,6 @@ export const formReducer = (state: FormData, action: FormAction): FormData => {
       // --- Electricity/Gas Contract Confirmation Logic ---
       const newElecProvider = name === 'elecProvider' ? value : newState.elecProvider;
       const newElecPrefix = newState.elecRecordIdPrefix;
-      const newGasProvider = name === 'gasProvider' ? value : newState.gasProvider;
 
       if (name === 'elecProvider' || name === 'recordId' || name === 'isSakaiRoute') {
         if (newElecProvider === 'プラチナでんき（ジャパン）' && newElecPrefix !== 'SR') {
@@ -124,14 +125,35 @@ export const formReducer = (state: FormData, action: FormAction): FormData => {
       }
       
       // --- Mailing Option Logic ---
-      const provider = name === 'elecProvider' ? value : (name === 'gasProvider' ? value : null);
-      if (provider) {
-        const providerConfig = {
-            '東京ガス電気セット': '現住所', '東邦ガスセット': '現住所', 'ループでんき': '新居', 'HTBエナジー': '新居', 'ユーパワー UPOWER': '新居', 'はぴe': '新居',
-            '東邦ガス単品': '現住所', '東急ガス': '現住所'
+      if (name === 'elecProvider') {
+        const newProvider = value;
+        const elecMailingConfig = {
+            'すまいのでんき（ストエネ）': '新居',
+            'プラチナでんき（ジャパン）': '新居',
+            '東京ガス電気セット': '現住所', 
+            '東邦ガスセット': '現住所', 
+            'ループでんき': '新居', 
+            'HTBエナジー': '新居', 
+            'ユーパワー UPOWER': '新居', 
+            'はぴe': '新居'
         };
-        if(providerConfig[provider]) {
-            newState.mailingOption = providerConfig[provider];
+        if (elecMailingConfig.hasOwnProperty(newProvider)) {
+            newState.mailingOption = elecMailingConfig[newProvider];
+        } else if (value === '') { 
+            newState.mailingOption = INITIAL_FORM_DATA.mailingOption;
+        }
+      }
+      
+      if (name === 'gasProvider') {
+        const newProvider = value;
+        const gasMailingConfig = {
+            '東邦ガス単品': '現住所', 
+            '東急ガス': '現住所'
+        };
+        if (gasMailingConfig.hasOwnProperty(newProvider)) {
+            newState.mailingOption = gasMailingConfig[newProvider];
+        } else if (value === '') {
+            newState.mailingOption = INITIAL_FORM_DATA.mailingOption;
         }
       }
       
