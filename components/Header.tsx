@@ -11,7 +11,7 @@ const Header = ({ onManualOpen, onResetRequest }) => {
             </div>
             <div>
             <h1 className="text-2xl sm:text-3xl font-bold tracking-wider">営業コメント作成ツール～エイコメン～</h1>
-            <p className="text-xs text-blue-200 mt-1">最終更新: 2024/08/12 16:51</p>
+            <p className="text-xs text-blue-200 mt-1">最終更新: 2024/08/12 17:15</p>
             </div>
         </div>
         <div className="flex items-center gap-x-3">

@@ -167,63 +167,68 @@ const generateDefaultInternetComment = (formData: FormData): string => {
             break;
             
         default: // This handles '賃貸ねっと' and '賃貸ねっと【無料施策】'
-            const isChintai = product && product.includes('賃貸ねっと');
-            if (isChintai) {
-                 commentLines.push(`【${product || ''}】`);
-                 commentLines.push(idField);
-                 commentLines.push(`名乗り：${greeting || ''}`);
-                 commentLines.push(`担当者：${apName || ''}`);
-                 commentLines.push('---');
-                 commentLines.push('【契約者情報】');
-                 commentLines.push(`契約者名義（漢字）：${contractorName || ''}`);
-                 commentLines.push(`契約者名義（フリガナ）：${contractorNameKana || ''}`);
-                 commentLines.push(`生年月日（西暦）：${dob || ''}`);
-                 commentLines.push(`電話番号：${phone || ''}`);
-                 commentLines.push(`メアド：${email || ''}`);
-                 commentLines.push('---');
-                 commentLines.push('【設置先情報】');
-                 commentLines.push(`郵便番号：${postalCode || ''}`);
-                 commentLines.push(`住所：${address || ''}`);
-                 commentLines.push(`物件名＋部屋番号：${buildingInfo || ''}`);
-                 commentLines.push(`利用開始日(必ず引っ越し日を記載)：${moveInDate || ''}`);
-                 commentLines.push('---');
-                 commentLines.push('【その他詳細】');
-                 commentLines.push(`書面発送先：${mailingOptionLabel || ''}`);
-                 if (mailingOption === '現住所') {
-                     commentLines.push(`現住所の郵便番号：${currentPostalCode || ''}`);
-                     commentLines.push(`現住所・物件名・部屋番号：${currentAddress || ''}`);
-                 }
-                 commentLines.push(`案内料金：${serviceFee || ''}`);
-                 const isChintaiFree = product === '賃貸ねっと【無料施策】';
-                 if (!isChintaiFree) {
-                     commentLines.push(`ゼニガメ：${existingLineStatus || ''}`);
-                     if (existingLineStatus === 'あり') {
-                         commentLines.push(`現状回線：${existingLineCompany || ''}`);
-                     }
-                 }
-                 commentLines.push(`支払方法：${paymentMethod || ''}`);
-                 if (paymentMethod === '口座') {
-                     commentLines.push(`銀行名：${bankName || ''}`);
-                 }
-                 commentLines.push(`クロスパス無線ルーター：${crossPathRouter || ''}`);
-                 
-                 if (isFamily) {
-                    commentLines.push('---');
-                    commentLines.push('【管理会社情報】');
-                    commentLines.push(`①管理会社名：${managementCompany || ''}`);
-                    commentLines.push(`②管理連絡先：${managementContact || ''}`);
-                    commentLines.push(`③担当者名：${contactPerson || ''}`);
-                    commentLines.push(`④ビル調査希望：${buildingSurveyRequest || ''}`);
-                    commentLines.push(`⑤図面提出方法と送付先：${drawingSubmissionContact || ''}`);
+            { // Use a block to scope variables
+                const isChintaiProduct = product && product.includes('賃貸ねっと');
+                if (isChintaiProduct) {
+                    const isChintaiFree = product === '賃貸ねっと【無料施策】';
+                    const header = isChintaiFree 
+                        ? '【ちんむりょ賃貸ねっと無料施策】250811' 
+                        : '【賃貸ねっと】250811';
+
+                    commentLines.push(header);
+                    commentLines.push(`タイプ：${housingType || ''}`);
+                    commentLines.push(`AP名：${apName || ''}`);
+                    commentLines.push(idField);
+                    commentLines.push(`名乗り：${greeting || ''}`);
+
+                    if (!isChintaiFree) {
+                        const zenigameText = existingLineStatus === 'あり' ? `あり（現状回線：${existingLineCompany || ''}）` : (existingLineStatus || '無し');
+                        commentLines.push(`ゼニガメ：${zenigameText}`);
+                    }
+
+                    commentLines.push(`ラック：${rackType || ''}`);
+                    commentLines.push(`メアド：${email || ''}`);
+                    commentLines.push(`契約者名義（漢字）：${contractorName || ''}`);
+                    commentLines.push(`契約者名義（フリガナ）：${contractorNameKana || ''}`);
+                    commentLines.push(`生年月日(西暦)：${dob || ''}`);
+                    commentLines.push(`電話番号(ハイフン無し)：${phone || ''}`);
+                    commentLines.push(`➤設置先`);
+                    commentLines.push(`郵便番号(〒・ハイフン無し)：${postalCode || ''}`);
+                    commentLines.push(`住所：${address || ''}`);
+                    commentLines.push(`物件名＋部屋番号：${buildingInfo || ''}`);
+                    commentLines.push(`利用開始日(必ず引っ越し日を記載)：${moveInDate || ''}`);
+                    commentLines.push(`■書面発送先：${mailingOptionLabel || ''}`);
+                    
+                    if (mailingOption === '現住所') {
+                        commentLines.push(`現住所の場合郵便番号(〒・ハイフン無し)：${currentPostalCode || ''}`);
+                        commentLines.push(`住所・物件名・部屋番号：${currentAddress || ''}`);
+                    }
+                    
+                    commentLines.push(`案内料金：${serviceFee || ''}`);
+                    const paymentText = paymentMethod === '口座' ? `口座（銀行名：${bankName || ''}）※外国人は口座NG` : (paymentMethod || '');
+                    commentLines.push(`支払方法：${paymentText}`);
+                    commentLines.push(`クロスパス無線ルーター：${crossPathRouter || ''}`);
+                    commentLines.push(`備考：${remarks || ''}`);
+
+                    if (isFamily) {
+                        commentLines.push(
+                            ``,
+                            `ファミリータイプはオーナー確認①②③必須！`,
+                            `図面提出ある場合は④を「有」にして⑤を記載`,
+                            ``,
+                            `管理会社情報`,
+                            `①管理会社名：${managementCompany || ''}`,
+                            `②管理連絡先：${managementContact || ''}`,
+                            `③担当者名：${contactPerson || ''}`,
+                            `④ビル調査希望：${buildingSurveyRequest || '無'}`,
+                            `⑤図面提出方法と送付先：${drawingSubmissionContact || '無'}`
+                        );
+                    }
+
+                    return commentLines.join('\n');
+                } else {
+                    return '商材を選択してください。';
                 }
-                 
-                 if (remarks) {
-                     commentLines.push('---');
-                     commentLines.push(`備考：${remarks}`);
-                 }
-                 return commentLines.join('\n');
-            } else {
-                 return '商材を選択してください。';
             }
     }
 
