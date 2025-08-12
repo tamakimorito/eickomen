@@ -14,106 +14,235 @@ const formatDate = (dateStr) => {
 
 const generateDefaultInternetComment = (formData: FormData): string => {
     const {
-        apName, customerId, greeting, contractorName, contractorNameKana, gender, dob, phone, email,
-        postalCode, address, buildingInfo, moveInDate,
-        mailingOption, currentPostalCode, currentAddress,
-        product, housingType, rackType, serviceFee, campaign, preActivationRental,
-        existingLineStatus, existingLineCompany, mobileCarrier, homeDiscount, wifiRouter,
-        paymentMethod, bankName, crossPathRouter,
-        managementCompany, managementNumber, managementContact, contactPerson,
-        buildingSurveyRequest, drawingSubmissionContact,
-        remarks, isSakaiRoute, recordId
+        product,
+        housingType,
+        apName,
+        customerId,
+        recordId,
+        isSakaiRoute,
+        greeting,
+        rackType,
+        contractorName,
+        contractorNameKana,
+        gender,
+        dob,
+        phone,
+        postalCode,
+        address,
+        buildingInfo,
+        moveInDate,
+        mailingOption,
+        currentPostalCode,
+        currentAddress,
+        serviceFee,
+        campaign,
+        preActivationRental,
+        existingLineStatus,
+        existingLineCompany,
+        mobileCarrier,
+        homeDiscount,
+        wifiRouter,
+        remarks,
+        managementCompany,
+        managementNumber,
+        contactPerson,
+        noDrilling,
+        // Chintai specific fields
+        email,
+        paymentMethod,
+        bankName,
+        crossPathRouter,
+        managementContact,
+        buildingSurveyRequest,
+        drawingSubmissionContact
     } = formData;
 
     const idField = isSakaiRoute ? `レコードID：${recordId || ''}` : `顧客ID：${customerId || ''}`;
-    const isChintai = product && product.includes('賃貸ねっと');
-    const isChintaiFree = product === '賃貸ねっと【無料施策】';
     const isFamily = housingType && housingType.includes('ファミリー');
+    const mailingOptionLabel = mailingOption === '新居' ? '新居(設置先と同じ)' : '現住所';
+    let commentLines = [];
 
-    const commentLines = [];
+    switch (product) {
+        case 'SoftBank光1G':
+            commentLines = [
+                `〓SoftBank光1G〓250811`,
+                `タイプ：${housingType || ''}`,
+                `AP名：${apName || ''}`,
+                idField,
+                `名乗り(お客様にSMS届くため正確に)：${greeting || ''}`,
+                `ラック：${rackType || ''}`,
+                `契約者名義（漢字）：${contractorName || ''}`,
+                `契約者名義（フリガナ）：${contractorNameKana || ''}`,
+                `性別：${gender || ''}`,
+                `生年月日(西暦)：${dob || ''}`,
+                `電話番号(ハイフンあり)：${phone || ''}`,
+                `➤設置先`,
+                `郵便番号(〒・ハイフン無し)：${postalCode || ''}`,
+                `住所：${address || ''}`,
+                `物件名＋部屋番号：${buildingInfo || ''}`,
+                `入居予定日：${moveInDate || ''}`,
+                `■書面発送先：${mailingOptionLabel || ''}`,
+            ];
+            if (mailingOption === '現住所') {
+                commentLines.push(`現住所の場合郵便番号(〒・ハイフン無し)：${currentPostalCode || ''}`);
+                commentLines.push(`住所・物件名・部屋番号：${currentAddress || ''}`);
+            }
+            commentLines.push(
+                `案内料金：${serviceFee || ''}`,
+                `ＣＰ：${campaign || ''}`,
+                `開通前レンタル：${preActivationRental || ''}`,
+                `既存回線：${existingLineStatus === 'あり' ? `あり（回線会社：${existingLineCompany || ''}）` : '無し'}`,
+                `携帯キャリア：${mobileCarrier || ''}`,
+                `おうち割：${homeDiscount || ''}`,
+                `無線ルーター購入：${wifiRouter || ''}`,
+                `備考：${remarks || ''}`
+            );
+            break;
 
-    commentLines.push(`【${product || ''}】`);
-    commentLines.push(idField);
-    commentLines.push(isChintai ? `名乗り：${greeting || ''}` : `名乗り（SMS届くので正確に）：${greeting || ''}`);
-    commentLines.push(`担当者：${apName || ''}`);
-    commentLines.push('---');
-    commentLines.push('【契約者情報】');
-    commentLines.push(`契約者名義（漢字）：${contractorName || ''}`);
-    commentLines.push(`契約者名義（フリガナ）：${contractorNameKana || ''}`);
-    if (!isChintai && !isChintaiFree) {
-        commentLines.push(`性別：${gender || ''}`);
-    }
-    commentLines.push(`生年月日（西暦）：${dob || ''}`);
-    commentLines.push(`電話番号：${phone || ''}`);
-    if (isChintai || isChintaiFree) {
-        commentLines.push(`メアド：${email || ''}`);
-    }
-    commentLines.push('---');
-    commentLines.push('【設置先情報】');
-    commentLines.push(`郵便番号：${postalCode || ''}`);
-    commentLines.push(`住所：${address || ''}`);
-    commentLines.push(`物件名＋部屋番号：${buildingInfo || ''}`);
-    commentLines.push(`${isChintai || isChintaiFree ? "利用開始日(必ず引っ越し日を記載)" : "入居予定日"}：${moveInDate || ''}`);
-    commentLines.push('---');
-    commentLines.push('【その他詳細】');
-    commentLines.push(`書面発送先：${mailingOption || ''}`);
-    if (mailingOption === '現住所') {
-        commentLines.push(`現住所の郵便番号：${currentPostalCode || ''}`);
-        commentLines.push(`現住所・物件名・部屋番号：${currentAddress || ''}`);
-    }
-    commentLines.push(`案内料金：${serviceFee || ''}`);
+        case 'SoftBank光10G':
+            commentLines = [
+                `〓SoftBank光10ギガ〓250731`,
+                `タイプ：${housingType || ''}`,
+                `AP名：${apName || ''}`,
+                idField,
+                `名乗り（SMS届くので正確に）：${greeting || ''}`,
+                `ラック：${rackType || ''}`,
+                `契約者名義（漢字）：${contractorName || ''}`,
+                `契約者名義（フリガナ）：${contractorNameKana || ''}`,
+                `性別：${gender || ''}`,
+                `生年月日(西暦)：${dob || ''}`,
+                `電話番号(ハイフンあり)：${phone || ''}`,
+                `➤設置先`,
+                `郵便番号(〒・ハイフン無し)：${postalCode || ''}`,
+                `住所：${address || ''}`,
+                `物件名＋部屋番号：${buildingInfo || ''}`,
+                `入居予定日：${moveInDate || ''}`,
+                `■書面発送先：${mailingOptionLabel || ''}`,
+            ];
+            if (mailingOption === '現住所') {
+                commentLines.push(`現住所の場合郵便番号(〒・ハイフン無し)：${currentPostalCode || ''}`);
+                commentLines.push(`住所・物件名・部屋番号：${currentAddress || ''}`);
+            }
+            commentLines.push(
+                `案内料金：${serviceFee || ''}`,
+                `ＣＰ：${campaign || ''}`,
+                `開通前レンタル：${preActivationRental || ''}`,
+                `既存回線：${existingLineStatus === 'あり' ? `あり（回線会社：${existingLineCompany || ''}）` : '無し'}`,
+                `携帯キャリア：${mobileCarrier || ''}`,
+                `おうち割：${homeDiscount || ''}`,
+                `備考：${remarks || ''}`
+            );
+            break;
 
-    if (!isChintai && !isChintaiFree) {
-        commentLines.push(`CP：${campaign || ''}`);
-    }
-    if (product !== 'SB Air' && !isChintai && !isChintaiFree) {
-        commentLines.push(`開通前レンタル：${preActivationRental || ''}`);
-    }
-    if (!isChintaiFree) {
-        commentLines.push(`${isChintai ? "ゼニガメ" : "既存回線"}：${existingLineStatus || ''}`);
-        if (existingLineStatus === 'あり') {
-            commentLines.push(`${isChintai ? "現状回線" : "回線会社"}：${existingLineCompany || ''}`);
-        }
-    }
-
-    if (isChintai || isChintaiFree) {
-        commentLines.push(`支払方法：${paymentMethod || ''}`);
-        if (paymentMethod === '口座') {
-            commentLines.push(`銀行名：${bankName || ''}`);
-        }
-        commentLines.push(`クロスパス無線ルーター：${crossPathRouter || ''}`);
-    }
-
-    if (!isChintai && !isChintaiFree) {
-        commentLines.push(`携帯キャリア：${mobileCarrier || ''}`);
-        if (product !== 'SB Air') {
-            commentLines.push(`おうち割：${homeDiscount || ''}`);
-        }
-    }
-    
-    if (product === 'SoftBank光1G') {
-        commentLines.push(`無線ルーター購入：${wifiRouter || ''}`);
+        case 'SB Air':
+            commentLines = [
+                `〓SB Air〓250811`,
+                `タイプ：${housingType || ''}`,
+                `AP名：${apName || ''}`,
+                idField,
+                `名乗り（SMS届くので正確に）：${greeting || ''}`,
+                `契約者名義（漢字）：${contractorName || ''}`,
+                `契約者名義（フリガナ）：${contractorNameKana || ''}`,
+                `性別：${gender || ''}`,
+                `生年月日(西暦)：${dob || ''}`,
+                `電話番号(ハイフンあり)：${phone || ''}`,
+                `➤設置先`,
+                `郵便番号(〒・ハイフン無し)：${postalCode || ''}`,
+                `住所：${address || ''}`,
+                `物件名＋部屋番号：${buildingInfo || ''}`,
+                `入居予定日：${moveInDate || ''}`,
+                `■書面発送先：${mailingOptionLabel || ''}`,
+            ];
+            if (mailingOption === '現住所') {
+                commentLines.push(`現住所の場合郵便番号(〒・ハイフン無し)：${currentPostalCode || ''}`);
+                commentLines.push(`住所・物件名・部屋番号：${currentAddress || ''}`);
+            }
+            commentLines.push(
+                `案内料金：${serviceFee || ''}`,
+                `ＣＰ：${campaign || ''}`,
+                `既存回線：${existingLineStatus === 'あり' ? `あり（回線会社：${existingLineCompany || ''}）` : '無し'}`,
+                `携帯キャリア：${mobileCarrier || ''}`,
+                `備考：${remarks || ''}`
+            );
+            break;
+            
+        default: // This handles '賃貸ねっと' and '賃貸ねっと【無料施策】'
+            const isChintai = product && product.includes('賃貸ねっと');
+            if (isChintai) {
+                 commentLines.push(`【${product || ''}】`);
+                 commentLines.push(idField);
+                 commentLines.push(`名乗り：${greeting || ''}`);
+                 commentLines.push(`担当者：${apName || ''}`);
+                 commentLines.push('---');
+                 commentLines.push('【契約者情報】');
+                 commentLines.push(`契約者名義（漢字）：${contractorName || ''}`);
+                 commentLines.push(`契約者名義（フリガナ）：${contractorNameKana || ''}`);
+                 commentLines.push(`生年月日（西暦）：${dob || ''}`);
+                 commentLines.push(`電話番号：${phone || ''}`);
+                 commentLines.push(`メアド：${email || ''}`);
+                 commentLines.push('---');
+                 commentLines.push('【設置先情報】');
+                 commentLines.push(`郵便番号：${postalCode || ''}`);
+                 commentLines.push(`住所：${address || ''}`);
+                 commentLines.push(`物件名＋部屋番号：${buildingInfo || ''}`);
+                 commentLines.push(`利用開始日(必ず引っ越し日を記載)：${moveInDate || ''}`);
+                 commentLines.push('---');
+                 commentLines.push('【その他詳細】');
+                 commentLines.push(`書面発送先：${mailingOptionLabel || ''}`);
+                 if (mailingOption === '現住所') {
+                     commentLines.push(`現住所の郵便番号：${currentPostalCode || ''}`);
+                     commentLines.push(`現住所・物件名・部屋番号：${currentAddress || ''}`);
+                 }
+                 commentLines.push(`案内料金：${serviceFee || ''}`);
+                 const isChintaiFree = product === '賃貸ねっと【無料施策】';
+                 if (!isChintaiFree) {
+                     commentLines.push(`ゼニガメ：${existingLineStatus || ''}`);
+                     if (existingLineStatus === 'あり') {
+                         commentLines.push(`現状回線：${existingLineCompany || ''}`);
+                     }
+                 }
+                 commentLines.push(`支払方法：${paymentMethod || ''}`);
+                 if (paymentMethod === '口座') {
+                     commentLines.push(`銀行名：${bankName || ''}`);
+                 }
+                 commentLines.push(`クロスパス無線ルーター：${crossPathRouter || ''}`);
+                 
+                 if (isFamily) {
+                    commentLines.push('---');
+                    commentLines.push('【管理会社情報】');
+                    commentLines.push(`①管理会社名：${managementCompany || ''}`);
+                    commentLines.push(`②管理連絡先：${managementContact || ''}`);
+                    commentLines.push(`③担当者名：${contactPerson || ''}`);
+                    commentLines.push(`④ビル調査希望：${buildingSurveyRequest || ''}`);
+                    commentLines.push(`⑤図面提出方法と送付先：${drawingSubmissionContact || ''}`);
+                }
+                 
+                 if (remarks) {
+                     commentLines.push('---');
+                     commentLines.push(`備考：${remarks}`);
+                 }
+                 return commentLines.join('\n');
+            } else {
+                 return '商材を選択してください。';
+            }
     }
 
     if (isFamily) {
-        commentLines.push('---');
-        commentLines.push(isChintai ? '【管理会社情報】' : '【オーナー情報】');
-        commentLines.push(`①管理会社名：${managementCompany || ''}`);
-        commentLines.push(`②管理連絡先：${managementContact || ''}`);
-        commentLines.push(`③担当者名：${contactPerson || ''}`);
-        if (isChintai) {
-            commentLines.push(`④ビル調査希望：${buildingSurveyRequest || ''}`);
-            commentLines.push(`⑤図面提出方法と送付先：${drawingSubmissionContact || ''}`);
+        commentLines.push(
+            ``,
+            `オーナー情報`,
+            `・管理会社：${managementCompany || ''}`,
+            `・管理番号：${managementNumber || ''}`,
+            `・担当者：${contactPerson || ''}`
+        );
+        if (noDrilling) {
+            commentLines.push(`穴あけ・ビス止めNG`);
         }
     }
 
-    if (remarks) {
-        commentLines.push('---');
-        commentLines.push(`備考：${remarks}`);
-    }
-    
-    return commentLines.join('\n');
-}
+    return commentLines.filter(line => line !== null && line !== undefined).join('\n');
+};
+
 
 const generateGmoComment = (formData: FormData): string => {
     const {

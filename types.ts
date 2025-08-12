@@ -116,6 +116,7 @@ export type FormData = {
   wtsU20ParentalConsent: string;
   // Corporate only
   wtsCorporateInvoice: string;
+  wtsEmail: string;
 };
 
 // Action types for form reducer

@@ -118,6 +118,10 @@ export const useAppLogic = ({ formData, resetForm }) => {
     };
 
     const handleBugReportSubmit = useCallback(async () => {
+        if (!formData.apName.trim()) {
+            setToast({ message: '「担当者/AP名」を入力してください。', type: 'error' });
+            return;
+        }
         if (!bugReportState.text.trim()) {
             setBugReportState(prev => ({ ...prev, isInvalid: true }));
             return;

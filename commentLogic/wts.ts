@@ -18,43 +18,52 @@ export const generateWtsCommentLogic = (formData: FormData): string => {
         wtsServerColor, wtsFiveYearPlan, wtsFreeWater, wtsCreditCard, wtsCarrier,
         moveInDate, wtsWaterPurifier, wtsMultipleUnits, wtsCustomerType,
         wtsU20HighSchool, wtsU20ParentalConsent, wtsCorporateInvoice, remarks, wtsMailingAddress,
-        recordId, isSakaiRoute, wtsServerType
+        recordId, isSakaiRoute, wtsServerType, wtsEmail
     } = { ...formData, dob: formatDate(formData.dob), moveInDate: formatDate(formData.moveInDate) };
 
     const idField = isSakaiRoute ? `レコードID：${recordId || ''}` : `顧客ID：${customerId || ''}`;
     const serverAndColor = `${wtsServerType || ''} ${wtsServerColor || ''}`.trim();
     
-    let commentLines = [];
+    let header = '【プレミアムウォーター】';
+    if (wtsCustomerType === 'U-20') {
+        header = '【プレミアムウォーターU20】';
+    } else if (wtsCustomerType === '法人') {
+        header = '【プレミアムウォーター法人】';
+    }
+    
+    const commentLines = [header];
 
-    // Header based on customer type
     if (wtsCustomerType === 'U-20') {
         commentLines.push(`※高校生ヒアリング：${wtsU20HighSchool || ''}`);
         commentLines.push(`※親相談OKか：${wtsU20ParentalConsent || ''}`);
     }
 
-    // Common fields for all types
     commentLines.push(`AP名：${apName || ''}`);
     commentLines.push(idField);
-    commentLines.push(`①名義：${wtsCustomerType === '法人' ? (contractorName || '') : `（${contractorName || ''}）`}`);
-    commentLines.push(`②生年月日：${dob || ''}`);
-    commentLines.push(`③番号：${phone || ''}`);
-    commentLines.push(`④発送先：${wtsShippingDestination || ''}`);
-    commentLines.push(`⑤サーバー・色：${serverAndColor}`);
-    commentLines.push(`⑥契約年数：${wtsFiveYearPlan || ''}`);
-    commentLines.push(`⑦無料水：${wtsFreeWater || ''}`);
-    commentLines.push(`⑧クレカ：${wtsCreditCard || ''}`);
-    commentLines.push(`⑨キャリア：${wtsCarrier || ''}`);
-    commentLines.push(`⑩入居予定日：${moveInDate || ''}`);
-    commentLines.push(`⑪書面送付先：${wtsMailingAddress || ''}`);
-
-    // Type-specific fields
+    
+    let currentIndex = 1;
+    commentLines.push(`${currentIndex++}）名義：${wtsCustomerType === '法人' ? (contractorName || '') : `（${contractorName || ''}）`}`);
+    commentLines.push(`${currentIndex++}）生年月日：${dob || ''}`);
+    commentLines.push(`${currentIndex++}）番号：${phone || ''}`);
     if (wtsCustomerType === '法人') {
-        commentLines.push(`⑫請求書先：${wtsCorporateInvoice || ''}`);
-        commentLines.push(`⑬浄水器確認：${wtsWaterPurifier || ''}`);
-        commentLines.push(`⑭複数台提案：${wtsMultipleUnits || ''}`);
-    } else { // 通常 and U-20
-        commentLines.push(`⑫浄水器確認：${wtsWaterPurifier || ''}`);
-        commentLines.push(`⑬複数台提案：${wtsMultipleUnits || ''}`);
+        commentLines.push(`${currentIndex++}）メアド：${wtsEmail || ''}`);
+    }
+    commentLines.push(`${currentIndex++}）発送先：${wtsShippingDestination || ''}`);
+    commentLines.push(`${currentIndex++}）サーバー・色：${serverAndColor}`);
+    commentLines.push(`${currentIndex++}）契約年数：${wtsFiveYearPlan || ''}`);
+    commentLines.push(`${currentIndex++}）無料水：${wtsFreeWater || ''}`);
+    commentLines.push(`${currentIndex++}）クレカ：${wtsCreditCard || ''}`);
+    commentLines.push(`${currentIndex++}）キャリア：${wtsCarrier || ''}`);
+    commentLines.push(`${currentIndex++}）入居予定日：${moveInDate || ''}`);
+    commentLines.push(`${currentIndex++}）書面送付先：${wtsMailingAddress || ''}`);
+
+    if (wtsCustomerType === '法人') {
+        commentLines.push(`${currentIndex++}）請求書先：${wtsCorporateInvoice || ''}`);
+        commentLines.push(`${currentIndex++}）浄水器確認：${wtsWaterPurifier || ''}`);
+        commentLines.push(`${currentIndex++}）複数台提案：${wtsMultipleUnits || ''}`);
+    } else {
+        commentLines.push(`${currentIndex++}）浄水器確認：${wtsWaterPurifier || ''}`);
+        commentLines.push(`${currentIndex++}）複数台提案：${wtsMultipleUnits || ''}`);
     }
 
     let comment = commentLines.join('\n');

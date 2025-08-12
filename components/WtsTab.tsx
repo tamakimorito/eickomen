@@ -16,6 +16,15 @@ const WtsTab = () => {
     const colorOptions = useMemo(() => {
         return wtsServerType && WTS_COLORS[wtsServerType] ? WTS_COLORS[wtsServerType] : [];
     }, [wtsServerType]);
+    
+    const isCorporate = wtsCustomerType === '法人';
+    
+    // Dynamically adjust numbering
+    const num = (base) => {
+      let n = base;
+      if (isCorporate) n += 1;
+      return `⑩${String.fromCharCode(n + 82)}`.replace('⑩10', '⑭').replace('⑩11', '⑮');
+    };
 
     return (
         <div className="space-y-6">
@@ -108,8 +117,19 @@ const WtsTab = () => {
                         isInvalid={invalidFields.includes('phone')}
                         required
                     />
+                    {isCorporate && (
+                         <FormInput
+                            label="④メアド"
+                            name="wtsEmail"
+                            type="email"
+                            value={formData.wtsEmail}
+                            onChange={handleInputChange}
+                            isInvalid={invalidFields.includes('wtsEmail')}
+                            required
+                        />
+                    )}
                     <FormSelect
-                        label="④発送先"
+                        label={isCorporate ? "⑤発送先" : "④発送先"}
                         name="wtsShippingDestination"
                         value={formData.wtsShippingDestination}
                         onChange={handleInputChange}
@@ -118,7 +138,7 @@ const WtsTab = () => {
                         required
                     />
                     <FormSelect
-                        label="⑤サーバー"
+                        label={isCorporate ? "⑥サーバー" : "⑤サーバー"}
                         name="wtsServerType"
                         value={formData.wtsServerType}
                         onChange={handleInputChange}
@@ -127,7 +147,7 @@ const WtsTab = () => {
                         required
                     />
                     <FormSelect
-                        label="⑥色"
+                        label={isCorporate ? "⑦色" : "⑥色"}
                         name="wtsServerColor"
                         value={formData.wtsServerColor}
                         onChange={handleInputChange}
@@ -137,7 +157,7 @@ const WtsTab = () => {
                         disabled={!formData.wtsServerType}
                     />
                      <FormSelect
-                        label="⑦契約年数"
+                        label={isCorporate ? "⑧契約年数" : "⑦契約年数"}
                         name="wtsFiveYearPlan"
                         value={formData.wtsFiveYearPlan}
                         onChange={handleInputChange}
@@ -146,7 +166,7 @@ const WtsTab = () => {
                         required
                     />
                      <FormInput
-                        label="⑧無料水"
+                        label={isCorporate ? "⑨無料水" : "⑧無料水"}
                         name="wtsFreeWater"
                         value={formData.wtsFreeWater}
                         onChange={handleInputChange}
@@ -154,7 +174,7 @@ const WtsTab = () => {
                         required
                     />
                      <FormInput
-                        label="⑨クレカ"
+                        label={isCorporate ? "⑩クレカ" : "⑨クレカ"}
                         name="wtsCreditCard"
                         value={formData.wtsCreditCard}
                         onChange={handleInputChange}
@@ -163,7 +183,7 @@ const WtsTab = () => {
                         required
                     />
                     <FormInput
-                        label="⑩キャリア"
+                        label={isCorporate ? "⑪キャリア" : "⑩キャリア"}
                         name="wtsCarrier"
                         value={formData.wtsCarrier}
                         onChange={handleInputChange}
@@ -171,7 +191,7 @@ const WtsTab = () => {
                         required
                     />
                     <FormDateInput
-                        label="⑪入居予定日"
+                        label={isCorporate ? "⑫入居予定日" : "⑪入居予定日"}
                         name="moveInDate"
                         value={formData.moveInDate}
                         onChange={handleInputChange}
@@ -181,7 +201,7 @@ const WtsTab = () => {
                         required
                     />
                      <FormRadioGroup
-                        label="⑫書面送付先"
+                        label={isCorporate ? "⑬書面送付先" : "⑫書面送付先"}
                         name="wtsMailingAddress"
                         value={formData.wtsMailingAddress}
                         onChange={handleInputChange}
@@ -189,9 +209,9 @@ const WtsTab = () => {
                         isInvalid={invalidFields.includes('wtsMailingAddress')}
                         required
                     />
-                     {wtsCustomerType === '法人' ? (
+                     {isCorporate ? (
                         <FormInput
-                            label="⑬請求書先"
+                            label="⑭請求書先"
                             name="wtsCorporateInvoice"
                             value={formData.wtsCorporateInvoice}
                             onChange={handleInputChange}
@@ -210,9 +230,9 @@ const WtsTab = () => {
                         />
                      )}
 
-                    {wtsCustomerType === '法人' ? (
+                    {isCorporate ? (
                          <FormSelect
-                            label="⑭浄水器確認"
+                            label="⑮浄水器確認"
                             name="wtsWaterPurifier"
                             value={formData.wtsWaterPurifier}
                             onChange={handleInputChange}
@@ -232,9 +252,9 @@ const WtsTab = () => {
                         />
                     )}
 
-                    {wtsCustomerType === '法人' && (
+                    {isCorporate && (
                           <FormSelect
-                            label="⑮複数台提案"
+                            label="⑯複数台提案"
                             name="wtsMultipleUnits"
                             value={formData.wtsMultipleUnits}
                             onChange={handleInputChange}
