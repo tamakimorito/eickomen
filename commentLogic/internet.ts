@@ -1,3 +1,5 @@
+
+
 import type { FormData } from '../types.ts';
 
 const formatDate = (dateStr) => {
@@ -47,6 +49,8 @@ const generateDefaultInternetComment = (formData: FormData): string => {
         managementNumber,
         contactPerson,
         noDrilling,
+        drawingSubmission,
+        drawingSubmissionContact,
         // Chintai specific fields
         email,
         paymentMethod,
@@ -54,7 +58,6 @@ const generateDefaultInternetComment = (formData: FormData): string => {
         crossPathRouter,
         managementContact,
         buildingSurveyRequest,
-        drawingSubmissionContact
     } = formData;
 
     const idField = isSakaiRoute ? `レコードID：${recordId || ''}` : `顧客ID：${customerId || ''}`;
@@ -165,14 +168,14 @@ const generateDefaultInternetComment = (formData: FormData): string => {
                 `備考：${remarks || ''}`
             );
             break;
-            
+
         default: // This handles '賃貸ねっと' and '賃貸ねっと【無料施策】'
             { // Use a block to scope variables
                 const isChintaiProduct = product && product.includes('賃貸ねっと');
                 if (isChintaiProduct) {
                     const isChintaiFree = product === '賃貸ねっと【無料施策】';
-                    const header = isChintaiFree 
-                        ? '【ちんむりょ賃貸ねっと無料施策】250811' 
+                    const header = isChintaiFree
+                        ? '【ちんむりょ賃貸ねっと無料施策】250811'
                         : '【賃貸ねっと】250811';
 
                     commentLines.push(header);
@@ -198,12 +201,12 @@ const generateDefaultInternetComment = (formData: FormData): string => {
                     commentLines.push(`物件名＋部屋番号：${buildingInfo || ''}`);
                     commentLines.push(`利用開始日(必ず引っ越し日を記載)：${moveInDate || ''}`);
                     commentLines.push(`■書面発送先：${mailingOptionLabel || ''}`);
-                    
+
                     if (mailingOption === '現住所') {
                         commentLines.push(`現住所の場合郵便番号(〒・ハイフン無し)：${currentPostalCode || ''}`);
                         commentLines.push(`住所・物件名・部屋番号：${currentAddress || ''}`);
                     }
-                    
+
                     commentLines.push(`案内料金：${serviceFee || ''}`);
                     const paymentText = paymentMethod === '口座' ? `口座（銀行名：${bankName || ''}）※外国人は口座NG` : (paymentMethod || '');
                     commentLines.push(`支払方法：${paymentText}`);
@@ -248,7 +251,6 @@ const generateDefaultInternetComment = (formData: FormData): string => {
     return commentLines.filter(line => line !== null && line !== undefined).join('\n');
 };
 
-
 const generateGmoComment = (formData: FormData): string => {
     const {
         housingType, apName, customerId, gmoConstructionSplit, gmoCompensation, gmoRouter, greeting,
@@ -256,7 +258,7 @@ const generateGmoComment = (formData: FormData): string => {
         existingLineCompany, gmoCallback1, gmoCallback2, gmoCallback3,
         gmoCallbackDate1, gmoCallbackDate2, gmoCallbackDate3,
         gmoNoPairIdType, mobileCarrier, paymentMethod,
-        managementCompany, managementNumber, contactPerson, noDrilling
+        managementCompany, managementNumber, contactPerson, noDrilling, remarks
     } = formData;
 
     const isNoPair = housingType.includes('ペアなし');
@@ -264,32 +266,33 @@ const generateGmoComment = (formData: FormData): string => {
     const is1G = housingType.includes('1G');
     const commentLines = [];
 
-    if (is1G) {
-        commentLines.push('■GMOドコモ光※10G案内不要');
-    } else {
-        const planName = isNoPair ? `GMOドコモ光 ${housingType}` : `GMOドコモ光`;
-        commentLines.push(`■${planName}`);
+    let header = '■GMOドコモ光';
+    if (housingType) {
+        header += `（${housingType}）`;
     }
-    
+    if (is1G) {
+        header += '※10G案内不要';
+    }
+    commentLines.push(header);
+
     if (!isNoPair) {
         commentLines.push(`工事費分割案内済${gmoConstructionSplit ? '✔' : ''}`);
-        commentLines.push(`1Gマンション／1Gファミリー／10G：${housingType || ''}`);
     }
-    
+
     commentLines.push(`AP名：${apName || ''}`);
     commentLines.push(`顧客ID：${customerId || ''}`);
-    
+
     const compensationLabel = isNoPair ? 'GMO解約違約金補填2万円' : 'GMO解約違約金補填対象2万円';
     commentLines.push(`${compensationLabel}：${gmoCompensation || ''}`);
-    
+
     const routerLabel = isNoPair ? '無線LANルーター案内' : '無線LANルーター無料案内';
     const routerValue = gmoRouter || '';
     commentLines.push(`${routerLabel}：${routerValue}`);
-    
+
     if (isNoPair) {
         commentLines.push(`身分証：${gmoNoPairIdType || ''}`);
     }
-    
+
     commentLines.push(`名乗り会社名：${greeting || ''}`);
     commentLines.push(`①申し込み者：${contractorName || ''}`);
     commentLines.push(`②申込者電話番号：${phone || ''}`);
@@ -308,70 +311,91 @@ const generateGmoComment = (formData: FormData): string => {
         }
         commentLines.push(`⑥現在利用回線（必須）：${existingLineCompany || ''}`);
     }
-    
+
     commentLines.push('後確希望時間枠');
     commentLines.push(`第一希望：${formatDate(gmoCallbackDate1) || ''} ${gmoCallback1 || ''}`.trim());
     commentLines.push(`第二希望：${formatDate(gmoCallbackDate2) || ''} ${gmoCallback2 || ''}`.trim());
     commentLines.push(`第三希望：${formatDate(gmoCallbackDate3) || ''} ${gmoCallback3 || ''}`.trim());
 
     if (isFamily) {
-        commentLines.push('\nオーナー確認');
-        commentLines.push(`・管理会社：${managementCompany || ''}`);
-        commentLines.push(`・管理番号：${managementNumber || ''}`);
-        commentLines.push(`・担当者：${contactPerson || ''}`);
-        if(noDrilling) {
-            commentLines.push('穴あけ・ビス止めNG');
+        commentLines.push(
+            ``,
+            `オーナー情報（ファミリープラン用）`,
+            `管理会社：${managementCompany || ''}`,
+            `管理番号：${managementNumber || ''}`,
+            `担当者：${contactPerson || ''}`
+        );
+        if (noDrilling) {
+            commentLines.push(`穴あけ・ビス止めNG`);
         }
     }
     
+    if (remarks) {
+        commentLines.push(`備考：${remarks}`);
+    }
+
     return commentLines.join('\n');
 };
 
-const generateAuComment = (formData: FormData): string => {
+const generateAuHikariComment = (formData: FormData): string => {
     const {
-        apName, contractorName, existingLineCompany, postalCode, address, buildingInfo,
-        auPlanProvider, auWifiRouter, auOptions, auSupport, auCampaign, phone, auContactType,
-        auPreCheckTime, serviceFee
+        apName,
+        contractorName,
+        existingLineCompany,
+        postalCode,
+        address,
+        auPlanProvider,
+        remarks, // This is used for '案内内容'
+        auWifiRouter,
+        auOptions,
+        auSupport,
+        auCampaign,
+        phone,
+        auContactType,
+        auPreCheckTime,
+        serviceFee
     } = formData;
 
-    const commentLines = [
-        '【必要連携項目】',
-        'AUひかりお得プラン※AUでんき案内禁止',
-        `■獲得者：${apName || ''}`,
-        `■お客様氏名: ${contractorName || ''}`,
-        `■現状回線/プロバイダ：${existingLineCompany || ''}`,
-        `■〒${postalCode || ''}`,
-        `■住所：${address || ''} ${buildingInfo || ''}`,
-        `■案内プラン/プロバイダ：${auPlanProvider || ''}/ソネット`,
-        `■案内内容：${formData.remarks || ''}`, // remarks is used for 案内内容
-        `▪️Wi-Fiルーター：${auWifiRouter || ''}`,
-        `▪️オプション付帯：${auOptions || ''}`,
-        `▪️乗り換えサポート：${auSupport || ''}`,
-        `▪️適用CP：${auCampaign || ''}`,
-        `■ご連絡先電話番号(${auContactType || ''})：${phone || ''}`,
-        `■前確希望時間：${auPreCheckTime || ''}`,
-        `■案内料金：${serviceFee || ''}`
-    ];
-    
-    return commentLines.join('\n');
-};
+    let comment = [
+        '【AUひかり】250811',
+        `獲得者：${apName || ''}`,
+        `お客様氏名：${contractorName || ''}`,
+        `現状回線/プロバイダ：${existingLineCompany || ''}`,
+        `郵便番号：${postalCode || ''}`,
+        `住所：${address || ''}`,
+        `案内プラン/プロバイダ：${auPlanProvider || ''}`,
+        `案内内容：${remarks || ''}`, // remarks field is used here
+        `Wi-Fiルーター：${auWifiRouter || ''}`,
+        `オプション付帯：${auOptions || ''}`,
+        `乗り換えサポート：${auSupport || ''}`,
+        `適用CP：${auCampaign || ''}`,
+        `ご連絡先電話番号：${phone || ''} (${auContactType || ''})`,
+        `前確希望時間：${auPreCheckTime || ''}`,
+        `案内料金：${serviceFee || ''}`,
+    ].join('\n');
 
+    // Even though remarks is used for 案内内容, we add a generic 備考 at the end for consistency if it's filled.
+    if (remarks) {
+        comment += `\n備考：${remarks}`;
+    }
+
+    return comment;
+};
 
 export const generateInternetCommentLogic = (formData: FormData): string => {
     const { product } = formData;
-    
-    const formattedData = {
-        ...formData,
-        dob: formatDate(formData.dob),
-        moveInDate: formatDate(formData.moveInDate)
-    };
-    
     switch (product) {
         case 'GMOドコモ光':
-            return generateGmoComment(formattedData);
+            return generateGmoComment(formData);
         case 'AUひかり':
-            return generateAuComment(formattedData);
+            return generateAuHikariComment(formData);
+        case 'SoftBank光1G':
+        case 'SoftBank光10G':
+        case 'SB Air':
+        case '賃貸ねっと':
+        case '賃貸ねっと【無料施策】':
+            return generateDefaultInternetComment(formData);
         default:
-            return generateDefaultInternetComment(formattedData);
+            return '商材を選択してください。';
     }
 };

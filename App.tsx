@@ -12,7 +12,7 @@ import { Modal } from './components/Modal.tsx';
 import ManualModal from './components/ManualModal.tsx';
 import BugReportModal from './components/BugReportModal.tsx';
 import { FormInput, FormCheckbox } from './components/FormControls.tsx';
-import { BoltIcon, FireIcon, WifiIcon, CloudIcon, ChatBubbleBottomCenterTextIcon } from 'https://esm.sh/@heroicons/react@^2.2.0/24/solid';
+import { BoltIcon, FireIcon, WifiIcon, CloudIcon, ChatBubbleBottomCenterTextIcon, XCircleIcon, XMarkIcon } from 'https://esm.sh/@heroicons/react@^2.2.0/24/solid';
 
 const TABS = [
   { id: 'electricity', label: '電気', icon: BoltIcon },
@@ -44,6 +44,7 @@ const App = () => {
         toast,
         setToast,
         modalState,
+        setModalState,
         isManualOpen,
         setIsManualOpen,
         isBugReportOpen,
@@ -63,6 +64,29 @@ const App = () => {
 
             {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
             
+             {modalState.isErrorBanner && (
+                <div className="bg-red-600 text-white shadow-md">
+                    <div className="max-w-7xl mx-auto py-3 px-3 sm:px-6 lg:px-8">
+                        <div className="flex items-center justify-between flex-wrap">
+                            <div className="w-0 flex-1 flex items-center">
+                                <span className="flex p-2 rounded-lg bg-red-800">
+                                    <XCircleIcon className="h-6 w-6 text-white" aria-hidden="true" />
+                                </span>
+                                <p className="ml-3 font-medium truncate">
+                                    <span>{modalState.bannerMessage}</span>
+                                </p>
+                            </div>
+                            <div className="order-2 flex-shrink-0 sm:order-3 sm:ml-3">
+                                <button type="button" onClick={() => setModalState(prev => ({...prev, isErrorBanner: false}))} className="-mr-1 flex p-2 rounded-md hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
+                                    <span className="sr-only">Dismiss</span>
+                                    <XMarkIcon className="h-6 w-6 text-white" aria-hidden="true" />
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <Modal {...modalState} />
             <ManualModal isOpen={isManualOpen} onClose={() => setIsManualOpen(false)} />
             <BugReportModal 

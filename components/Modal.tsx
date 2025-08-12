@@ -1,3 +1,4 @@
+
 import React from 'https://esm.sh/react@^19.1.0';
 
 export const Modal = ({
@@ -25,9 +26,14 @@ export const Modal = ({
   
   switch(type) {
       case 'warning':
-          // For warnings, the 'cancel' button ('修正する') is the primary action (blue).
-          confirmButtonClasses = grayButtonClasses; // 'このまま進む' is secondary
-          cancelButtonClasses = blueButtonClasses;
+          // For warnings, if there are two buttons, the 'cancel' button is the primary action (blue).
+          // If only one button, it should be blue.
+          if (cancelText) {
+            confirmButtonClasses = grayButtonClasses; // 'このまま進む' is secondary
+            cancelButtonClasses = blueButtonClasses;
+          } else {
+             confirmButtonClasses = blueButtonClasses;
+          }
           break;
       case 'danger':
            // For danger, the 'confirm' button ('はい、リセットする') is the danger action (red).
@@ -50,13 +56,15 @@ export const Modal = ({
           <div className="mt-4 px-4 py-3">
             <p className={messageClasses}>{message}</p>
           </div>
-          <div className="flex justify-center items-center gap-4 mt-4 px-4">
-            <button
-              onClick={onCancel}
-              className={cancelButtonClasses}
-            >
-              {cancelText}
-            </button>
+          <div className={`grid ${cancelText ? 'grid-cols-2' : 'grid-cols-1'} gap-4 mt-4 px-4`}>
+            {cancelText && (
+              <button
+                onClick={onCancel}
+                className={cancelButtonClasses}
+              >
+                {cancelText}
+              </button>
+            )}
             <button
               onClick={onConfirm}
               className={confirmButtonClasses}

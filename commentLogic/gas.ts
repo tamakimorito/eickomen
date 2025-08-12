@@ -60,15 +60,15 @@ export const generateGasCommentLogic = (formData: FormData): string => {
             break;
 
         case '東京ガス単品':
-            comment = `【東京ガス ガス単品】${tag}\n\nレコードID：${recordId || ''}\n担当者：${apName || ''}\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${phone || ''}\n郵便番号：${postalCode || ''}\n引越し先住所：${address || ''}\n物件名：${buildingInfo || ''}\n利用開始日：${moveInDate || ''}\nガス開栓日：${moveInDate || ''}\n時間枠：${gasOpeningTimeSlot || ''}\n（法人の場合下記も）\n立ち合い担当者フルネーム：${gasWitness || ''}\n立ち合い連絡先：${gasPreContact || ''}`;
+            comment = `【東京ガス ガス単品】${tag}\n\nレコードID：${recordId || ''}\n担当者：${apName || ''}\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${phone || ''}\n郵便番号：${postalCode || ''}\n引越し先住所：${address || ''}\n物件名：${buildingInfo || ''}\n利用開始日：${moveInDate || ''}\nガス開栓日：${moveInDate || ''}\n時間枠：${gasOpeningTimeSlot || ''}\n（法人の場合下記も）\n立ち合い担当者フルネーム：${gasWitness || ''}\n立ち合い連絡先：${gasPreContact || ''}\n備考：${remarks || ''}`;
             break;
             
         case '東邦ガス単品':
-            comment = `【東邦ガス_ガス単品】${tag}\nレコードID：${recordId || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：東邦ガス単品\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${phone || ''}\n郵便番号：${postalCode || ''}\n引越し先住所：${address || ''}\n物件名：${buildingInfo || ''}\n利用開始日：電気：なし　ガス：${moveInDate || ''}\nガス開栓日：${moveInDate || ''}\nガス立会時間枠：${gasOpeningTimeSlot || ''}\n支払い方法：${paymentMethod || ''}\n現住所：${currentAddress || '！！必須！！'}\n備考：※単品につき後確なし`;
+            comment = `【東邦ガス_ガス単品】${tag}\nレコードID：${recordId || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：東邦ガス単品\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${phone || ''}\n郵便番号：${postalCode || ''}\n引越し先住所：${address || ''}\n物件名：${buildingInfo || ''}\n利用開始日：電気：なし　ガス：${moveInDate || ''}\nガス開栓日：${moveInDate || ''}\nガス立会時間枠：${gasOpeningTimeSlot || ''}\n支払い方法：${paymentMethod || ''}\n現住所：${currentAddress || '！！必須！！'}\n特記事項：※単品につき後確なし\n備考：${remarks || ''}`;
             break;
 
         case '東急ガス':
-            comment = `【えねこねガス_開栓】${tag}\n契確時間：${elecConfirmationTime || ''}\nレコードID：${recordId || ''}\n主商材受注状況：${primaryProductStatus || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：えねこねガス\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${phone || ''}\n郵便番号：${postalCode || ''}\n引越し先住所：${address || ''}\n物件名：${buildingInfo || ''}\n利用開始日：${moveInDate || ''}　${gasOpeningTimeSlot || ''}\nメアド：${email || ''}\n支払い方法：${paymentMethod || ''}\n書面送付先（現住所）：${currentAddress || ''}`;
+            comment = `【えねこねガス_開栓】${tag}\n契確時間：${elecConfirmationTime || ''}\nレコードID：${recordId || ''}\n主商材受注状況：${primaryProductStatus || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：えねこねガス\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${phone || ''}\n郵便番号：${postalCode || ''}\n引越し先住所：${address || ''}\n物件名：${buildingInfo || ''}\n利用開始日：${moveInDate || ''}　${gasOpeningTimeSlot || ''}\nメアド：${email || ''}\n支払い方法：${paymentMethod || ''}\n書面送付先（現住所）：${currentAddress || ''}\n備考：${remarks || ''}`;
             break;
 
         case '大阪ガス単品':
