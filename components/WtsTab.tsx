@@ -226,6 +226,16 @@ const WtsTab = ({ formData, handleInputChange, handleDateBlur, handleNameBlur, i
                     )}
                 </div>
             </div>
+            <div className="border-t-2 border-dashed border-blue-300 pt-6 space-y-4">
+                <FormTextArea
+                    label="備考"
+                    name="remarks"
+                    value={formData.remarks}
+                    onChange={handleInputChange}
+                    rows={4}
+                    isInvalid={invalidFields.includes('remarks')}
+                />
+            </div>
         </div>
     );
 };

@@ -612,6 +612,13 @@ const App = () => {
             requiredFields = ['elecProvider', ...commonFields];
             if (!formData.isSakaiRoute) requiredFields.push('recordId');
 
+            if (
+                ['すまいのでんき（ストエネ）', 'プラチナでんき（ジャパン）'].includes(formData.elecProvider) ||
+                (formData.elecProvider === 'キューエネスでんき' && formData.elecRecordIdPrefix === 'ID:')
+            ) {
+                requiredFields.push('hasContractConfirmation');
+            }
+
             if (isElecGasSetSelected) {
               requiredFields.push('gasOpeningDate', 'gasOpeningTimeSlot');
               if (formData.elecProvider === 'ニチガス電気セット') {
@@ -677,7 +684,7 @@ const App = () => {
         }
 
         navigator.clipboard.writeText(generatedComment).then(() => {
-            setToast({ message: 'コピーしました！15分後にフォームがリセットされます。', type: 'success' });
+            setToast({ message: 'コピーしました！20分後にフォームがリセットされます。', type: 'success' });
             
             if (['internet', 'wts'].includes(activeTab)) {
                 setFormData(prev => ({...prev, primaryProductStatus: 'あり'}));
@@ -685,8 +692,8 @@ const App = () => {
 
             if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
             resetTimerRef.current = window.setTimeout(() => {
-                resetForm('15分経過したためフォームをリセットしました。');
-            }, 15 * 60 * 1000);
+                resetForm('20分経過したためフォームをリセットしました。');
+            }, 20 * 60 * 1000);
         }, () => {
             setToast({ message: 'コピーに失敗しました。', type: 'error' });
         });

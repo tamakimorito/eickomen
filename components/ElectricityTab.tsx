@@ -96,9 +96,15 @@ const ElectricityTab = ({ formData, setFormData, handleInputChange, handleDateBl
     const { elecProvider, elecRecordIdPrefix, isGasSet, isSakaiRoute } = formData;
 
     const showGasSetOption = elecProvider === 'すまいのでんき（ストエネ）';
+    
+    const showContractConfirmationOption = useMemo(() => {
+        if (['すまいのでんき（ストエネ）', 'プラチナでんき（ジャパン）'].includes(elecProvider)) return true;
+        if (elecProvider === 'キューエネスでんき' && elecRecordIdPrefix === 'ID:') return true;
+        return false;
+    }, [elecProvider, elecRecordIdPrefix]);
+
     const showAllElectricOption = ['すまいのでんき（ストエネ）', 'プラチナでんき（ジャパン）', 'ループでんき'].includes(elecProvider);
     const showVacancyOption = ['すまいのでんき（ストエネ）', 'プラチナでんき（ジャパン）'].includes(elecProvider);
-    const showContractConfirmationOption = ['すまいのでんき（ストエネ）', 'プラチナでんき（ジャパン）'].includes(elecProvider);
     const showNewConstructionOption = elecProvider === 'ユーパワー UPOWER';
     const showAttachedOption = useMemo(() => {
         return ['キューエネスでんき', 'リミックスでんき', 'プラチナでんき（ジャパン）'].includes(elecProvider) || 
@@ -127,7 +133,7 @@ const ElectricityTab = ({ formData, setFormData, handleInputChange, handleDateBl
             'STJP:': 'ベンダー（トーマス販路）',
             'code:': 'ベンダー（YMCS）販路',
             'S': 'すま直販路',
-            'ID:': 'キューエネス販路',
+            'ID:': 'イタンジ販路',
             'それ以外': 'スマサポ、イタンジ、ベンダー、その他販路',
         };
         return map[elecRecordIdPrefix] || '';
@@ -171,7 +177,7 @@ const ElectricityTab = ({ formData, setFormData, handleInputChange, handleDateBl
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 p-4 bg-blue-50/50 rounded-lg border border-blue-200">
                     {showAllElectricOption && <FormRadioGroup label="オール電化" name="isAllElectric" value={formData.isAllElectric} onChange={handleInputChange} options={YES_NO_OPTIONS} isInvalid={invalidFields.includes('isAllElectric')} />}
                     {showVacancyOption && <FormRadioGroup label="空室" name="isVacancy" value={formData.isVacancy} onChange={handleInputChange} options={YES_NO_OPTIONS} isInvalid={invalidFields.includes('isVacancy')} />}
-                    {showContractConfirmationOption && <FormRadioGroup label="契約確認" name="hasContractConfirmation" value={formData.hasContractConfirmation} onChange={handleInputChange} options={YES_NO_OPTIONS} isInvalid={invalidFields.includes('hasContractConfirmation')} />}
+                    {showContractConfirmationOption && <FormRadioGroup label="契約確認" name="hasContractConfirmation" value={formData.hasContractConfirmation} onChange={handleInputChange} options={YES_NO_OPTIONS} isInvalid={invalidFields.includes('hasContractConfirmation')} required />}
                     {showGasSetOption && <FormRadioGroup label="ガスセット" name="isGasSet" value={isGasSet} onChange={handleInputChange} options={SET_NONE_OPTIONS} isInvalid={invalidFields.includes('isGasSet')} />}
                     <FormRadioGroup label="主商材受注状況" name="primaryProductStatus" value={formData.primaryProductStatus} onChange={handleInputChange} options={PRIMARY_PRODUCT_STATUS_OPTIONS} isInvalid={invalidFields.includes('primaryProductStatus')} />
                     {showAttachedOption && <FormRadioGroup label="付帯OP" name="attachedOption" value={formData.attachedOption} onChange={handleInputChange} options={ATTACHED_OPTION_OPTIONS} isInvalid={invalidFields.includes('attachedOption')} />}

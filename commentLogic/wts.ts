@@ -17,7 +17,7 @@ export const generateWtsCommentLogic = (formData: FormData): string => {
         apName, customerId, contractorName, dob, phone, wtsShippingDestination,
         wtsServerColor, wtsFiveYearPlan, wtsFreeWater, wtsCreditCard, wtsCarrier,
         moveInDate, wtsWaterPurifier, wtsMultipleUnits, wtsCustomerType,
-        wtsU20HighSchool, wtsU20ParentalConsent, wtsCorporateInvoice
+        wtsU20HighSchool, wtsU20ParentalConsent, wtsCorporateInvoice, remarks
     } = { ...formData, dob: formatDate(formData.dob), moveInDate: formatDate(formData.moveInDate) };
 
     let comment = '';
@@ -81,6 +81,8 @@ export const generateWtsCommentLogic = (formData: FormData): string => {
         default:
             return '該当するテンプレートがありません。';
     }
+
+    comment += `\n備考：${remarks || ''}`;
 
     return comment;
 };

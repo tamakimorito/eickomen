@@ -222,7 +222,6 @@ export const PAYMENT_METHOD_OPTIONS = [
 export const PAYMENT_METHOD_OPTIONS_EXTENDED = [
     { value: 'クレカ', label: 'クレカ' },
     { value: '口座', label: '口座' },
-    { value: '口座・クレジットカード', label: '口座・クレジットカード' },
 ];
 
 export const CROSS_PATH_ROUTER_OPTIONS = [
