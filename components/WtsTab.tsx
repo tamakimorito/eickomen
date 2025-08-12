@@ -2,12 +2,12 @@ import React from 'https://esm.sh/react@^19.1.0';
 import {
     WTS_CUSTOMER_TYPES, WTS_SHIPPING_DESTINATIONS, WTS_FIVE_YEAR_PLAN_OPTIONS,
     WTS_CREDIT_CARD_OPTIONS, WTS_WATER_PURIFIER_OPTIONS, WTS_MULTIPLE_UNITS_OPTIONS,
-    WTS_U20_HIGHSCHOOL_OPTIONS, WTS_U20_PARENTAL_CONSENT_OPTIONS
+    WTS_U20_HIGHSCHOOL_OPTIONS, WTS_U20_PARENTAL_CONSENT_OPTIONS, MAILING_OPTIONS
 } from '../constants.ts';
 import { FormInput, FormSelect, FormRadioGroup, FormTextArea, FormDateInput } from './FormControls.tsx';
 
 
-const WtsTab = ({ formData, handleInputChange, handleDateBlur, handleNameBlur, invalidFields }) => {
+const WtsTab = ({ formData, setFormData, handleInputChange, handleDateBlur, handleNameBlur, invalidFields }) => {
     const { wtsCustomerType, isSakaiRoute } = formData;
     
     return (
@@ -119,7 +119,7 @@ const WtsTab = ({ formData, handleInputChange, handleDateBlur, handleNameBlur, i
                         required
                     />
                      <FormSelect
-                        label="⑥5年必須"
+                        label="⑥契約年数"
                         name="wtsFiveYearPlan"
                         value={formData.wtsFiveYearPlan}
                         onChange={handleInputChange}
@@ -162,13 +162,14 @@ const WtsTab = ({ formData, handleInputChange, handleDateBlur, handleNameBlur, i
                         isInvalid={invalidFields.includes('moveInDate')}
                         required
                     />
-                     <FormInput
+                     <FormRadioGroup
                         label="⑪書面送付先"
                         name="wtsMailingAddress"
-                        value="現住所"
-                        onChange={()=>{}}
-                        disabled
+                        value={formData.wtsMailingAddress}
+                        onChange={handleInputChange}
+                        options={MAILING_OPTIONS}
                         isInvalid={invalidFields.includes('wtsMailingAddress')}
+                        required
                     />
                      {wtsCustomerType === '法人' ? (
                         <FormInput

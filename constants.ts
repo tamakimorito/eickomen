@@ -84,7 +84,7 @@ export const INITIAL_FORM_DATA: FormData = {
   wtsCustomerType: '通常',
   wtsShippingDestination: '',
   wtsServerColor: '',
-  wtsFiveYearPlan: '',
+  wtsFiveYearPlan: '5年',
   wtsFreeWater: '',
   wtsCreditCard: '',
   wtsCarrier: '',
@@ -344,12 +344,11 @@ export const WTS_CUSTOMER_TYPES = [
 
 export const WTS_SHIPPING_DESTINATIONS = [
     { value: '設置先', label: '設置先' },
-    { value: '新住所', label: '新住所' },
 ];
 
 export const WTS_FIVE_YEAR_PLAN_OPTIONS = [
-    { value: '話した', label: '話した' },
-    { value: '話してない', label: '話してない' },
+    { value: '5年', label: '5年' },
+    { value: '3年', label: '3年' },
 ];
 
 export const WTS_CREDIT_CARD_OPTIONS = [

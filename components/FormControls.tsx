@@ -45,6 +45,21 @@ export const FormSelect = ({ label, name, value, onChange, options, className = 
 
 export const FormRadioGroup = ({ label, name, value, onChange, options, className = '', isInvalid, ...props }) => {
     const legendClasses = `block text-sm font-bold mb-2 ${isInvalid ? 'text-red-600' : 'text-gray-700'}`;
+    
+    const handleRadioClick = (e) => {
+        const clickedValue = e.target.value;
+        if (clickedValue === value) {
+            // If the user clicks the currently selected radio button, clear the selection.
+            const syntheticEvent = {
+                target: { name, value: '', type: 'radio' }
+            };
+            onChange(syntheticEvent);
+        } else {
+            // Otherwise, perform the default change action.
+            onChange(e);
+        }
+    };
+
     return (
         <fieldset className={className}>
             {label && <legend className={legendClasses}>{label}{props.required && <span className="text-red-500 ml-1">*</span>}</legend>}
@@ -62,7 +77,7 @@ export const FormRadioGroup = ({ label, name, value, onChange, options, classNam
                                 type="radio"
                                 value={radioOption.value}
                                 checked={value === radioOption.value}
-                                onChange={onChange}
+                                onChange={handleRadioClick} // Use the custom handler
                                 className="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
                             />
                             <label htmlFor={`${name}-${radioOption.value}`} className="ml-2 block text-sm text-gray-900">

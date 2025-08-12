@@ -63,7 +63,7 @@ export const generateGasCommentLogic = (formData: FormData): string => {
             break;
             
         case '東邦ガス単品':
-            comment = `【東邦ガス_ガス単品】${tag}\nレコードID：${recordId || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：東邦ガス単品\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${phone || ''}\n郵便番号：${postalCode || ''}\n引越し先住所：${address || ''}\n物件名：${buildingInfo || ''}\n利用開始日：電気：なし　ガス：${moveInDate || ''}\nガス開栓日：${moveInDate || ''}\nガス立会時間枠：${gasOpeningTimeSlot || ''}\n支払い方法：${paymentMethod || ''}\n書面送付先：現住所（${currentAddress || ''}）\n備考：※単品につき後確なし`;
+            comment = `【東邦ガス_ガス単品】${tag}\nレコードID：${recordId || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：東邦ガス単品\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${phone || ''}\n郵便番号：${postalCode || ''}\n引越し先住所：${address || ''}\n物件名：${buildingInfo || ''}\n利用開始日：電気：なし　ガス：${moveInDate || ''}\nガス開栓日：${moveInDate || ''}\nガス立会時間枠：${gasOpeningTimeSlot || ''}\n支払い方法：${paymentMethod || ''}\n現住所：${currentAddress || '！！必須！！'}\n備考：※単品につき後確なし`;
             break;
 
         case '東急ガス':
@@ -71,12 +71,11 @@ export const generateGasCommentLogic = (formData: FormData): string => {
             break;
 
         case '大阪ガス単品':
-             const osakaMailingAddress = mailingOption === '現住所' ? `支払登録用紙届け先：現住所（${currentAddress || ''}）` : '支払登録用紙届け先：新住所';
-            comment = `【大阪ガス単品】${tag}\n名乗り：${greeting || ''}\nレコードID：${recordId || ''}\n担当者：${apName || ''}\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n電話番号：${phone || ''}\n郵便番号：${postalCode || ''}\n住所：${address || ''}\n物件名：${buildingInfo || ''}\n利用開始日：${moveInDate || ''}\n${osakaMailingAddress}\n備考：${remarks || ''}`;
+            comment = `【大阪ガス単品】${tag}\n名乗り：${greeting || ''}\nレコードID：${recordId || ''}\n担当者：${apName || ''}\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n電話番号：${phone || ''}\n郵便番号：${postalCode || ''}\n住所：${address || ''}\n物件名：${buildingInfo || ''}\n利用開始日：${moveInDate || ''}\n備考：${remarks || ''}`;
             break;
 
         case 'ニチガス単品':
-            const nichiMailingAddress = mailingOption === '現住所' ? `書面送付先：現住所（${currentAddress || ''}）` : '書面送付先：設置先';
+            const nichiMailingAddress = `書面送付先：${mailingOption === '現住所' ? `現住所（${currentAddress || ''}）` : '設置先'}`;
             comment = `【ニチガス_単品】${tag}\nレコードID：${recordId || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：ニチガス_単品\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${phone || ''}\n郵便番号：${postalCode || ''}\n住所：${address || ''}\n物件名：${buildingInfo || ''}\nガスエリア：${gasArea || ''}（何ガスエリアかいれる）\n利用開始日：${moveInDate || ''}\nガス開栓日：${moveInDate || ''}\n立会時間枠：${gasOpeningTimeSlot || ''}（日祝以外）\n立会者：${gasWitness || ''}\nガス事前連絡先：${gasPreContact || ''}\n支払方法：${paymentMethod || ''}\n${nichiMailingAddress}\n備考：${remarks || ''}`;
             break;
     }

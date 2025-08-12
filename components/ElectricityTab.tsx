@@ -16,12 +16,14 @@ const MailingAddressSection = ({ provider, formData, handleInputChange, invalidF
         switch(provider) {
             case 'すまいのでんき（ストエネ）':
             case 'プラチナでんき（ジャパン）':
-            case 'キューエネスでんき':
             case 'ニチガス電気セット':
             case '東邦ガスセット':
             case '大阪ガス電気セット':
                 return { ...defaultConfig, showOptions: true, showFields: mailingOption === '現住所', isRequired: mailingOption === '現住所', description: '新住所郵送（指定も可能）' };
             
+            case 'キューエネスでんき':
+                return { ...defaultConfig, showOptions: true, showFields: mailingOption === '現住所', isRequired: false, description: '新住所郵送（指定も可能）' };
+
             case 'リミックスでんき':
                 return { ...defaultConfig, showFields: true, isRequired: false, description: '決済登録が難しい場合などの書面送付先を入力します。' };
 
@@ -133,7 +135,7 @@ const ElectricityTab = ({ formData, setFormData, handleInputChange, handleDateBl
             'STJP:': 'ベンダー（トーマス販路）',
             'code:': 'ベンダー（YMCS）販路',
             'S': 'すま直販路',
-            'ID:': 'イタンジ販路',
+            'ID:': 'スマサポ、イタンジ、ベンダー、その他販路',
             'それ以外': 'スマサポ、イタンジ、ベンダー、その他販路',
         };
         return map[elecRecordIdPrefix] || '';
@@ -144,8 +146,9 @@ const ElectricityTab = ({ formData, setFormData, handleInputChange, handleDateBl
     const isHapie = elecProvider === 'はぴe';
     const isToho = elecProvider === '東邦ガスセット';
     const isQenes = elecProvider === 'キューエネスでんき';
+    const isRemix = elecProvider === 'リミックスでんき';
     const isNichigasSet = elecProvider === 'ニチガス電気セット';
-    const emailIsRequired = isQenes || isUpower || isHtb || elecProvider === 'ループでんき';
+    const emailIsRequired = isQenes || isUpower || isHtb || isRemix || elecProvider === 'ループでんき';
 
 
     return (

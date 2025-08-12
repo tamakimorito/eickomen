@@ -17,7 +17,7 @@ export const generateWtsCommentLogic = (formData: FormData): string => {
         apName, customerId, contractorName, dob, phone, wtsShippingDestination,
         wtsServerColor, wtsFiveYearPlan, wtsFreeWater, wtsCreditCard, wtsCarrier,
         moveInDate, wtsWaterPurifier, wtsMultipleUnits, wtsCustomerType,
-        wtsU20HighSchool, wtsU20ParentalConsent, wtsCorporateInvoice, remarks
+        wtsU20HighSchool, wtsU20ParentalConsent, wtsCorporateInvoice, remarks, wtsMailingAddress
     } = { ...formData, dob: formatDate(formData.dob), moveInDate: formatDate(formData.moveInDate) };
 
     let comment = '';
@@ -30,12 +30,12 @@ export const generateWtsCommentLogic = (formData: FormData): string => {
         `③番号：${phone || ''}`,
         `④発送先：${wtsShippingDestination || ''}`,
         `⑤サーバー・色：${wtsServerColor || ''}`,
-        `⑥5年必須：${wtsFiveYearPlan || ''}`,
+        `⑥契約年数：${wtsFiveYearPlan || ''}`,
         `⑦無料水：${wtsFreeWater || ''}`,
         `⑧クレカ：${wtsCreditCard || ''}`,
         `⑨キャリア：${wtsCarrier || ''}`,
         `⑩入居予定日：${moveInDate || ''}`,
-        `⑪書面送付先：現住所`,
+        `⑪書面送付先：${wtsMailingAddress || ''}`,
     ];
 
     switch (wtsCustomerType) {
@@ -66,12 +66,12 @@ export const generateWtsCommentLogic = (formData: FormData): string => {
                 `③番号：${phone || ''}`,
                 `④発送先：${wtsShippingDestination || ''}`,
                 `⑤サーバー・色：${wtsServerColor || ''}`,
-                `⑥5年必須：${wtsFiveYearPlan || ''}`,
+                `⑥契約年数：${wtsFiveYearPlan || ''}`,
                 `⑦無料水：${wtsFreeWater || ''}`,
                 `⑧クレカ：${wtsCreditCard || ''}`,
                 `⑨キャリア：${wtsCarrier || ''}`,
                 `⑩入居予定日：${moveInDate || ''}`,
-                `⑪書面送付先：現住所`,
+                `⑪書面送付先：${wtsMailingAddress || ''}`,
                 `⑫請求書先：${wtsCorporateInvoice || ''}`,
                 `⑬浄水器確認：${wtsWaterPurifier || ''}`,
                 `⑭複数台提案：${wtsMultipleUnits || ''}`
@@ -82,7 +82,9 @@ export const generateWtsCommentLogic = (formData: FormData): string => {
             return '該当するテンプレートがありません。';
     }
 
-    comment += `\n備考：${remarks || ''}`;
+    if (remarks) {
+      comment += `\n備考：${remarks}`;
+    }
 
     return comment;
 };
