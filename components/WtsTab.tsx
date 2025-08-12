@@ -1,15 +1,22 @@
-import React from 'https://esm.sh/react@^19.1.0';
+import React, { useContext, useMemo } from 'https://esm.sh/react@^19.1.0';
 import {
     WTS_CUSTOMER_TYPES, WTS_SHIPPING_DESTINATIONS, WTS_FIVE_YEAR_PLAN_OPTIONS,
-    WTS_CREDIT_CARD_OPTIONS, WTS_WATER_PURIFIER_OPTIONS, WTS_MULTIPLE_UNITS_OPTIONS,
-    WTS_U20_HIGHSCHOOL_OPTIONS, WTS_U20_PARENTAL_CONSENT_OPTIONS, MAILING_OPTIONS
+    WTS_WATER_PURIFIER_OPTIONS, WTS_MULTIPLE_UNITS_OPTIONS,
+    WTS_U20_HIGHSCHOOL_OPTIONS, WTS_U20_PARENTAL_CONSENT_OPTIONS, MAILING_OPTIONS,
+    WTS_SERVERS, WTS_COLORS
 } from '../constants.ts';
+import { AppContext } from '../context/AppContext.tsx';
 import { FormInput, FormSelect, FormRadioGroup, FormTextArea, FormDateInput } from './FormControls.tsx';
 
 
-const WtsTab = ({ formData, setFormData, handleInputChange, handleDateBlur, handleNameBlur, invalidFields }) => {
-    const { wtsCustomerType, isSakaiRoute } = formData;
+const WtsTab = () => {
+    const { formData, handleInputChange, handleDateBlur, handleNameBlur, invalidFields } = useContext(AppContext);
+    const { wtsCustomerType, isSakaiRoute, wtsServerType } = formData;
     
+    const colorOptions = useMemo(() => {
+        return wtsServerType && WTS_COLORS[wtsServerType] ? WTS_COLORS[wtsServerType] : [];
+    }, [wtsServerType]);
+
     return (
         <div className="space-y-6">
             <h3 className="text-xl font-bold text-gray-800 border-b-2 pb-2">ウォーターサーバー契約情報</h3>
@@ -110,16 +117,27 @@ const WtsTab = ({ formData, setFormData, handleInputChange, handleDateBlur, hand
                         isInvalid={invalidFields.includes('wtsShippingDestination')}
                         required
                     />
-                     <FormInput
-                        label="⑤サーバー・色"
+                    <FormSelect
+                        label="⑤サーバー"
+                        name="wtsServerType"
+                        value={formData.wtsServerType}
+                        onChange={handleInputChange}
+                        options={WTS_SERVERS}
+                        isInvalid={invalidFields.includes('wtsServerType')}
+                        required
+                    />
+                    <FormSelect
+                        label="⑥色"
                         name="wtsServerColor"
                         value={formData.wtsServerColor}
                         onChange={handleInputChange}
+                        options={colorOptions}
                         isInvalid={invalidFields.includes('wtsServerColor')}
                         required
+                        disabled={!formData.wtsServerType}
                     />
                      <FormSelect
-                        label="⑥契約年数"
+                        label="⑦契約年数"
                         name="wtsFiveYearPlan"
                         value={formData.wtsFiveYearPlan}
                         onChange={handleInputChange}
@@ -128,7 +146,7 @@ const WtsTab = ({ formData, setFormData, handleInputChange, handleDateBlur, hand
                         required
                     />
                      <FormInput
-                        label="⑦無料水"
+                        label="⑧無料水"
                         name="wtsFreeWater"
                         value={formData.wtsFreeWater}
                         onChange={handleInputChange}
@@ -136,7 +154,7 @@ const WtsTab = ({ formData, setFormData, handleInputChange, handleDateBlur, hand
                         required
                     />
                      <FormInput
-                        label="⑧クレカ"
+                        label="⑨クレカ"
                         name="wtsCreditCard"
                         value={formData.wtsCreditCard}
                         onChange={handleInputChange}
@@ -145,7 +163,7 @@ const WtsTab = ({ formData, setFormData, handleInputChange, handleDateBlur, hand
                         required
                     />
                     <FormInput
-                        label="⑨キャリア"
+                        label="⑩キャリア"
                         name="wtsCarrier"
                         value={formData.wtsCarrier}
                         onChange={handleInputChange}
@@ -153,7 +171,7 @@ const WtsTab = ({ formData, setFormData, handleInputChange, handleDateBlur, hand
                         required
                     />
                     <FormDateInput
-                        label="⑩入居予定日"
+                        label="⑪入居予定日"
                         name="moveInDate"
                         value={formData.moveInDate}
                         onChange={handleInputChange}
@@ -163,7 +181,7 @@ const WtsTab = ({ formData, setFormData, handleInputChange, handleDateBlur, hand
                         required
                     />
                      <FormRadioGroup
-                        label="⑪書面送付先"
+                        label="⑫書面送付先"
                         name="wtsMailingAddress"
                         value={formData.wtsMailingAddress}
                         onChange={handleInputChange}
@@ -173,7 +191,7 @@ const WtsTab = ({ formData, setFormData, handleInputChange, handleDateBlur, hand
                     />
                      {wtsCustomerType === '法人' ? (
                         <FormInput
-                            label="⑫請求書先"
+                            label="⑬請求書先"
                             name="wtsCorporateInvoice"
                             value={formData.wtsCorporateInvoice}
                             onChange={handleInputChange}
@@ -182,7 +200,7 @@ const WtsTab = ({ formData, setFormData, handleInputChange, handleDateBlur, hand
                         />
                      ) : (
                          <FormSelect
-                            label="⑫浄水器確認"
+                            label="⑬浄水器確認"
                             name="wtsWaterPurifier"
                             value={formData.wtsWaterPurifier}
                             onChange={handleInputChange}
@@ -194,7 +212,7 @@ const WtsTab = ({ formData, setFormData, handleInputChange, handleDateBlur, hand
 
                     {wtsCustomerType === '法人' ? (
                          <FormSelect
-                            label="⑬浄水器確認"
+                            label="⑭浄水器確認"
                             name="wtsWaterPurifier"
                             value={formData.wtsWaterPurifier}
                             onChange={handleInputChange}
@@ -204,7 +222,7 @@ const WtsTab = ({ formData, setFormData, handleInputChange, handleDateBlur, hand
                         />
                     ) : (
                          <FormSelect
-                            label="⑬複数台提案"
+                            label="⑭複数台提案"
                             name="wtsMultipleUnits"
                             value={formData.wtsMultipleUnits}
                             onChange={handleInputChange}
@@ -216,7 +234,7 @@ const WtsTab = ({ formData, setFormData, handleInputChange, handleDateBlur, hand
 
                     {wtsCustomerType === '法人' && (
                           <FormSelect
-                            label="⑭複数台提案"
+                            label="⑮複数台提案"
                             name="wtsMultipleUnits"
                             value={formData.wtsMultipleUnits}
                             onChange={handleInputChange}

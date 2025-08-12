@@ -47,6 +47,27 @@ export type FormData = {
   drawingSubmissionContact: string;
   buildingSurveyRequest: string;
 
+  // --- GMO Docomo Specific ---
+  gmoConstructionSplit: boolean;
+  gmoCompensation: string;
+  gmoRouter: string;
+  gmoIsDocomoOwnerSame: boolean;
+  gmoDocomoOwnerName: string;
+  gmoDocomoOwnerPhone: string;
+  gmoCallback1: string;
+  gmoCallback2: string;
+  gmoCallback3: string;
+  gmoNoPairIdType: string;
+  
+  // --- AU Hikari Specific ---
+  auPlanProvider: string;
+  auWifiRouter: string;
+  auOptions: string;
+  auSupport: string;
+  auCampaign: string;
+  auContactType: string;
+  auPreCheckTime: string;
+
   // --- Electricity Specific ---
   elecProvider: string;
   elecRecordIdPrefix: string;
@@ -81,6 +102,7 @@ export type FormData = {
   // --- WTS Specific ---
   wtsCustomerType: string; 
   wtsShippingDestination: string;
+  wtsServerType: string;
   wtsServerColor: string;
   wtsFiveYearPlan: string;
   wtsFreeWater: string;
@@ -95,3 +117,9 @@ export type FormData = {
   // Corporate only
   wtsCorporateInvoice: string;
 };
+
+// Action types for form reducer
+export type FormAction =
+  | { type: 'UPDATE_FIELD'; payload: { name: string; value: any; type?: string } }
+  | { type: 'SET_FORM_DATA'; payload: Partial<FormData> }
+  | { type: 'RESET_FORM'; payload: { keepApName: boolean; apName: string } };

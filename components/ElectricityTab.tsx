@@ -1,19 +1,21 @@
-import React, { useMemo, useEffect } from 'https://esm.sh/react@^19.1.0';
+import React, { useMemo, useContext } from 'https://esm.sh/react@^19.1.0';
 import { 
     ELEC_PROVIDERS, YES_NO_OPTIONS,
     SET_NONE_OPTIONS, PRIMARY_PRODUCT_STATUS_OPTIONS, ATTACHED_OPTION_OPTIONS, 
     PAYMENT_METHOD_OPTIONS_EXTENDED, GENDERS, NEW_CONSTRUCTION_OPTIONS, TIME_SLOTS_TOHO, MAILING_OPTIONS,
     TIME_SLOTS_NICHI, TIME_SLOTS_SUTENE_SR, GAS_OPENING_TIME_SLOTS, TIME_SLOTS_TOKYO_GAS
 } from '../constants.ts';
+import { AppContext } from '../context/AppContext.tsx';
 import { FormInput, FormSelect, FormRadioGroup, FormTextArea, FormDateInput } from './FormControls.tsx';
 
 // A component to render the mailing address section based on provider rules
-const MailingAddressSection = ({ provider, formData, handleInputChange, invalidFields }) => {
-    const { mailingOption, currentPostalCode, currentAddress } = formData;
+const MailingAddressSection = () => {
+    const { formData, handleInputChange, invalidFields } = useContext(AppContext);
+    const { elecProvider, mailingOption, currentPostalCode, currentAddress } = formData;
     
     const config = useMemo(() => {
         const defaultConfig = { showOptions: false, showFields: false, isRequired: false, fixedValue: null, description: null };
-        switch(provider) {
+        switch(elecProvider) {
             case 'すまいのでんき（ストエネ）':
             case 'プラチナでんき（ジャパン）':
             case 'ニチガス電気セット':
@@ -41,15 +43,8 @@ const MailingAddressSection = ({ provider, formData, handleInputChange, invalidF
             default:
                 return { ...defaultConfig, showOptions: false, showFields: false };
         }
-    }, [provider, mailingOption]);
-
-    // Effect to set fixed mailingOption value when provider changes
-    useEffect(() => {
-        if (config.fixedValue && mailingOption !== config.fixedValue) {
-            handleInputChange({ target: { name: 'mailingOption', value: config.fixedValue, type: 'radio' } });
-        }
-    }, [provider, config.fixedValue, mailingOption, handleInputChange]);
-
+    }, [elecProvider, mailingOption]);
+    
     if (!config.showOptions && !config.showFields && !config.description) {
         return null;
     }
@@ -73,7 +68,7 @@ const MailingAddressSection = ({ provider, formData, handleInputChange, invalidF
             {config.showFields && (
                  <div className="p-4 bg-blue-50/50 rounded-lg border border-blue-200 grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormInput
-                        label={provider === 'リミックスでんき' ? "郵送先郵便番号" : "現住所の郵便番号"}
+                        label={elecProvider === 'リミックスでんき' ? "郵送先郵便番号" : "現住所の郵便番号"}
                         name="currentPostalCode"
                         value={currentPostalCode}
                         onChange={handleInputChange}
@@ -81,7 +76,7 @@ const MailingAddressSection = ({ provider, formData, handleInputChange, invalidF
                         required={config.isRequired}
                     />
                     <FormInput
-                        label={provider === 'リミックスでんき' ? "郵送先住所" : "現住所・物件名・部屋番号"}
+                        label={elecProvider === 'リミックスでんき' ? "郵送先住所" : "現住所・物件名・部屋番号"}
                         name="currentAddress"
                         value={currentAddress}
                         onChange={handleInputChange}
@@ -96,7 +91,8 @@ const MailingAddressSection = ({ provider, formData, handleInputChange, invalidF
 };
 
 
-const ElectricityTab = ({ formData, setFormData, handleInputChange, handleDateBlur, handleNameBlur, invalidFields, isElecGasSetSelected }) => {
+const ElectricityTab = () => {
+    const { formData, handleInputChange, handleDateBlur, handleNameBlur, invalidFields } = useContext(AppContext);
     const { elecProvider, elecRecordIdPrefix, isGasSet, isSakaiRoute } = formData;
 
     const showGasSetOption = elecProvider === 'すまいのでんき（ストエネ）';
@@ -104,32 +100,14 @@ const ElectricityTab = ({ formData, setFormData, handleInputChange, handleDateBl
     const showContractConfirmationOption = useMemo(() => {
         if (elecProvider === 'すまいのでんき（ストエネ）') return true;
         if (elecProvider === 'プラチナでんき（ジャパン）' && elecRecordIdPrefix === 'SR') return true;
-        // For Qenes, it's always determined automatically, so never show the option.
+        // For Qenes and others, it's determined automatically, so never show the option.
         return false;
     }, [elecProvider, elecRecordIdPrefix]);
 
-    useEffect(() => {
-        const provider = formData.elecProvider;
-        const prefix = formData.elecRecordIdPrefix;
-
-        // Logic for providers where the choice is fixed and options are hidden
-        if (provider === 'プラチナでんき（ジャパン）' && prefix !== 'SR') {
-            if (formData.hasContractConfirmation !== 'なし') {
-                handleInputChange({ target: { name: 'hasContractConfirmation', value: 'なし', type: 'radio' } });
-            }
-            return;
-        }
-
-        if (provider === 'キューエネスでんき') {
-            const targetValue = (prefix === 'ID:') ? 'なし' : 'あり';
-            if (formData.hasContractConfirmation !== targetValue) {
-                handleInputChange({ target: { name: 'hasContractConfirmation', value: targetValue, type: 'radio' } });
-            }
-            return;
-        }
-    }, [formData.elecProvider, formData.elecRecordIdPrefix, formData.hasContractConfirmation, handleInputChange]);
-
-
+    const isElecGasSetSelected = useMemo(() => {
+        return elecProvider === 'すまいのでんき（ストエネ）' && formData.isGasSet === 'セット';
+    }, [elecProvider, formData.isGasSet]);
+    
     const showAllElectricOption = ['すまいのでんき（ストエネ）', 'プラチナでんき（ジャパン）', 'ループでんき'].includes(elecProvider);
     const showVacancyOption = ['すまいのでんき（ストエネ）', 'プラチナでんき（ジャパン）'].includes(elecProvider);
     const showNewConstructionOption = elecProvider === 'ユーパワー UPOWER';
@@ -265,12 +243,7 @@ const ElectricityTab = ({ formData, setFormData, handleInputChange, handleDateBl
             )}
 
 
-            <MailingAddressSection 
-                provider={elecProvider}
-                formData={formData}
-                handleInputChange={handleInputChange}
-                invalidFields={invalidFields}
-            />
+            <MailingAddressSection />
 
             <div className="border-t-2 border-dashed border-blue-300 pt-6 space-y-4">
                 <h3 className="text-lg font-bold text-blue-700">その他</h3>

@@ -1,8 +1,11 @@
-import React from 'https://esm.sh/react@^19.1.0';
+import React, { useContext } from 'https://esm.sh/react@^19.1.0';
+import { AppContext } from '../context/AppContext.tsx';
 import { FormInput, FormCheckbox } from './FormControls.tsx';
 import { HomeModernIcon } from 'https://esm.sh/@heroicons/react@^2.2.0/24/outline';
 
-const OwnerInfo = ({ formData, onChange, invalidFields, isChintai }) => {
+const OwnerInfo = ({ isChintai }) => {
+  const { formData, handleInputChange, invalidFields } = useContext(AppContext);
+  
   return (
     <div className="border-t-2 border-dashed border-blue-300 pt-6 mt-6 space-y-4">
       <h3 className="text-lg font-bold text-blue-700 flex items-center gap-2">
@@ -16,7 +19,7 @@ const OwnerInfo = ({ formData, onChange, invalidFields, isChintai }) => {
               label="①管理会社名"
               name="managementCompany"
               value={formData.managementCompany}
-              onChange={onChange}
+              onChange={handleInputChange}
               isInvalid={invalidFields.includes('managementCompany')}
               required
             />
@@ -24,7 +27,7 @@ const OwnerInfo = ({ formData, onChange, invalidFields, isChintai }) => {
               label="②管理連絡先"
               name="managementContact"
               value={formData.managementContact}
-              onChange={onChange}
+              onChange={handleInputChange}
               isInvalid={invalidFields.includes('managementContact')}
               required
             />
@@ -32,7 +35,7 @@ const OwnerInfo = ({ formData, onChange, invalidFields, isChintai }) => {
               label="③担当者名"
               name="contactPerson"
               value={formData.contactPerson}
-              onChange={onChange}
+              onChange={handleInputChange}
               isInvalid={invalidFields.includes('contactPerson')}
               required
             />
@@ -40,14 +43,14 @@ const OwnerInfo = ({ formData, onChange, invalidFields, isChintai }) => {
               label="④ビル調査希望"
               name="buildingSurveyRequest"
               value={formData.buildingSurveyRequest}
-              onChange={onChange}
+              onChange={handleInputChange}
               isInvalid={invalidFields.includes('buildingSurveyRequest')}
             />
             <FormInput
               label="⑤図面提出方法と送付先"
               name="drawingSubmissionContact"
               value={formData.drawingSubmissionContact}
-              onChange={onChange}
+              onChange={handleInputChange}
               isInvalid={invalidFields.includes('drawingSubmissionContact')}
             />
         </div>
@@ -57,21 +60,21 @@ const OwnerInfo = ({ formData, onChange, invalidFields, isChintai }) => {
               label="管理会社"
               name="managementCompany"
               value={formData.managementCompany}
-              onChange={onChange}
+              onChange={handleInputChange}
               isInvalid={invalidFields.includes('managementCompany')}
             />
             <FormInput
               label="管理番号"
               name="managementNumber"
               value={formData.managementNumber}
-              onChange={onChange}
+              onChange={handleInputChange}
               isInvalid={invalidFields.includes('managementNumber')}
             />
             <FormInput
               label="担当者"
               name="contactPerson"
               value={formData.contactPerson}
-              onChange={onChange}
+              onChange={handleInputChange}
               className="md:col-span-2"
               isInvalid={invalidFields.includes('contactPerson')}
             />
@@ -80,7 +83,7 @@ const OwnerInfo = ({ formData, onChange, invalidFields, isChintai }) => {
                     label="穴あけ・ビス止めNG"
                     name="noDrilling"
                     checked={formData.noDrilling}
-                    onChange={onChange}
+                    onChange={handleInputChange}
                     isInvalid={invalidFields.includes('noDrilling')}
                     description=""
                 />
@@ -88,7 +91,7 @@ const OwnerInfo = ({ formData, onChange, invalidFields, isChintai }) => {
                     label="図面提出あり"
                     name="drawingSubmission"
                     checked={formData.drawingSubmission}
-                    onChange={onChange}
+                    onChange={handleInputChange}
                     isInvalid={invalidFields.includes('drawingSubmission')}
                     description=""
                 />
@@ -97,7 +100,7 @@ const OwnerInfo = ({ formData, onChange, invalidFields, isChintai }) => {
                         label="FAX番号または郵送先"
                         name="drawingSubmissionContact"
                         value={formData.drawingSubmissionContact}
-                        onChange={onChange}
+                        onChange={handleInputChange}
                         placeholder="FAX: 03-XXXX-XXXX または 郵送先住所"
                         required={formData.drawingSubmission}
                         isInvalid={invalidFields.includes('drawingSubmissionContact')}

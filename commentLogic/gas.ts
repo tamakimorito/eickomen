@@ -68,7 +68,7 @@ export const generateGasCommentLogic = (formData: FormData): string => {
             break;
 
         case '東急ガス':
-            comment = `【えねこねガス_開栓】${tag}\n契確時間：${elecConfirmationTime || ''}\nレコードID：${recordId || ''}\n主商材受注状況：${primaryProductStatus || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：えねこねガス\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${phone || ''}\n郵便番号：${postalCode || ''}\n引越し先住所：${address || ''}\n物件名：${buildingInfo || ''}\n利用開始日：${moveInDate || ''}\nガス開栓日：${moveInDate || ''}\n立会時間枠：${gasOpeningTimeSlot || ''}\nメアド：${email || ''}\n支払い方法：${paymentMethod || ''}\n書面送付先（現住所）：${currentAddress || ''}`;
+            comment = `【えねこねガス_開栓】${tag}\n契確時間：${elecConfirmationTime || ''}\nレコードID：${recordId || ''}\n主商材受注状況：${primaryProductStatus || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：えねこねガス\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${phone || ''}\n郵便番号：${postalCode || ''}\n引越し先住所：${address || ''}\n物件名：${buildingInfo || ''}\n利用開始日：${moveInDate || ''}　${gasOpeningTimeSlot || ''}\nメアド：${email || ''}\n支払い方法：${paymentMethod || ''}\n書面送付先（現住所）：${currentAddress || ''}`;
             break;
 
         case '大阪ガス単品':

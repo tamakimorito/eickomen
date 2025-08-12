@@ -1,18 +1,20 @@
-import React, { useMemo, useEffect } from 'https://esm.sh/react@^19.1.0';
+import React, { useMemo, useContext } from 'https://esm.sh/react@^19.1.0';
 import { 
     GAS_PROVIDERS, YES_NO_OPTIONS,
     PRIMARY_PRODUCT_STATUS_OPTIONS, ATTACHED_OPTION_OPTIONS, GENDERS, 
     PAYMENT_METHOD_OPTIONS_EXTENDED, MAILING_OPTIONS, GAS_OPENING_TIME_SLOTS, 
     TIME_SLOTS_NICHI, TIME_SLOTS_SUTENE_SR, TIME_SLOTS_TOKYO_GAS
 } from '../constants.ts';
+import { AppContext } from '../context/AppContext.tsx';
 import { FormInput, FormSelect, FormRadioGroup, FormTextArea, FormDateInput } from './FormControls.tsx';
 
-const MailingAddressSection = ({ provider, formData, handleInputChange, invalidFields }) => {
-    const { mailingOption, currentPostalCode, currentAddress } = formData;
+const MailingAddressSection = () => {
+    const { formData, handleInputChange, invalidFields } = useContext(AppContext);
+    const { gasProvider, mailingOption, currentPostalCode, currentAddress } = formData;
     
     const config = useMemo(() => {
         const defaultConfig = { showOptions: false, showFields: false, isRequired: false, fixedValue: null, description: null };
-        switch(provider) {
+        switch(gasProvider) {
             case 'すまいのでんき（ストエネ）': // This is "すまいのガス"
             case 'ニチガス単品':
             case '大阪ガス単品':
@@ -30,13 +32,7 @@ const MailingAddressSection = ({ provider, formData, handleInputChange, invalidF
             default:
                 return { ...defaultConfig, showOptions: false, showFields: false };
         }
-    }, [provider, mailingOption]);
-
-    useEffect(() => {
-        if (config.fixedValue && mailingOption !== config.fixedValue) {
-            handleInputChange({ target: { name: 'mailingOption', value: config.fixedValue, type: 'radio' } });
-        }
-    }, [provider, config.fixedValue, mailingOption, handleInputChange]);
+    }, [gasProvider, mailingOption]);
 
     if (!config.showOptions && !config.showFields && !config.description) {
         return null;
@@ -85,7 +81,8 @@ const MailingAddressSection = ({ provider, formData, handleInputChange, invalidF
 };
 
 
-const GasTab = ({ formData, handleInputChange, handleDateBlur, handleNameBlur, invalidFields }) => {
+const GasTab = () => {
+    const { formData, handleInputChange, handleDateBlur, handleNameBlur, invalidFields } = useContext(AppContext);
     const { gasProvider, gasRecordIdPrefix, isSakaiRoute } = formData;
     
     const isSumainoGas = gasProvider === 'すまいのでんき（ストエネ）';
@@ -98,12 +95,6 @@ const GasTab = ({ formData, handleInputChange, handleDateBlur, handleNameBlur, i
     const showAttachedOption = useMemo(() => {
         return isSumainoGas && formData.gasHasContractConfirmation === 'なし';
     }, [isSumainoGas, formData.gasHasContractConfirmation]);
-
-    useEffect(() => {
-        if (isTokyu) {
-            handleInputChange({ target: { name: 'gasHasContractConfirmation', value: 'あり', type: 'radio' } });
-        }
-    }, [isTokyu, handleInputChange]);
 
     const needsWitness = useMemo(() => {
         return ['すまいのでんき（ストエネ）', '東京ガス単品', '東邦ガス単品', '東急ガス', 'ニチガス単品'].includes(gasProvider);
@@ -224,12 +215,7 @@ const GasTab = ({ formData, handleInputChange, handleDateBlur, handleNameBlur, i
                 </div>
             </div>
             
-            <MailingAddressSection 
-                provider={gasProvider}
-                formData={formData}
-                handleInputChange={handleInputChange}
-                invalidFields={invalidFields}
-            />
+            <MailingAddressSection />
 
             <div className="border-t-2 border-dashed border-blue-300 pt-6 space-y-4">
                 <h3 className="text-lg font-bold text-blue-700">その他</h3>
