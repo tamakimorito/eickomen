@@ -102,6 +102,8 @@ export type FormData = {
   // --- WTS Specific ---
   wtsCustomerType: string; 
   wtsShippingDestination: string;
+  wtsShippingPostalCode: string;
+  wtsShippingAddress: string;
   wtsServerType: string;
   wtsServerColor: string;
   wtsFiveYearPlan: string;

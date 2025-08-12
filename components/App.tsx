@@ -1,4 +1,3 @@
-
 import React, { useContext } from 'https://esm.sh/react@^19.1.0';
 import { AppContext } from './context/AppContext.tsx';
 import InternetTab from './components/InternetTab.tsx';

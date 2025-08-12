@@ -255,10 +255,15 @@ const generateGmoComment = (formData: FormData): string => {
 
     const isNoPair = housingType.includes('ペアなし');
     const isFamily = housingType.includes('ファミリー');
+    const is1G = housingType.includes('1G');
     const commentLines = [];
 
-    const planName = isNoPair ? `GMOドコモ光 ${housingType}` : `GMOドコモ光`;
-    commentLines.push(`■${planName}`);
+    if (is1G) {
+        commentLines.push('■GMOドコモ光※10G案内不要');
+    } else {
+        const planName = isNoPair ? `GMOドコモ光 ${housingType}` : `GMOドコモ光`;
+        commentLines.push(`■${planName}`);
+    }
     
     if (!isNoPair) {
         commentLines.push(`工事費分割案内済${gmoConstructionSplit ? '✔' : ''}`);

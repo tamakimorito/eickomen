@@ -15,6 +15,7 @@ const formatDate = (dateStr) => {
 export const generateWtsCommentLogic = (formData: FormData): string => {
     const {
         apName, customerId, contractorName, dob, phone, wtsShippingDestination,
+        wtsShippingPostalCode, wtsShippingAddress,
         wtsServerColor, wtsFiveYearPlan, wtsFreeWater, wtsCreditCard, wtsCarrier,
         moveInDate, wtsWaterPurifier, wtsMultipleUnits, wtsCustomerType,
         wtsU20HighSchool, wtsU20ParentalConsent, wtsCorporateInvoice, remarks, wtsMailingAddress,
@@ -44,11 +45,19 @@ export const generateWtsCommentLogic = (formData: FormData): string => {
     let currentIndex = 1;
     commentLines.push(`${currentIndex++}）名義：${wtsCustomerType === '法人' ? (contractorName || '') : `（${contractorName || ''}）`}`);
     commentLines.push(`${currentIndex++}）生年月日：${dob || ''}`);
-    commentLines.push(`${currentIndex++}）番号：${phone || ''}`);
+    commentLines.push(`${currentIndex++}）電話番号：${phone || ''}`);
     if (wtsCustomerType === '法人') {
         commentLines.push(`${currentIndex++}）メアド：${wtsEmail || ''}`);
     }
-    commentLines.push(`${currentIndex++}）発送先：${wtsShippingDestination || ''}`);
+
+    let shippingDestinationText = wtsShippingDestination || '';
+    if (wtsShippingDestination === 'その他') {
+        shippingDestinationText = `その他（〒${wtsShippingPostalCode || ''} ${wtsShippingAddress || ''}）`;
+    } else if (wtsShippingDestination === '新住所') {
+        shippingDestinationText = '新住所(設置先と同じ)';
+    }
+
+    commentLines.push(`${currentIndex++}）発送先：${shippingDestinationText}`);
     commentLines.push(`${currentIndex++}）サーバー・色：${serverAndColor}`);
     commentLines.push(`${currentIndex++}）契約年数：${wtsFiveYearPlan || ''}`);
     commentLines.push(`${currentIndex++}）無料水：${wtsFreeWater || ''}`);

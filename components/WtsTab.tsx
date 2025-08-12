@@ -3,7 +3,7 @@ import {
     WTS_CUSTOMER_TYPES, WTS_SHIPPING_DESTINATIONS, WTS_FIVE_YEAR_PLAN_OPTIONS,
     WTS_WATER_PURIFIER_OPTIONS, WTS_MULTIPLE_UNITS_OPTIONS,
     WTS_U20_HIGHSCHOOL_OPTIONS, WTS_U20_PARENTAL_CONSENT_OPTIONS, MAILING_OPTIONS,
-    WTS_SERVERS, WTS_COLORS
+    WTS_SERVERS, WTS_COLORS, WTS_FREE_WATER_OPTIONS, WTS_CARRIER_OPTIONS
 } from '../constants.ts';
 import { AppContext } from '../context/AppContext.tsx';
 import { FormInput, FormSelect, FormRadioGroup, FormTextArea, FormDateInput } from './FormControls.tsx';
@@ -14,17 +14,15 @@ const WtsTab = () => {
     const { wtsCustomerType, isSakaiRoute, wtsServerType } = formData;
     
     const colorOptions = useMemo(() => {
-        return wtsServerType && WTS_COLORS[wtsServerType] ? WTS_COLORS[wtsServerType] : [];
+        if (!wtsServerType) return [];
+        
+        if (wtsServerType.startsWith('スリム4')) {
+            return WTS_COLORS['スリム4ロング'] || [];
+        }
+        return WTS_COLORS[wtsServerType] || [];
     }, [wtsServerType]);
     
     const isCorporate = wtsCustomerType === '法人';
-    
-    // Dynamically adjust numbering
-    const num = (base) => {
-      let n = base;
-      if (isCorporate) n += 1;
-      return `⑩${String.fromCharCode(n + 82)}`.replace('⑩10', '⑭').replace('⑩11', '⑮');
-    };
 
     return (
         <div className="space-y-6">
@@ -42,14 +40,6 @@ const WtsTab = () => {
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormInput
-                    label="AP名"
-                    name="apName"
-                    value={formData.apName}
-                    onChange={handleInputChange}
-                    isInvalid={invalidFields.includes('apName')}
-                    required
-                />
-                <FormInput
                     label="顧客ID"
                     name="customerId"
                     value={formData.customerId}
@@ -58,6 +48,7 @@ const WtsTab = () => {
                     required={!isSakaiRoute}
                     disabled={isSakaiRoute}
                     placeholder={isSakaiRoute ? 'サカイ販路選択時は入力不要' : ''}
+                    className="md:col-span-2"
                 />
             </div>
             
@@ -110,7 +101,7 @@ const WtsTab = () => {
                         required
                     />
                     <FormInput
-                        label="③番号"
+                        label="③電話番号"
                         name="phone"
                         value={formData.phone}
                         onChange={handleInputChange}
@@ -128,15 +119,37 @@ const WtsTab = () => {
                             required
                         />
                     )}
-                    <FormSelect
-                        label={isCorporate ? "⑤発送先" : "④発送先"}
-                        name="wtsShippingDestination"
-                        value={formData.wtsShippingDestination}
-                        onChange={handleInputChange}
-                        options={WTS_SHIPPING_DESTINATIONS}
-                        isInvalid={invalidFields.includes('wtsShippingDestination')}
-                        required
-                    />
+                    <div className="md:col-span-2">
+                        <FormRadioGroup
+                            label={isCorporate ? "⑤発送先" : "④発送先"}
+                            name="wtsShippingDestination"
+                            value={formData.wtsShippingDestination}
+                            onChange={handleInputChange}
+                            options={WTS_SHIPPING_DESTINATIONS}
+                            isInvalid={invalidFields.includes('wtsShippingDestination')}
+                            required
+                        />
+                         {formData.wtsShippingDestination === 'その他' && (
+                            <div className="mt-2 p-4 bg-blue-50/50 rounded-lg border border-blue-200 grid grid-cols-1 gap-4">
+                                <FormInput
+                                    label="発送先 郵便番号"
+                                    name="wtsShippingPostalCode"
+                                    value={formData.wtsShippingPostalCode}
+                                    onChange={handleInputChange}
+                                    isInvalid={invalidFields.includes('wtsShippingPostalCode')}
+                                    required
+                                />
+                                <FormInput
+                                    label="発送先 住所"
+                                    name="wtsShippingAddress"
+                                    value={formData.wtsShippingAddress}
+                                    onChange={handleInputChange}
+                                    isInvalid={invalidFields.includes('wtsShippingAddress')}
+                                    required
+                                />
+                            </div>
+                        )}
+                    </div>
                     <FormSelect
                         label={isCorporate ? "⑥サーバー" : "⑤サーバー"}
                         name="wtsServerType"
@@ -165,11 +178,12 @@ const WtsTab = () => {
                         isInvalid={invalidFields.includes('wtsFiveYearPlan')}
                         required
                     />
-                     <FormInput
+                     <FormRadioGroup
                         label={isCorporate ? "⑨無料水" : "⑧無料水"}
                         name="wtsFreeWater"
                         value={formData.wtsFreeWater}
                         onChange={handleInputChange}
+                        options={WTS_FREE_WATER_OPTIONS}
                         isInvalid={invalidFields.includes('wtsFreeWater')}
                         required
                     />
@@ -182,11 +196,12 @@ const WtsTab = () => {
                         isInvalid={invalidFields.includes('wtsCreditCard')}
                         required
                     />
-                    <FormInput
+                    <FormSelect
                         label={isCorporate ? "⑪キャリア" : "⑩キャリア"}
                         name="wtsCarrier"
                         value={formData.wtsCarrier}
                         onChange={handleInputChange}
+                        options={WTS_CARRIER_OPTIONS}
                         isInvalid={invalidFields.includes('wtsCarrier')}
                         required
                     />

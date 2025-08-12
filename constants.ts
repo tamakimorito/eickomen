@@ -103,7 +103,9 @@ export const INITIAL_FORM_DATA: FormData = {
 
   // --- WTS Specific ---
   wtsCustomerType: '通常',
-  wtsShippingDestination: '',
+  wtsShippingDestination: '新住所',
+  wtsShippingPostalCode: '',
+  wtsShippingAddress: '',
   wtsServerType: '',
   wtsServerColor: '',
   wtsFiveYearPlan: '5年',
@@ -416,7 +418,8 @@ export const WTS_CUSTOMER_TYPES = [
 ];
 
 export const WTS_SHIPPING_DESTINATIONS = [
-    { value: '設置先', label: '設置先' },
+    { value: '新住所', label: '新住所 (設置先と同じ)' },
+    { value: 'その他', label: 'その他' },
 ];
 
 export const WTS_FIVE_YEAR_PLAN_OPTIONS = [
@@ -424,9 +427,10 @@ export const WTS_FIVE_YEAR_PLAN_OPTIONS = [
     { value: '3年', label: '3年' },
 ];
 
-export const WTS_CREDIT_CARD_OPTIONS = [
+export const WTS_FREE_WATER_OPTIONS = [
     { value: 'あり', label: 'あり' },
     { value: 'なし', label: 'なし' },
+    { value: 'クレカの場合無料水あり', label: 'クレカの場合無料水あり' },
 ];
 
 export const WTS_WATER_PURIFIER_OPTIONS = [
@@ -452,7 +456,8 @@ export const WTS_U20_PARENTAL_CONSENT_OPTIONS = [
 
 export const WTS_SERVERS = [
     { value: 'fam2', label: 'fam2' },
-    { value: 'スリム4', label: 'スリム4' },
+    { value: 'スリム4ロング', label: 'スリム4ロング' },
+    { value: 'スリム4ショート', label: 'スリム4ショート' },
     { value: 'ロッカスマート', label: 'ロッカスマート' },
     { value: 'リッタ', label: 'リッタ' },
     { value: 'スリムR2', label: 'スリムR2' },
@@ -465,7 +470,13 @@ export const WTS_COLORS = {
         { value: 'ホワイト', label: 'ホワイト' },
         { value: 'ブラック', label: 'ブラック' },
     ],
-    スリム4: [
+    スリム4ロング: [
+        { value: 'ホワイト', label: 'ホワイト' },
+        { value: 'ブラック', label: 'ブラック' },
+        { value: 'トープ', label: 'トープ' },
+        { value: 'グレー', label: 'グレー' },
+    ],
+    スリム4ショート: [
         { value: 'ホワイト', label: 'ホワイト' },
         { value: 'ブラック', label: 'ブラック' },
         { value: 'トープ', label: 'トープ' },
@@ -495,3 +506,13 @@ export const WTS_COLORS = {
         { value: 'ブラウン', label: 'ブラウン' },
     ],
 };
+
+export const WTS_CARRIER_OPTIONS = [
+    { value: 'AU', label: 'AU' },
+    { value: 'SB', label: 'SB' },
+    { value: 'ドコモ', label: 'ドコモ' },
+    { value: 'アハモ', label: 'アハモ' },
+    { value: 'UQモバイル', label: 'UQモバイル' },
+    { value: 'Yモバイル', label: 'Yモバイル' },
+    { value: 'その他', label: 'その他' },
+];
