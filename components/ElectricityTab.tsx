@@ -3,7 +3,7 @@ import {
     ELEC_PROVIDERS, YES_NO_OPTIONS,
     SET_NONE_OPTIONS, PRIMARY_PRODUCT_STATUS_OPTIONS, ATTACHED_OPTION_OPTIONS, 
     PAYMENT_METHOD_OPTIONS_EXTENDED, GENDERS, NEW_CONSTRUCTION_OPTIONS, TIME_SLOTS_TOHO, MAILING_OPTIONS,
-    TIME_SLOTS_NICHI, TIME_SLOTS_SUTENE_SR, GAS_OPENING_TIME_SLOTS
+    TIME_SLOTS_NICHI, TIME_SLOTS_SUTENE_SR, GAS_OPENING_TIME_SLOTS, TIME_SLOTS_TOKYO_GAS
 } from '../constants.ts';
 import { FormInput, FormSelect, FormRadioGroup, FormTextArea, FormDateInput } from './FormControls.tsx';
 
@@ -17,7 +17,6 @@ const MailingAddressSection = ({ provider, formData, handleInputChange, invalidF
             case 'すまいのでんき（ストエネ）':
             case 'プラチナでんき（ジャパン）':
             case 'ニチガス電気セット':
-            case '東邦ガスセット':
             case '大阪ガス電気セット':
                 return { ...defaultConfig, showOptions: true, showFields: mailingOption === '現住所', isRequired: mailingOption === '現住所', description: '新住所郵送（指定も可能）' };
             
@@ -30,6 +29,9 @@ const MailingAddressSection = ({ provider, formData, handleInputChange, invalidF
             case '東京ガス電気セット':
                  return { ...defaultConfig, fixedValue: '現住所', showFields: true, isRequired: true, description: '書面は現住所へ送付されます。' };
             
+            case '東邦ガスセット':
+                 return { ...defaultConfig, fixedValue: '現住所', showFields: true, isRequired: true, description: '現住所が必須となります。' };
+
             case 'ループでんき':
             case 'HTBエナジー':
             case 'ユーパワー UPOWER':
@@ -48,7 +50,7 @@ const MailingAddressSection = ({ provider, formData, handleInputChange, invalidF
         }
     }, [provider, config.fixedValue, mailingOption, handleInputChange]);
 
-    if (!config.showOptions && !config.showFields) {
+    if (!config.showOptions && !config.showFields && !config.description) {
         return null;
     }
 
@@ -100,18 +102,41 @@ const ElectricityTab = ({ formData, setFormData, handleInputChange, handleDateBl
     const showGasSetOption = elecProvider === 'すまいのでんき（ストエネ）';
     
     const showContractConfirmationOption = useMemo(() => {
-        if (['すまいのでんき（ストエネ）', 'プラチナでんき（ジャパン）'].includes(elecProvider)) return true;
-        if (elecProvider === 'キューエネスでんき' && elecRecordIdPrefix === 'ID:') return true;
+        if (elecProvider === 'すまいのでんき（ストエネ）') return true;
+        if (elecProvider === 'プラチナでんき（ジャパン）' && elecRecordIdPrefix === 'SR') return true;
+        // For Qenes, it's always determined automatically, so never show the option.
         return false;
     }, [elecProvider, elecRecordIdPrefix]);
+
+    useEffect(() => {
+        const provider = formData.elecProvider;
+        const prefix = formData.elecRecordIdPrefix;
+
+        // Logic for providers where the choice is fixed and options are hidden
+        if (provider === 'プラチナでんき（ジャパン）' && prefix !== 'SR') {
+            if (formData.hasContractConfirmation !== 'なし') {
+                handleInputChange({ target: { name: 'hasContractConfirmation', value: 'なし', type: 'radio' } });
+            }
+            return;
+        }
+
+        if (provider === 'キューエネスでんき') {
+            const targetValue = (prefix === 'ID:') ? 'なし' : 'あり';
+            if (formData.hasContractConfirmation !== targetValue) {
+                handleInputChange({ target: { name: 'hasContractConfirmation', value: targetValue, type: 'radio' } });
+            }
+            return;
+        }
+    }, [formData.elecProvider, formData.elecRecordIdPrefix, formData.hasContractConfirmation, handleInputChange]);
+
 
     const showAllElectricOption = ['すまいのでんき（ストエネ）', 'プラチナでんき（ジャパン）', 'ループでんき'].includes(elecProvider);
     const showVacancyOption = ['すまいのでんき（ストエネ）', 'プラチナでんき（ジャパン）'].includes(elecProvider);
     const showNewConstructionOption = elecProvider === 'ユーパワー UPOWER';
     const showAttachedOption = useMemo(() => {
-        return ['キューエネスでんき', 'リミックスでんき', 'プラチナでんき（ジャパン）'].includes(elecProvider) || 
-                (elecProvider === 'すまいのでんき（ストエネ）' && formData.hasContractConfirmation === 'なし');
-    }, [elecProvider, formData.hasContractConfirmation]);
+        // Show attached option only when contract confirmation is not required.
+        return formData.hasContractConfirmation === 'なし';
+    }, [formData.hasContractConfirmation]);
     
     const gasTimeSlotOptions = useMemo(() => {
         if (elecProvider === 'すまいのでんき（ストエネ）' && elecRecordIdPrefix === 'SR') {
@@ -122,6 +147,9 @@ const ElectricityTab = ({ formData, setFormData, handleInputChange, handleDateBl
         }
         if (elecProvider === 'ニチガス電気セット') {
             return TIME_SLOTS_NICHI;
+        }
+        if (elecProvider === '東京ガス電気セット') {
+            return TIME_SLOTS_TOKYO_GAS;
         }
         if (isElecGasSetSelected) {
             return GAS_OPENING_TIME_SLOTS;
@@ -180,7 +208,7 @@ const ElectricityTab = ({ formData, setFormData, handleInputChange, handleDateBl
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 p-4 bg-blue-50/50 rounded-lg border border-blue-200">
                     {showAllElectricOption && <FormRadioGroup label="オール電化" name="isAllElectric" value={formData.isAllElectric} onChange={handleInputChange} options={YES_NO_OPTIONS} isInvalid={invalidFields.includes('isAllElectric')} />}
                     {showVacancyOption && <FormRadioGroup label="空室" name="isVacancy" value={formData.isVacancy} onChange={handleInputChange} options={YES_NO_OPTIONS} isInvalid={invalidFields.includes('isVacancy')} />}
-                    {showContractConfirmationOption && <FormRadioGroup label="契約確認" name="hasContractConfirmation" value={formData.hasContractConfirmation} onChange={handleInputChange} options={YES_NO_OPTIONS} isInvalid={invalidFields.includes('hasContractConfirmation')} required />}
+                    {showContractConfirmationOption && <FormRadioGroup label="契確は必要ですか？" name="hasContractConfirmation" value={formData.hasContractConfirmation} onChange={handleInputChange} options={YES_NO_OPTIONS} isInvalid={invalidFields.includes('hasContractConfirmation')} required />}
                     {showGasSetOption && <FormRadioGroup label="ガスセット" name="isGasSet" value={isGasSet} onChange={handleInputChange} options={SET_NONE_OPTIONS} isInvalid={invalidFields.includes('isGasSet')} />}
                     <FormRadioGroup label="主商材受注状況" name="primaryProductStatus" value={formData.primaryProductStatus} onChange={handleInputChange} options={PRIMARY_PRODUCT_STATUS_OPTIONS} isInvalid={invalidFields.includes('primaryProductStatus')} />
                     {showAttachedOption && <FormRadioGroup label="付帯OP" name="attachedOption" value={formData.attachedOption} onChange={handleInputChange} options={ATTACHED_OPTION_OPTIONS} isInvalid={invalidFields.includes('attachedOption')} />}
@@ -210,7 +238,7 @@ const ElectricityTab = ({ formData, setFormData, handleInputChange, handleDateBl
                 </div>
             </div>
             
-            {isElecGasSetSelected ? (
+            {isElecGasSetSelected || elecProvider === 'ニチガス電気セット' || elecProvider === '東邦ガスセット' || elecProvider === '東京ガス電気セット' ? (
                 <div className="border-t-2 border-dashed border-blue-300 pt-6 space-y-4">
                     <h3 className="text-lg font-bold text-blue-700">利用開始日・開栓日</h3>
                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-blue-50/50 rounded-lg border border-blue-200">
@@ -224,7 +252,7 @@ const ElectricityTab = ({ formData, setFormData, handleInputChange, handleDateBl
                                 <FormInput label="ガス事前連絡先" name="gasPreContact" value={formData.gasPreContact} onChange={handleInputChange} isInvalid={invalidFields.includes('gasPreContact')} required />
                             </>
                         )}
-                        {isToho && (
+                         {(isToho || elecProvider === '東京ガス電気セット') && (
                             <FormInput label="現住所" name="currentAddress" value={formData.currentAddress} onChange={handleInputChange} placeholder="！！必須！！" className="md:col-span-2" isInvalid={invalidFields.includes('currentAddress')} required />
                         )}
                     </div>

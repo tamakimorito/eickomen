@@ -166,12 +166,12 @@ const GasTab = ({ formData, handleInputChange, handleDateBlur, handleNameBlur, i
                     {isSumainoGas && (
                          <>
                             <FormRadioGroup label="空室" name="gasIsVacancy" value={formData.gasIsVacancy} onChange={handleInputChange} options={YES_NO_OPTIONS} isInvalid={invalidFields.includes('gasIsVacancy')} />
-                            <FormRadioGroup label="契約確認" name="gasHasContractConfirmation" value={formData.gasHasContractConfirmation} onChange={handleInputChange} options={YES_NO_OPTIONS} isInvalid={invalidFields.includes('gasHasContractConfirmation')} />
+                            <FormRadioGroup label="契確は必要ですか？" name="gasHasContractConfirmation" value={formData.gasHasContractConfirmation} onChange={handleInputChange} options={YES_NO_OPTIONS} isInvalid={invalidFields.includes('gasHasContractConfirmation')} />
                             {showAttachedOption && <FormRadioGroup label="付帯OP" name="attachedOption" value={formData.attachedOption} onChange={handleInputChange} options={ATTACHED_OPTION_OPTIONS} isInvalid={invalidFields.includes('attachedOption')} />}
                         </>
                     )}
                     {isTokyu && (
-                        <FormRadioGroup label="契約確認" name="gasHasContractConfirmation" value={formData.gasHasContractConfirmation} onChange={handleInputChange} options={[{value: 'あり', label: 'あり'}]} disabled isInvalid={invalidFields.includes('gasHasContractConfirmation')} />
+                        <FormRadioGroup label="契確は必要ですか？" name="gasHasContractConfirmation" value={formData.gasHasContractConfirmation} onChange={handleInputChange} options={[{value: 'あり', label: 'あり'}]} disabled isInvalid={invalidFields.includes('gasHasContractConfirmation')} />
                     )}
                     {(isSumainoGas || isTokyu) && (
                          <FormRadioGroup label="主商材受注状況" name="primaryProductStatus" value={formData.primaryProductStatus} onChange={handleInputChange} options={PRIMARY_PRODUCT_STATUS_OPTIONS} isInvalid={invalidFields.includes('primaryProductStatus')} />

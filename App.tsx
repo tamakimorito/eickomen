@@ -16,6 +16,8 @@ import { BoltIcon, FireIcon, WifiIcon, CloudIcon, ExclamationTriangleIcon, ChatB
 import { generateElectricityCommentLogic } from './commentLogic/electricity.ts';
 import { generateGasCommentLogic } from './commentLogic/gas.ts';
 import { generateWtsCommentLogic } from './commentLogic/wts.ts';
+import { generateInternetCommentLogic } from './commentLogic/internet.ts';
+
 
 const TABS = [
   { id: 'electricity', label: '電気', icon: BoltIcon },
@@ -110,6 +112,14 @@ const App = () => {
             value = value.replace(/\s/g, '');
         }
         updates[name] = value;
+        
+        // Sync recordId and customerId
+        if (name === 'recordId') {
+            updates.customerId = value;
+        }
+        if (name === 'customerId') {
+            updates.recordId = value;
+        }
     
         if (name === 'recordId' && !formData.isSakaiRoute) {
             let prefix = 'それ以外';
@@ -235,7 +245,7 @@ const App = () => {
                         newComment = generateGasCommentLogic(formData);
                         break;
                     case 'internet':
-                        newComment = 'インターネットのコメント生成は現在サポートされていません。';
+                        newComment = generateInternetCommentLogic(formData);
                         break;
                     case 'wts':
                         newComment = generateWtsCommentLogic(formData);

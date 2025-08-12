@@ -30,47 +30,56 @@ export const generateElectricityCommentLogic = (formData: FormData): string => {
     let comment = '該当するテンプレートがありません。';
     const tag = "250811";
 
+    const isSet = isGasSet === 'セット' || elecProvider === 'ニチガス電気セット' || elecProvider === '東邦ガスセット' || elecProvider === '東京ガス電気セット';
+
     // Date line logic for sets
     let dateLine = `利用開始日：${moveInDate || ''}`;
-    if (isGasSet === 'セット') {
-        if (moveInDate && gasOpeningDate && moveInDate === gasOpeningDate) {
-            dateLine = `利用開始日(電気/ガス)：${moveInDate}`;
-        } else {
-            dateLine = `利用開始日：電気→${moveInDate || ''} ガス→${gasOpeningDate || ''}`;
-        }
-    }
+    if (isSet) {
+        let elecPart = `電気→${moveInDate || ''}`;
+        let gasPart = `ガス→${gasOpeningDate || ''}`;
+        let timePart = gasOpeningTimeSlot || '';
 
+        if (moveInDate && gasOpeningDate && moveInDate === gasOpeningDate) {
+            dateLine = `利用開始日(電気/ガス)：${moveInDate} ${timePart}`;
+        } else {
+            dateLine = `利用開始日：${elecPart}　${gasPart} ${timePart}`;
+        }
+        dateLine = dateLine.trim();
+    }
+    
+    const showPrimaryProductStatus = hasContractConfirmation === 'あり';
+    const showAttachedOption = hasContractConfirmation === 'なし';
 
     switch (elecProvider) {
-        case 'すまいのでんき（ストエネ）':
+        case 'すまいのでんき（ストエне）':
             switch (elecRecordIdPrefix) {
                 case 'SR':
                     if (isAllElectric === 'あり') {
                         if (isVacancy === 'あり') {
                              if (hasContractConfirmation === 'あり') {
-                                comment = `【ストエネ/賃貸でんき※空室プランHAHZZT223】${tag}\n主商材受注状況：${primaryProductStatus || ''}\n契確時間：${elecConfirmationTime || ''}\nレコードID：${recordId || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：※空室プラン　賃貸でんきオール電化プラン\nガス：${isGasSet || ''}\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${phone || ''}\n郵便番号：${postalCode || ''}\n引越し先住所：${address || ''}\n物件名：${buildingInfo || ''}\n${dateLine}\n支払い方法：${paymentMethod || ''}\n備考：${remarks || ''}`;
+                                comment = `【ストエネ/賃貸でんき※空室プランHAHZZT223】${tag}\n${showPrimaryProductStatus ? `主商材受注状況：${primaryProductStatus || ''}\n` : ''}契確時間：${elecConfirmationTime || ''}\nレコードID：${recordId || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：※空室プラン　賃貸でんきオール電化プラン\nガス：${isGasSet || ''}\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${phone || ''}\n郵便番号：${postalCode || ''}\n引越し先住所：${address || ''}\n物件名：${buildingInfo || ''}\n${dateLine}\n支払い方法：${paymentMethod || ''}\n備考：${remarks || ''}`;
                             } else {
-                                comment = `【ストエネ/★インポートのみ/すまいの/※空室プランHAHZZT223】${tag}\nレコードID：${recordId || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：※空室プラン　すまいのでんきオール電化プラン\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n性別：${gender || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${phone || ''}\n郵便番号：${postalCode || ''}\n住所：${address || ''}\n物件名：${buildingInfo || ''}\n${dateLine}\n付帯OP：${attachedOption || ''}\n支払い方法：${paymentMethod || ''}\n備考：${remarks || ''}`;
+                                comment = `【ストエネ/★インポートのみ/すまいの/※空室プランHAHZZT223】${tag}\nレコードID：${recordId || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：※空室プラン　すまいのでんきオール電化プラン\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n性別：${gender || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${phone || ''}\n郵便番号：${postalCode || ''}\n住所：${address || ''}\n物件名：${buildingInfo || ''}\n${dateLine}\n${showAttachedOption ? `付帯OP：${attachedOption || ''}\n` : ''}支払い方法：${paymentMethod || ''}\n備考：${remarks || ''}`;
                             }
                         } else { // isVacancy === 'なし'
                              if (hasContractConfirmation === 'あり') {
-                                comment = `【ストエネ】${tag}\n契確時間：${elecConfirmationTime || ''}\nレコードID：${recordId || ''}\n主商材受注状況：${primaryProductStatus || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：賃貸でんきオール電化プラン\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${phone || ''}\n郵便番号：${postalCode || ''}\n引越し先住所：${address || ''}\n物件名：${buildingInfo || ''}\n${dateLine}\n支払い方法：${paymentMethod || ''}\n重説送付先：新居\n備考：${remarks || ''}`;
+                                comment = `【ストエネ】${tag}\n契確時間：${elecConfirmationTime || ''}\nレコードID：${recordId || ''}\n${showPrimaryProductStatus ? `主商材受注状況：${primaryProductStatus || ''}\n` : ''}名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：賃貸でんきオール電化プラン\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${phone || ''}\n郵便番号：${postalCode || ''}\n引越し先住所：${address || ''}\n物件名：${buildingInfo || ''}\n${dateLine}\n支払い方法：${paymentMethod || ''}\n重説送付先：新居\n備考：${remarks || ''}`;
                             } else {
-                                comment = `【ストエネ/★インポートのみ/すまいの】${tag}\nレコードID：${recordId || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：すまいのでんきオール電化プラン\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n性別：${gender || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${phone || ''}\n郵便番号：${postalCode || ''}\n住所：${address || ''}\n物件名：${buildingInfo || ''}\n${dateLine}\n付帯OP：${attachedOption || ''}\n支払い方法：${paymentMethod || ''}\n備考：${remarks || ''}`;
+                                comment = `【ストエネ/★インポートのみ/すまいの】${tag}\nレコードID：${recordId || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：すまいのでんきオール電化プラン\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n性別：${gender || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${phone || ''}\n郵便番号：${postalCode || ''}\n住所：${address || ''}\n物件名：${buildingInfo || ''}\n${dateLine}\n${showAttachedOption ? `付帯OP：${attachedOption || ''}\n` : ''}支払い方法：${paymentMethod || ''}\n備考：${remarks || ''}`;
                             }
                         }
                     } else { // isAllElectric === 'なし'
                          if (isVacancy === 'あり') {
                             if (hasContractConfirmation === 'あり') {
-                                comment = `【ストエネ/賃貸でんき※空室プランHAHZZT223】${tag}\n主商材受注状況：${primaryProductStatus || ''}\n契確時間：${elecConfirmationTime || ''}\nレコードID：${recordId || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：※空室プラン ${isGasSet === 'セット' ? '賃貸セット' : '賃貸電気のみ'}\nガス：${isGasSet || ''}\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${phone || ''}\n郵便番号：${postalCode || ''}\n引越し先住所：${address || ''}\n物件名：${buildingInfo || ''}\n${dateLine}\n支払い方法：\n備考：${remarks || ''}`;
+                                comment = `【ストエネ/賃貸でんき※空室プランHAHZZT223】${tag}\n${showPrimaryProductStatus ? `主商材受注状況：${primaryProductStatus || ''}\n` : ''}契確時間：${elecConfirmationTime || ''}\nレコードID：${recordId || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：※空室プラン ${isGasSet === 'セット' ? '賃貸セット' : '賃貸電気のみ'}\nガス：${isGasSet || ''}\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${phone || ''}\n郵便番号：${postalCode || ''}\n引越し先住所：${address || ''}\n物件名：${buildingInfo || ''}\n${dateLine}\n支払い方法：\n備考：${remarks || ''}`;
                             } else { // hasContractConfirmation === 'なし'
-                                comment = `【ストエネ/★インポートのみ/すまいの/※空室プランHAHZZT223】${tag}\nレコードID：${recordId || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：※空室プラン ${isGasSet === 'セット' ? 'すまいのセット' : 'すまいの電気のみ'}\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n性別：${gender || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${phone || ''}\n郵便番号：${postalCode || ''}\n住所：${address || ''}\n物件名：${buildingInfo || ''}\n${dateLine}\n付帯OP：${attachedOption || ''}\n支払い方法：\n備考：${remarks || ''}`;
+                                comment = `【ストエネ/★インポートのみ/すまいの/※空室プランHAHZZT223】${tag}\nレコードID：${recordId || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：※空室プラン ${isGasSet === 'セット' ? 'すまいのセット' : 'すまいの電気のみ'}\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n性別：${gender || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${phone || ''}\n郵便番号：${postalCode || ''}\n住所：${address || ''}\n物件名：${buildingInfo || ''}\n${dateLine}\n${showAttachedOption ? `付帯OP：${attachedOption || ''}\n` : ''}支払い方法：\n備考：${remarks || ''}`;
                             }
                         } else { // isVacancy === 'なし'
                             if (hasContractConfirmation === 'あり') {
-                                comment = `【ストエネ/賃貸】${tag}\n主商材受注状況：${primaryProductStatus || ''}\n契確時間：${elecConfirmationTime || ''}\nレコードID：${recordId || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：${isGasSet === 'セット' ? '賃貸セット' : '賃貸電気のみ'}\nガス：${isGasSet || ''}\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n性別：${gender || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${phone || ''}\n郵便番号：${postalCode || ''}\n引越し先住所：${address || ''}\n物件名：${buildingInfo || ''}\n${dateLine}\n支払い方法：\n備考：${remarks || ''}`;
+                                comment = `【ストエネ/賃貸】${tag}\n${showPrimaryProductStatus ? `主商材受注状況：${primaryProductStatus || ''}\n` : ''}契確時間：${elecConfirmationTime || ''}\nレコードID：${recordId || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：${isGasSet === 'セット' ? '賃貸セット' : '賃貸電気のみ'}\nガス：${isGasSet || ''}\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n性別：${gender || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${phone || ''}\n郵便番号：${postalCode || ''}\n引越し先住所：${address || ''}\n物件名：${buildingInfo || ''}\n${dateLine}\n支払い方法：\n備考：${remarks || ''}`;
                             } else { // hasContractConfirmation === 'なし'
-                                comment = `【ストエネ/★インポートのみ/すまいの】${tag}\nレコードID：${recordId || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：${isGasSet === 'セット' ? 'すまいのセット' : 'すまいの電気のみ'}\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n性別：${gender || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${phone || ''}\n郵便番号：${postalCode || ''}\n住所：${address || ''}\n物件名：${buildingInfo || ''}\n${dateLine}\n付帯OP：${attachedOption || ''}\n支払い方法：\n備考：${remarks || ''}`;
+                                comment = `【ストエネ/★インポートのみ/すまいの】${tag}\nレコードID：${recordId || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：${isGasSet === 'セット' ? 'すまいのセット' : 'すまいの電気のみ'}\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n性別：${gender || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${phone || ''}\n郵便番号：${postalCode || ''}\n住所：${address || ''}\n物件名：${buildingInfo || ''}\n${dateLine}\n${showAttachedOption ? `付帯OP：${attachedOption || ''}\n` : ''}支払い方法：\n備考：${remarks || ''}`;
                             }
                         }
                     }
@@ -98,51 +107,42 @@ export const generateElectricityCommentLogic = (formData: FormData): string => {
             break;
 
         case 'プラチナでんき（ジャパン）':
-             const platinaMailingAddress = mailingOption === '現住所' ? `書面送付先：現住所（${currentAddress || ''}）` : '';
-
             switch (elecRecordIdPrefix) {
                 case 'SR':
                     if (isVacancy === 'あり') {
                          if (hasContractConfirmation === 'あり') {
-                            comment = `【JAPAN電力※空室プランHAHZZT281】${tag}\n契確時間：${elecConfirmationTime || ''}\nレコードID：${recordId || ''}\n主商材受注状況：${primaryProductStatus || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：${isAllElectric === 'あり' ? 'プラチナでんきオール電化プラン' : 'プラチナでんき'}\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${phone || ''}\n郵便番号：${postalCode || ''}\n引越し先住所：${address || ''}\n物件名：${buildingInfo || ''}\n利用開始日：電気→${moveInDate || ''}\n支払い方法：${paymentMethod || ''}\n${platinaMailingAddress}\n備考：${remarks || ''}`;
+                            comment = `【JAPAN電力※空室プランHAHZZT281】${tag}\n契確時間：${elecConfirmationTime || ''}\nレコードID：${recordId || ''}\n${showPrimaryProductStatus ? `主商材受注状況：${primaryProductStatus || ''}\n` : ''}名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：${isAllElectric === 'あり' ? 'プラチナでんきオール電化プラン' : 'プラチナでんき'}\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${phone || ''}\n郵便番号：${postalCode || ''}\n引越し先住所：${address || ''}\n物件名：${buildingInfo || ''}\n利用開始日：電気→${moveInDate || ''}\n支払い方法：${paymentMethod || ''}\n備考：${remarks || ''}`;
                         } else {
-                            comment = `【JAPAN電力/★インポートのみ※空室プランHAHZZT281】${tag}\nレコードID：${recordId || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：${isAllElectric === 'あり' ? 'プラチナでんきオール電化プラン' : 'プラチナでんき'}\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n性別：${gender || ''}\n電話番号：${phone || ''}\n郵便番号：${postalCode || ''}\n住所：${address || ''}\n物件名：${buildingInfo || ''}\n利用開始日：${moveInDate || ''}\n付帯OP：${attachedOption || ''}\n支払い方法：${paymentMethod || ''}\n${platinaMailingAddress}\n備考：${remarks || ''}`;
+                            comment = `【JAPAN電力/★インポートのみ※空室プランHAHZZT281】${tag}\nレコードID：${recordId || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：${isAllElectric === 'あり' ? 'プラチナでんきオール電化プラン' : 'プラチナでんき'}\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n性別：${gender || ''}\n電話番号：${phone || ''}\n郵便番号：${postalCode || ''}\n住所：${address || ''}\n物件名：${buildingInfo || ''}\n利用開始日：${moveInDate || ''}\n${showAttachedOption ? `付帯OP：${attachedOption || ''}\n` : ''}支払い方法：${paymentMethod || ''}\n備考：${remarks || ''}`;
                         }
                     } else { // isVacancy === 'なし'
                          if (hasContractConfirmation === 'あり') {
-                             comment = `【JAPAN電力】HAHZZT182 ${tag}\n契確時間：${elecConfirmationTime || ''}\nレコードID：${recordId || ''}\n主商材受注状況：${primaryProductStatus || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：${isAllElectric === 'あり' ? 'プラチナでんきオール電化プラン' : 'プラチナでんき'}\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${phone || ''}\n郵便番号：${postalCode || ''}\n引越し先住所：${address || ''}\n物件名：${buildingInfo || ''}\n利用開始日：電気→${moveInDate || ''}\n支払い方法：${paymentMethod || ''}\n${platinaMailingAddress}\n備考：${remarks || ''}`;
+                             comment = `【JAPAN電力】HAHZZT182 ${tag}\n契確時間：${elecConfirmationTime || ''}\nレコードID：${recordId || ''}\n${showPrimaryProductStatus ? `主商材受注状況：${primaryProductStatus || ''}\n` : ''}名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：${isAllElectric === 'あり' ? 'プラチナでんきオール電化プラン' : 'プラチナでんき'}\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${phone || ''}\n郵便番号：${postalCode || ''}\n引越し先住所：${address || ''}\n物件名：${buildingInfo || ''}\n利用開始日：電気→${moveInDate || ''}\n支払い方法：${paymentMethod || ''}\n備考：${remarks || ''}`;
                         } else {
-                            comment = `【JAPAN電力/★インポートのみ】HAHZZT182 ${tag}\nレコードID：${recordId || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：${isAllElectric === 'あり' ? 'プラチナでんきオール電化' : 'プラチナでんき'}\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n性別：${gender || ''}\n電話番号：${phone || ''}\n郵便番号：${postalCode || ''}\n住所：${address || ''}\n物件名：${buildingInfo || ''}\n利用開始日：${moveInDate || ''}\n付帯OP：${attachedOption || ''}\n支払い方法：${paymentMethod || ''}\n${platinaMailingAddress}\n備考：${remarks || ''}`;
+                            comment = `【JAPAN電力/★インポートのみ】HAHZZT182 ${tag}\nレコードID：${recordId || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：${isAllElectric === 'あり' ? 'プラチナでんきオール電化' : 'プラチナでんき'}\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n性別：${gender || ''}\n電話番号：${phone || ''}\n郵便番号：${postalCode || ''}\n住所：${address || ''}\n物件名：${buildingInfo || ''}\n利用開始日：${moveInDate || ''}\n${showAttachedOption ? `付帯OP：${attachedOption || ''}\n` : ''}支払い方法：${paymentMethod || ''}\n備考：${remarks || ''}`;
                         }
                     }
                     break;
                 case 'STJP:':
                 case 'S':
                     const code = elecRecordIdPrefix === 'STJP:' ? 'HAHZZT293' : 'HAHZZT276';
-                     comment = `【JAPAN電力/★インポートのみ】${code} ${tag}\nレコードID：${recordId || ''}\n担当者：${apName || ''}\nプラン：${isAllElectric === 'あり' ? 'プラチナでんきオール電化' : 'プラチナでんき'}\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n性別：${gender || ''}\n電話番号：${phone || ''}\n郵便番号：${postalCode || ''}\n住所：${address || ''}\n物件名：${buildingInfo || ''}\n利用開始日：電気→${moveInDate || ''}\n付帯OP：${attachedOption || ''}\n支払い方法：${paymentMethod || ''}\n${platinaMailingAddress}\n備考：${remarks || ''}`;
+                     comment = `【JAPAN電力/★インポートのみ】${code} ${tag}\nレコードID：${recordId || ''}\n担当者：${apName || ''}\nプラン：${isAllElectric === 'あり' ? 'プラチナでんきオール電化' : 'プラチナでんき'}\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n性別：${gender || ''}\n電話番号：${phone || ''}\n郵便番号：${postalCode || ''}\n住所：${address || ''}\n物件名：${buildingInfo || ''}\n利用開始日：電気→${moveInDate || ''}\n付帯OP：${attachedOption || ''}\n支払い方法：${paymentMethod || ''}\n備考：${remarks || ''}`;
                     break;
                 case 'サカイ':
-                     if (isAllElectric === 'あり') {
-                        comment = `【JAPAN電力】HAHZZT259 ${tag}\nFM取込社名：サカイ販路\n名乗り：ライフイン24\n担当者：${apName || ''}\nプラン：プラチナでんきオール電化プラン\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n性別：${gender || ''}\n電話番号：${phone || ''}\n郵便番号：${postalCode || ''}\n住所：${address || ''}\n物件名：${buildingInfo || ''}\n利用開始日：${moveInDate || ''}\n支払い方法：${paymentMethod || ''}\n${platinaMailingAddress}\n備考：5000CB`;
-                    } else {
-                        comment = `【JAPAN電力/★インポートのみ】HAHZZT259 ${tag}\nFM取込社名：サカイ販路\n名乗り：ライフイン24\n担当者：${apName || ''}\nプラン：プラチナでんき\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n性別：${gender || ''}\n電話番号：${phone || ''}\n郵便番号：${postalCode || ''}\n住所：${address || ''}\n物件名：${buildingInfo || ''}\n利用開始日：${moveInDate || ''}\n付帯OP：${attachedOption || ''}\n支払い方法：${paymentMethod || ''}\n${platinaMailingAddress}\n備考：5000CB`;
-                    }
+                    comment = `【JAPAN電力/★インポートのみ】HAHZZT259 ${tag}\nFM取込社名：サカイ販路\n名乗り：ライフイン24\n担当者：${apName || ''}\nプラン：${isAllElectric === 'あり' ? 'プラチナでんきオール電化プラン' : 'プラチナでんき'}\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n性別：${gender || ''}\n電話番号：${phone || ''}\n郵便番号：${postalCode || ''}\n住所：${address || ''}\n物件名：${buildingInfo || ''}\n利用開始日：${moveInDate || ''}\n付帯OP：${attachedOption || ''}\n支払い方法：${paymentMethod || ''}\n備考：5000CB`;
                     break;
                 case 'ID:':
                 case 'それ以外':
-                    if (hasContractConfirmation === 'あり') {
-                        comment = `【JAPAN電力】${tag}\n契確時間：${elecConfirmationTime || ''}\nレコードID：${recordId || ''}\n主商材受注状況：${primaryProductStatus || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：${isAllElectric === 'あり' ? 'プラチナでんきオール電化プラン' : 'プラチナでんき'}\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${phone || ''}\n郵便番号：${postalCode || ''}\n引越し先住所：${address || ''}\n物件名：${buildingInfo || ''}\n利用開始日：${moveInDate || ''}\n支払い方法：${paymentMethod || ''}\n${platinaMailingAddress}\n備考：${remarks || ''}`;
-                    } else {
-                        comment = `【JAPAN電力/★インポートのみ】${tag}\nレコードID：${recordId || ''}\n担当者：${apName || ''}\nプラン：${isAllElectric === 'あり' ? 'プラチナでんきオール電化' : 'プラチナでんき'}\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n性別：${gender || ''}\n電話番号：${phone || ''}\n郵便番号：${postalCode || ''}\n住所：${address || ''}\n物件名：${buildingInfo || ''}\n利用開始日：電気→${moveInDate || ''}\n付帯OP：${attachedOption || ''}\n支払い方法：${paymentMethod || ''}\n${platinaMailingAddress}\n備考：${remarks || ''}`;
-                    }
+                    // These cases for Purachina always have hasContractConfirmation: 'なし'
+                    comment = `【JAPAN電力/★インポートのみ】${tag}\nレコードID：${recordId || ''}\n担当者：${apName || ''}\nプラン：${isAllElectric === 'あり' ? 'プラチナでんきオール電化' : 'プラチナでんき'}\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n性別：${gender || ''}\n電話番号：${phone || ''}\n郵便番号：${postalCode || ''}\n住所：${address || ''}\n物件名：${buildingInfo || ''}\n利用開始日：電気→${moveInDate || ''}\n${showAttachedOption ? `付帯OP：${attachedOption || ''}\n` : ''}支払い方法：${paymentMethod || ''}\n備考：${remarks || ''}`;
                     break;
             }
             break;
         case 'キューエネスでんき':
-             if (elecRecordIdPrefix === 'ID:') {
-                comment = `【キューエネスでんき】【★インポートのみ】${tag}\nレコードID：${recordId || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：エコhome\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${phone || ''}\n郵便番号：${postalCode || ''}\n住所：${address || ''}\n物件名：${buildingInfo || ''}\n利用開始日：${moveInDate || ''}\n支払方法：${paymentMethod || ''}\nメアド：${email || ''}\n付帯：\n\n※法人の場合は電話対応者名を記載\n対応者（漢字）：${contactPersonName || ''}\n対応者（フリガナ）：${contactPersonNameKana || ''}`;
-            } else { // それ以外
-                comment = `【キューエネスでんき】${tag}\n契確時間：${elecConfirmationTime || ''}\nレコードID：${recordId || ''}\n主商材受注状況：${primaryProductStatus || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：エコhome\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${phone || ''}\n郵便番号：${postalCode || ''}\n引越し先住所：${address || ''}\n物件名：${buildingInfo || ''}\n利用開始日：${moveInDate || ''}\n支払方法：${paymentMethod || ''}\nメアド：${email || ''}\n備考：${remarks || ''}\n※法人の場合は電話対応者名を記載\n対応者（漢字）：${contactPersonName || ''}\n対応者（フリガナ）：${contactPersonNameKana || ''}`;
+             if (hasContractConfirmation === 'なし') {
+                comment = `【キューエネスでんき】【★インポートのみ】${tag}\nレコードID：${recordId || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：エコhome\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${phone || ''}\n郵便番号：${postalCode || ''}\n住所：${address || ''}\n物件名：${buildingInfo || ''}\n利用開始日：${moveInDate || ''}\n支払方法：${paymentMethod || ''}\nメアド：${email || ''}\n${showAttachedOption ? `付帯：${attachedOption || ''}\n` : ''}\n※法人の場合は電話対応者名を記載\n対応者（漢字）：${contactPersonName || ''}\n対応者（フリガナ）：${contactPersonNameKana || ''}`;
+            } else { // 契確あり
+                comment = `【キューエネスでんき】${tag}\n契確時間：${elecConfirmationTime || ''}\nレコードID：${recordId || ''}\n${showPrimaryProductStatus ? `主商材受注状況：${primaryProductStatus || ''}\n` : ''}名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：エコhome\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${phone || ''}\n郵便番号：${postalCode || ''}\n引越し先住所：${address || ''}\n物件名：${buildingInfo || ''}\n利用開始日：${moveInDate || ''}\n支払方法：${paymentMethod || ''}\nメアド：${email || ''}\n備考：${remarks || ''}\n※法人の場合は電話対応者名を記載\n対応者（漢字）：${contactPersonName || ''}\n対応者（フリガナ）：${contactPersonNameKana || ''}`;
             }
             break;
         case 'リミックスでんき':
@@ -153,8 +153,8 @@ export const generateElectricityCommentLogic = (formData: FormData): string => {
             comment = `【エネ商流_HTBエナジー】${tag}\n架電希望日時：${postConfirmationTime || ''}\n主商材受注状況：${primaryProductStatus || ''}\nレコードID：${recordId || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：プランS\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日（西暦）：${dob || ''}\n電話番号：${phone || ''}\n郵便番号：${postalCode || ''}\n引越し先住所：${address || ''}\n物件名：${buildingInfo || ''}\n利用開始日：${moveInDate || ''}\n支払い方法：${paymentMethod || ''}\nﾒｰﾙｱﾄﾞﾚｽ：${email || ''}\n備考：${remarks || ''}`;
             break;
         case 'ニチガス電気セット':
-             const nichiMailingAddress = mailingOption === '現住所' ? `書面送付先：現住所（${currentAddress || ''}）` : '';
-            comment = `【ニチガス電気セット】${tag}\nレコードID：${recordId || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：ニチガス\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${phone || ''}\n郵便番号：${postalCode || ''}\n引越し先住所：${address || ''}\n物件名：${buildingInfo || ''}\nガスエリア：${gasArea || ''}（何ガスエリアかいれる）\n${dateLine}\n立会時間枠：${gasOpeningTimeSlot || ''}（日祝以外）\n立会者：${gasWitness || ''}\nガス事前連絡先：${gasPreContact || ''}\n支払方法：${paymentMethod || ''}\n${nichiMailingAddress}\n備考：${remarks || ''}`;
+             const nichiMailingAddress = mailingOption === '現住所' ? `書面送付先：現住所（${currentAddress || ''}）` : `書面送付先：${mailingOption || ''}`;
+            comment = `【ニチガス電気セット】${tag}\nレコードID：${recordId || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：ニチガス\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${phone || ''}\n郵便番号：${postalCode || ''}\n引越し先住所：${address || ''}\n物件名：${buildingInfo || ''}\nガスエリア：${gasArea || ''}（何ガスエリアかいれる）\n${dateLine}\n立会者：${gasWitness || ''}\nガス事前連絡先：${gasPreContact || ''}\n支払方法：${paymentMethod || ''}\n${nichiMailingAddress}\n備考：${remarks || ''}`;
             break;
         case 'ユーパワー UPOWER':
             const upowerHeader = isNewConstruction === 'はい' ? `【U-POWER】【新築再点】${tag}` : `【U-POWER】${tag}`;
@@ -170,13 +170,12 @@ export const generateElectricityCommentLogic = (formData: FormData): string => {
             comment = `【東京ガス_電気セット】${tag}\n契確時間：${elecConfirmationTime || ''}\nレコードID：${recordId || ''}\n主商材受注状況：${primaryProductStatus || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：東京ガス_セット\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日:${dob || ''}\n電話番号：${phone || ''}\n郵便番号：${postalCode || ''}\n住所：${address || ''}\n物件名：${buildingInfo || ''}\n${dateLine}\n現住所：${currentAddress || ''}\n備考：${remarks || ''}`;
             break;
         case '東邦ガスセット':
-             const tohoMailingAddress = mailingOption === '現住所' ? `書面送付先：現住所（${currentAddress || ''}）` : '書面送付先：新住所';
-            comment = `【東邦ガス電気セット】${tag}\nレコードID：${recordId || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：東邦ガスセット\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${phone || ''}\n郵便番号：${postalCode || ''}\n引越し先住所：${address || ''}\n物件名：${buildingInfo || ''}\n${dateLine}\nガス立会時間枠：${gasOpeningTimeSlot || ''}\n支払い方法：${paymentMethod || ''}\n${tohoMailingAddress}\n備考：後確希望時間（${postConfirmationTime || ''}）`;
+            comment = `【東邦ガス電気セット】${tag}\nレコードID：${recordId || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：東邦ガスセット\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${phone || ''}\n郵便番号：${postalCode || ''}\n引越し先住所：${address || ''}\n物件名：${buildingInfo || ''}\n${dateLine}\n支払い方法：${paymentMethod || ''}\n現住所：${currentAddress || '！！必須！！'}\n備考：後確希望時間（${postConfirmationTime || '10-12・12-15・15-18・18-21'}）`;
             break;
         case '大阪ガス電気セット':
             comment = `【大阪ガス電気セット　新生活応援プラン】${tag}\n契確時間：${elecConfirmationTime || ''}\nレコードID：${recordId || ''}\n主商材受注状況：${primaryProductStatus || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n電話番号：${phone || ''}\n郵便番号：${postalCode || ''}\n引越し先住所：${address || ''}\n${dateLine}\n支払方法：${paymentMethod || ''}\n備考：${remarks || ''}`;
             break;
     }
 
-    return comment;
+    return comment.replace(/\n\n/g, '\n').trim();
 };

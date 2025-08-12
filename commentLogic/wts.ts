@@ -17,14 +17,16 @@ export const generateWtsCommentLogic = (formData: FormData): string => {
         apName, customerId, contractorName, dob, phone, wtsShippingDestination,
         wtsServerColor, wtsFiveYearPlan, wtsFreeWater, wtsCreditCard, wtsCarrier,
         moveInDate, wtsWaterPurifier, wtsMultipleUnits, wtsCustomerType,
-        wtsU20HighSchool, wtsU20ParentalConsent, wtsCorporateInvoice, remarks, wtsMailingAddress
+        wtsU20HighSchool, wtsU20ParentalConsent, wtsCorporateInvoice, remarks, wtsMailingAddress,
+        recordId, isSakaiRoute
     } = { ...formData, dob: formatDate(formData.dob), moveInDate: formatDate(formData.moveInDate) };
 
     let comment = '';
+    const idField = isSakaiRoute ? `レコードID：${recordId || ''}` : `顧客ID：${customerId || ''}`;
 
     const commonFields = [
         `AP名：${apName || ''}`,
-        `顧客ID：${customerId || ''}`,
+        idField,
         `①名義：（${contractorName || ''}）`,
         `②生年月日：${dob || ''}`,
         `③番号：${phone || ''}`,
@@ -60,7 +62,7 @@ export const generateWtsCommentLogic = (formData: FormData): string => {
         case '法人':
             comment = [
                 `AP名：${apName || ''}`,
-                `顧客ID：${customerId || ''}`,
+                idField,
                 `①名義：${contractorName || ''}`,
                 `②生年月日：${dob || ''}`,
                 `③番号：${phone || ''}`,
