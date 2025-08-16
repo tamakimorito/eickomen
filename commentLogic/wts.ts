@@ -14,7 +14,7 @@ const formatDate = (dateStr) => {
 
 export const generateWtsCommentLogic = (formData: FormData): string => {
     const {
-        apName, customerId, contractorName, dob, phone, wtsShippingDestination,
+        apName, customerId, contractorName, contractorNameKana, dob, phone, wtsShippingDestination,
         wtsShippingPostalCode, wtsShippingAddress,
         wtsServerColor, wtsFiveYearPlan, wtsFreeWater, wtsCreditCard, wtsCarrier,
         moveInDate, wtsWaterPurifier, wtsMultipleUnits, wtsCustomerType,
@@ -43,7 +43,13 @@ export const generateWtsCommentLogic = (formData: FormData): string => {
     commentLines.push(idField);
     
     let currentIndex = 1;
-    commentLines.push(`${currentIndex++}）名義：${wtsCustomerType === '法人' ? (contractorName || '') : `（${contractorName || ''}）`}`);
+    
+    let nameDisplay = contractorName || '';
+    if (contractorNameKana) {
+        nameDisplay += `（${contractorNameKana}）`;
+    }
+    commentLines.push(`${currentIndex++}）名義：${nameDisplay}`);
+    
     commentLines.push(`${currentIndex++}）生年月日：${dob || ''}`);
     commentLines.push(`${currentIndex++}）電話番号：${phone || ''}`);
     if (wtsCustomerType === '法人') {

@@ -1,21 +1,21 @@
-import React from 'https://esm.sh/react@^19.1.0';
+import React, { type PropsWithChildren } from 'https://esm.sh/react@^19.1.0';
 import { BookOpenIcon, XMarkIcon, ShareIcon, BoltIcon, BellAlertIcon, ArrowPathIcon } from 'https://esm.sh/@heroicons/react@^2.2.0/24/solid';
 
 const ManualModal = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
-  const SectionTitle = ({ children, icon: Icon }) => (
+  const SectionTitle = ({ children, icon: Icon }: PropsWithChildren<{ icon?: React.ElementType }>) => (
     <h3 className="text-lg font-bold text-blue-700 mt-6 mb-2 border-b-2 border-blue-200 pb-1 flex items-center gap-2">
       {Icon && <Icon className="h-5 w-5" />}
       {children}
     </h3>
   );
 
-  const ListItem = ({ children }) => (
+  const ListItem = ({ children }: PropsWithChildren) => (
     <li className="text-gray-700 mb-1">{children}</li>
   );
   
-  const SubTitle = ({ children }) => (
+  const SubTitle = ({ children }: PropsWithChildren) => (
     <h4 className="font-bold text-gray-800 mt-3 mb-1">{children}</h4>
   );
 
