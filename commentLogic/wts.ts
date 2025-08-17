@@ -12,6 +12,26 @@ const formatDate = (dateStr) => {
     return dateStr;
 };
 
+const formatPhoneNumberWithHyphens = (phoneStr: string): string => {
+  if (!phoneStr) return '';
+  const digits = phoneStr.replace(/\D/g, '');
+
+  if (digits.length === 11) { // Mobile phones (e.g., 090-1234-5678)
+    return `${digits.substring(0, 3)}-${digits.substring(3, 7)}-${digits.substring(7)}`;
+  }
+  if (digits.length === 10) {
+    // Major cities with 2-digit area codes (e.g., Tokyo 03, Osaka 06)
+    const twoDigitAreaCodes = ['3', '6'];
+    if (digits.startsWith('0') && twoDigitAreaCodes.includes(digits.charAt(1))) {
+      return `${digits.substring(0, 2)}-${digits.substring(2, 6)}-${digits.substring(6)}`;
+    }
+    // Other landlines, typically 3-digit area codes (e.g., 011-234-5678)
+    return `${digits.substring(0, 3)}-${digits.substring(3, 6)}-${digits.substring(6)}`;
+  }
+  // Fallback for unexpected lengths
+  return phoneStr;
+};
+
 export const generateWtsCommentLogic = (formData: FormData): string => {
     const {
         apName, customerId, contractorName, contractorNameKana, dob, phone, wtsShippingDestination,
@@ -24,6 +44,8 @@ export const generateWtsCommentLogic = (formData: FormData): string => {
 
     const idField = isSakaiRoute ? `レコードID：${recordId || ''}` : `顧客ID：${customerId || ''}`;
     const serverAndColor = `${wtsServerType || ''} ${wtsServerColor || ''}`.trim();
+    
+    const formattedPhone = formatPhoneNumberWithHyphens(phone);
     
     let header = '【プレミアムウォーター】';
     if (wtsCustomerType === 'U-20') {
@@ -51,7 +73,7 @@ export const generateWtsCommentLogic = (formData: FormData): string => {
     commentLines.push(`${currentIndex++}）名義：${nameDisplay}`);
     
     commentLines.push(`${currentIndex++}）生年月日：${dob || ''}`);
-    commentLines.push(`${currentIndex++}）電話番号：${phone || ''}`);
+    commentLines.push(`${currentIndex++}）電話番号：${formattedPhone || ''}`);
     if (wtsCustomerType === '法人') {
         commentLines.push(`${currentIndex++}）メアド：${wtsEmail || ''}`);
     }

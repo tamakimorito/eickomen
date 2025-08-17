@@ -1,5 +1,3 @@
-
-
 import type { FormData } from '../types.ts';
 
 const formatDate = (dateStr) => {
@@ -12,6 +10,26 @@ const formatDate = (dateStr) => {
         return `${year}/${month}/${day}`;
     }
     return dateStr;
+};
+
+const formatPhoneNumberWithHyphens = (phoneStr: string): string => {
+  if (!phoneStr) return '';
+  const digits = phoneStr.replace(/\D/g, '');
+
+  if (digits.length === 11) { // Mobile phones (e.g., 090-1234-5678)
+    return `${digits.substring(0, 3)}-${digits.substring(3, 7)}-${digits.substring(7)}`;
+  }
+  if (digits.length === 10) {
+    // Major cities with 2-digit area codes (e.g., Tokyo 03, Osaka 06)
+    const twoDigitAreaCodes = ['3', '6'];
+    if (digits.startsWith('0') && twoDigitAreaCodes.includes(digits.charAt(1))) {
+      return `${digits.substring(0, 2)}-${digits.substring(2, 6)}-${digits.substring(6)}`;
+    }
+    // Other landlines, typically 3-digit area codes (e.g., 011-234-5678)
+    return `${digits.substring(0, 3)}-${digits.substring(3, 6)}-${digits.substring(6)}`;
+  }
+  // Fallback for unexpected lengths
+  return phoneStr;
 };
 
 const generateDefaultInternetComment = (formData: FormData): string => {
@@ -64,6 +82,10 @@ const generateDefaultInternetComment = (formData: FormData): string => {
     const isFamily = housingType && housingType.includes('ファミリー');
     const mailingOptionLabel = mailingOption === '新居' ? '新居(設置先と同じ)' : '現住所';
     let commentLines = [];
+    
+    const isChintaiProduct = product && product.includes('賃貸ねっと');
+    const formattedPhone = isChintaiProduct ? (phone || '').replace(/\D/g, '') : formatPhoneNumberWithHyphens(phone);
+
 
     switch (product) {
         case 'SoftBank光1G':
@@ -78,7 +100,7 @@ const generateDefaultInternetComment = (formData: FormData): string => {
                 `契約者名義（フリガナ）：${contractorNameKana || ''}`,
                 `性別：${gender || ''}`,
                 `生年月日(西暦)：${dob || ''}`,
-                `電話番号(ハイフンあり)：${phone || ''}`,
+                `電話番号(ハイフンあり)：${formattedPhone || ''}`,
                 `➤設置先`,
                 `郵便番号(〒・ハイフン無し)：${postalCode || ''}`,
                 `住所：${address || ''}`,
@@ -114,7 +136,7 @@ const generateDefaultInternetComment = (formData: FormData): string => {
                 `契約者名義（フリガナ）：${contractorNameKana || ''}`,
                 `性別：${gender || ''}`,
                 `生年月日(西暦)：${dob || ''}`,
-                `電話番号(ハイフンあり)：${phone || ''}`,
+                `電話番号(ハイフンあり)：${formattedPhone || ''}`,
                 `➤設置先`,
                 `郵便番号(〒・ハイフン無し)：${postalCode || ''}`,
                 `住所：${address || ''}`,
@@ -148,7 +170,7 @@ const generateDefaultInternetComment = (formData: FormData): string => {
                 `契約者名義（フリガナ）：${contractorNameKana || ''}`,
                 `性別：${gender || ''}`,
                 `生年月日(西暦)：${dob || ''}`,
-                `電話番号(ハイフンあり)：${phone || ''}`,
+                `電話番号(ハイフンあり)：${formattedPhone || ''}`,
                 `➤設置先`,
                 `郵便番号(〒・ハイフン無し)：${postalCode || ''}`,
                 `住所：${address || ''}`,
@@ -171,7 +193,6 @@ const generateDefaultInternetComment = (formData: FormData): string => {
 
         default: // This handles '賃貸ねっと' and '賃貸ねっと【無料施策】'
             { // Use a block to scope variables
-                const isChintaiProduct = product && product.includes('賃貸ねっと');
                 if (isChintaiProduct) {
                     const isChintaiFree = product === '賃貸ねっと【無料施策】';
                     const header = isChintaiFree
@@ -194,7 +215,7 @@ const generateDefaultInternetComment = (formData: FormData): string => {
                     commentLines.push(`契約者名義（漢字）：${contractorName || ''}`);
                     commentLines.push(`契約者名義（フリガナ）：${contractorNameKana || ''}`);
                     commentLines.push(`生年月日(西暦)：${dob || ''}`);
-                    commentLines.push(`電話番号(ハイフン無し)：${phone || ''}`);
+                    commentLines.push(`電話番号(ハイフン無し)：${formattedPhone || ''}`);
                     commentLines.push(`➤設置先`);
                     commentLines.push(`郵便番号(〒・ハイフン無し)：${postalCode || ''}`);
                     commentLines.push(`住所：${address || ''}`);
@@ -265,6 +286,10 @@ const generateGmoComment = (formData: FormData): string => {
     const isFamily = housingType.includes('ファミリー');
     const is1G = housingType.includes('1G');
     const commentLines = [];
+    
+    const formattedPhone = formatPhoneNumberWithHyphens(phone);
+    const formattedGmoDocomoOwnerPhone = formatPhoneNumberWithHyphens(gmoDocomoOwnerPhone);
+
 
     let header = '■GMOドコモ光';
     if (housingType) {
@@ -295,7 +320,7 @@ const generateGmoComment = (formData: FormData): string => {
 
     commentLines.push(`名乗り会社名：${greeting || ''}`);
     commentLines.push(`①申し込み者：${contractorName || ''}`);
-    commentLines.push(`②申込者電話番号：${phone || ''}`);
+    commentLines.push(`②申込者電話番号：${formattedPhone || ''}`);
 
     if (isNoPair) {
         commentLines.push(`③携帯キャリア：${mobileCarrier || ''}`);
@@ -307,7 +332,7 @@ const generateGmoComment = (formData: FormData): string => {
             commentLines.push(`⑤ドコモ名義人電話番号：同じ`);
         } else {
             commentLines.push(`④ドコモ名義人：${gmoDocomoOwnerName || ''}`);
-            commentLines.push(`⑤ドコモ名義人電話番号：${gmoDocomoOwnerPhone || ''}`);
+            commentLines.push(`⑤ドコモ名義人電話番号：${formattedGmoDocomoOwnerPhone || ''}`);
         }
         commentLines.push(`⑥現在利用回線（必須）：${existingLineCompany || ''}`);
     }
@@ -356,6 +381,8 @@ const generateAuHikariComment = (formData: FormData): string => {
         serviceFee
     } = formData;
 
+    const formattedPhone = formatPhoneNumberWithHyphens(phone);
+
     let comment = [
         '【AUひかり】250811',
         `獲得者：${apName || ''}`,
@@ -369,7 +396,7 @@ const generateAuHikariComment = (formData: FormData): string => {
         `オプション付帯：${auOptions || ''}`,
         `乗り換えサポート：${auSupport || ''}`,
         `適用CP：${auCampaign || ''}`,
-        `ご連絡先電話番号：${phone || ''} (${auContactType || ''})`,
+        `ご連絡先電話番号：${formattedPhone || ''} (${auContactType || ''})`,
         `前確希望時間：${auPreCheckTime || ''}`,
         `案内料金：${serviceFee || ''}`,
     ].join('\n');

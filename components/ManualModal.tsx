@@ -44,6 +44,7 @@ const ManualModal = ({ isOpen, onClose }) => {
             <ListItem>画面上部のタブ（電気、ガス、インターネット...）で商材を切り替えます。</ListItem>
             <ListItem>フォームの各項目を上から順に入力してください。</ListItem>
             <ListItem>必須項目には赤いアスタリスク（*）が付いています。</ListItem>
+            <ListItem>「サカイ販路」にチェックを入れると、顧客ID/レコードIDの入力が不要になり、一部の項目が自動で設定されます。</ListItem>
             <ListItem>入力内容は右側の「生成コメント」エリアにリアルタイムで反映されます。</ListItem>
             <ListItem>「担当者/AP名」は一度入力すると、フォームをリセットしても内容は保持されます。</ListItem>
           </ul>
@@ -54,19 +55,17 @@ const ManualModal = ({ isOpen, onClose }) => {
           </p>
 
           <SectionTitle icon={BoltIcon}>商材ごとの入力フォーム</SectionTitle>
-          <SubTitle>・電気</SubTitle>
+          <SubTitle>・電気 / ガス</SubTitle>
           <p className="text-gray-700 ml-4">
-            「商材選択」でプランを選ぶと、そのプランに必要な入力フォームが自動で表示されます。
+            「商材選択」でプランやガス会社を選ぶと、その商材に必要な入力フォームが自動で表示されます。電気とガスをセットで契約する場合、電気タブから入力するとよりスムーズです。
           </p>
-
           <SubTitle>・インターネット</SubTitle>
           <p className="text-gray-700 ml-4">
-              従来のインターネット契約用のフォームです。「商材」を選択すると、そのプラン（1G, 10G, Air, 賃貸ねっと等）に合わせて入力項目が最適化されます。
+              「商材」を選択すると、そのプラン（SoftBank光, Air, 賃貸ねっと等）に合わせて入力項目が最適化されます。
           </p>
-          
-           <SubTitle>・ガス / ウォーターサーバー</SubTitle>
+          <SubTitle>・ウォーターサーバー</SubTitle>
           <p className="text-gray-700 ml-4">
-              これらの機能は現在準備中です。
+              顧客タイプ（通常、U-20、法人）を選択し、サーバーの種類や色、契約プランなどを入力します。
           </p>
 
           <SectionTitle icon={BellAlertIcon}>便利機能</SectionTitle>
@@ -76,15 +75,19 @@ const ManualModal = ({ isOpen, onClose }) => {
                 <p className="text-gray-700 ml-4">日付フィールドで「8/1」と入力すると、最も近い未来の日付（例: 2024/08/01）に自動整形されます。カレンダーアイコンからも選択可能です。</p>
             </li>
              <li>
+                <SubTitle>・電話番号の自動整形</SubTitle>
+                <p className="text-gray-700 ml-4">商材に応じて、電話番号がハイフン付き（090-1234-5678）またはハイフン無し（09012345678）に自動で整形されます。</p>
+            </li>
+             <li>
                 <SubTitle>・入力内容のチェック機能</SubTitle>
-                <p className="text-gray-700 ml-4">名前に数字が含まれるなど、入力ミス可能性がある場合に確認メッセージが表示されます。</p>
+                <p className="text-gray-700 ml-4">必須項目が未入力のままコピーしようとすると、どの項目が足りないかを教えてくれます。</p>
             </li>
           </ul>
 
           <SectionTitle icon={ArrowPathIcon}>コピーとリセット</SectionTitle>
           <ul className="list-disc list-inside space-y-1">
             <ListItem>右下の「コピー」ボタンをクリックすると、生成されたコメント全文がクリップボードにコピーされます。</ListItem>
-            <ListItem>コピーが完了すると、**15分後**にフォームを自動リセットするタイマーが起動します。</ListItem>
+            <ListItem>コピーが完了すると、**20分後**にフォームを自動リセットするタイマーが起動します。</ListItem>
             <ListItem>作業中に**他のタブに切り替える**と、このタイマーは自動で解除され、入力内容が保持されます。</ListItem>
             <ListItem>右下の「リセット(終話)」ボタンで、いつでもフォームを初期状態に戻せます。(安全のため、確認画面が表示されます)</ListItem>
           </ul>
