@@ -138,13 +138,23 @@ export const generateElectricityCommentLogic = (formData: FormData): string => {
                     break;
             }
             break;
-        case 'キューエネスでんき':
+        case 'キューエネスでんき': {
+            let header;
+            if (recordId?.includes('No.') && isVacancy === 'あり') {
+                header = `【キューエネスでんき】${tag}/※ケイアイ空室通電`;
+            } else if (hasContractConfirmation === 'なし') {
+                header = `【キューエネスでんき】【★インポートのみ】${tag}`;
+            } else {
+                header = `【キューエネスでんき】${tag}`;
+            }
+
              if (hasContractConfirmation === 'なし') {
-                comment = `【キューエネスでんき】【★インポートのみ】${tag}\nレコードID：${recordId || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：エコhome\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${phone || ''}\n郵便番号：${postalCode || ''}\n住所：${address || ''}\n物件名：${buildingInfo || ''}\n利用開始日：${moveInDate || ''}\n支払方法：${paymentMethod || ''}\nメアド：${email || ''}\n${showAttachedOption ? `付帯：${attachedOption || ''}\n` : ''}※法人の場合は電話対応者名を記載\n対応者（漢字）：${contactPersonName || ''}\n対応者（フリガナ）：${contactPersonNameKana || ''}\n備考：${remarks || ''}`;
+                comment = `${header}\nレコードID：${recordId || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：エコhome\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${phone || ''}\n郵便番号：${postalCode || ''}\n住所：${address || ''}\n物件名：${buildingInfo || ''}\n利用開始日：${moveInDate || ''}\n支払方法：${paymentMethod || ''}\nメアド：${email || ''}\n${showAttachedOption ? `付帯：${attachedOption || ''}\n` : ''}※法人の場合は電話対応者名を記載\n対応者（漢字）：${contactPersonName || ''}\n対応者（フリガナ）：${contactPersonNameKana || ''}\n備考：${remarks || ''}`;
             } else { // 契確あり
-                comment = `【キューエネスでんき】${tag}\n契確時間：${elecConfirmationTime || ''}\nレコードID：${recordId || ''}\n${showPrimaryProductStatus ? `主商材受注状況：${primaryProductStatus || ''}\n` : ''}名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：エコhome\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${phone || ''}\n郵便番号：${postalCode || ''}\n引越し先住所：${address || ''}\n物件名：${buildingInfo || ''}\n利用開始日：${moveInDate || ''}\n支払方法：${paymentMethod || ''}\nメアド：${email || ''}\n※法人の場合は電話対応者名を記載\n対応者（漢字）：${contactPersonName || ''}\n対応者（フリガナ）：${contactPersonNameKana || ''}\n備考：${remarks || ''}`;
+                comment = `${header}\n契確時間：${elecConfirmationTime || ''}\nレコードID：${recordId || ''}\n${showPrimaryProductStatus ? `主商材受注状況：${primaryProductStatus || ''}\n` : ''}名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：エコhome\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${phone || ''}\n郵便番号：${postalCode || ''}\n引越し先住所：${address || ''}\n物件名：${buildingInfo || ''}\n利用開始日：${moveInDate || ''}\n支払方法：${paymentMethod || ''}\nメアド：${email || ''}\n※法人の場合は電話対応者名を記載\n対応者（漢字）：${contactPersonName || ''}\n対応者（フリガナ）：${contactPersonNameKana || ''}\n備考：${remarks || ''}`;
             }
             break;
+        }
         case 'リミックスでんき':
             const remixHeader = elecRecordIdPrefix === 'サカイ' ? `【リミックスでんき/★インポートのみ】${tag}\nレコードID：${recordId || ''}\n名乗り：ライフイン24` : `【リミックスでんき/★インポートのみ】${tag}\nレコードID：${recordId || ''}\n名乗り：${greeting || ''}`;
             comment = `${remixHeader}\n担当者：${apName || ''}\nプラン：ベーシックプラン\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${phone || ''}\n郵便番号：${postalCode || ''}\n住所：${address || ''}\n物件名：${buildingInfo || ''}\n利用開始日：${moveInDate || ''}\n---\n郵送先郵便番号：${formData.currentPostalCode || ''}\n郵送先住所：${currentAddress || ''}\n郵送先物件名：\n---\nメアド：${email || ''}\n支払い方法：${paymentMethod || ''}\n備考：${remarks || ''}`;

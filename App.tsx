@@ -22,7 +22,15 @@ const TABS = [
   { id: 'wts', label: 'ウォーターサーバー', icon: CloudIcon },
 ];
 
-const Tab = ({ id, label, icon: Icon, activeTab, onTabChange }) => (
+type TabProps = {
+    id: string;
+    label: string;
+    icon: React.ElementType;
+    activeTab: string;
+    onTabChange: (id: string) => void;
+};
+
+const Tab: React.FC<TabProps> = ({ id, label, icon: Icon, activeTab, onTabChange }) => (
     <button
         onClick={() => onTabChange(id)}
         className={`flex items-center gap-2 px-3 sm:px-4 py-3 text-sm sm:text-base font-bold transition-colors duration-200 ease-in-out focus:outline-none -mb-px ${
@@ -125,7 +133,7 @@ const App = () => {
                         </div>
                         <div className="border-b-2 border-gray-200">
                             <nav className="flex space-x-2 sm:space-x-4">
-                                {TABS.map(tab => <Tab key={tab.id} {...tab} activeTab={activeTab} onTabChange={onTabChange} />)}
+                                {TABS.map(tab => <Tab key={tab.id} id={tab.id} label={tab.label} icon={tab.icon} activeTab={activeTab} onTabChange={onTabChange} />)}
                             </nav>
                         </div>
                         <div className="mt-6 space-y-6">

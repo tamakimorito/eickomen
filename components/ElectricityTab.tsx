@@ -93,7 +93,7 @@ const MailingAddressSection = () => {
 
 const ElectricityTab = () => {
     const { formData, handleInputChange, handleDateBlur, handleNameBlur, invalidFields } = useContext(AppContext);
-    const { elecProvider, elecRecordIdPrefix, isGasSet, isSakaiRoute } = formData;
+    const { elecProvider, elecRecordIdPrefix, isGasSet, isSakaiRoute, recordId } = formData;
 
     const showGasSetOption = elecProvider === 'すまいのでんき（ストエネ）';
     
@@ -109,7 +109,17 @@ const ElectricityTab = () => {
     }, [elecProvider, formData.isGasSet]);
     
     const showAllElectricOption = ['すまいのでんき（ストエネ）', 'プラチナでんき（ジャパン）', 'ループでんき'].includes(elecProvider);
-    const showVacancyOption = ['すまいのでんき（ストエネ）', 'プラチナでんき（ジャパン）'].includes(elecProvider);
+    
+    const showVacancyOption = useMemo(() => {
+        if (['すまいのでんき（ストエネ）', 'プラチナでんき（ジャパン）'].includes(elecProvider)) {
+            return true;
+        }
+        if (elecProvider === 'キューエネスでんき' && recordId?.includes('No.')) {
+            return true;
+        }
+        return false;
+    }, [elecProvider, recordId]);
+
     const showNewConstructionOption = elecProvider === 'ユーパワー UPOWER';
     const showAttachedOption = useMemo(() => {
         // Show attached option only when contract confirmation is not required.
