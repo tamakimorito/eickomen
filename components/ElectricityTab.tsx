@@ -92,7 +92,7 @@ const MailingAddressSection = () => {
 
 
 const ElectricityTab = () => {
-    const { formData, handleInputChange, handleDateBlur, handleNameBlur, invalidFields } = useContext(AppContext);
+    const { formData, handleInputChange, handleDateBlur, handleNameBlur, handleIdBlur, invalidFields } = useContext(AppContext);
     const { elecProvider, elecRecordIdPrefix, isGasSet, isSakaiRoute, recordId } = formData;
 
     const showGasSetOption = elecProvider === 'すまいのでんき（ストエネ）';
@@ -180,6 +180,7 @@ const ElectricityTab = () => {
                 <div className="md:col-span-2">
                     <FormInput
                         label="レコードID" name="recordId" value={formData.recordId} onChange={handleInputChange}
+                        onBlur={handleIdBlur}
                         isInvalid={invalidFields.includes('recordId')}
                         required={!isSakaiRoute}
                         disabled={isSakaiRoute}

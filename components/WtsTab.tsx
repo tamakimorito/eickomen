@@ -10,7 +10,7 @@ import { FormInput, FormSelect, FormRadioGroup, FormTextArea, FormDateInput } fr
 
 
 const WtsTab = () => {
-    const { formData, handleInputChange, handleDateBlur, handleNameBlur, invalidFields } = useContext(AppContext);
+    const { formData, handleInputChange, handleDateBlur, handleNameBlur, handleIdBlur, invalidFields } = useContext(AppContext);
     const { wtsCustomerType, isSakaiRoute, wtsServerType } = formData;
     
     const colorOptions = useMemo(() => {
@@ -44,6 +44,7 @@ const WtsTab = () => {
                     name="customerId"
                     value={formData.customerId}
                     onChange={handleInputChange}
+                    onBlur={handleIdBlur}
                     isInvalid={invalidFields.includes('customerId')}
                     required={!isSakaiRoute}
                     disabled={isSakaiRoute}

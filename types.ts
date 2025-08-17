@@ -128,4 +128,5 @@ export type FormData = {
 export type FormAction =
   | { type: 'UPDATE_FIELD'; payload: { name: string; value: any; type?: string } }
   | { type: 'SET_FORM_DATA'; payload: Partial<FormData> }
-  | { type: 'RESET_FORM'; payload: { keepApName: boolean; apName: string } };
+  | { type: 'RESET_FORM'; payload: { keepApName: boolean; apName: string } }
+  | { type: 'UPDATE_DERIVED_FIELDS_FROM_ID' };

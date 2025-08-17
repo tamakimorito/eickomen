@@ -41,12 +41,29 @@ export const formReducer = (state: FormData, action: FormAction): FormData => {
 
       // --- Logic for dependent field updates ---
       
-      // Sync recordId and customerId across all tabs
-      if (name === 'recordId') {
-          newState.customerId = value;
-      }
-      if (name === 'customerId') {
-          newState.recordId = value;
+      // Sync recordId/customerId and update prefix (greeting is handled on blur)
+      if (name === 'recordId' || name === 'customerId') {
+          const idValue = value;
+          // Sync both fields
+          newState.recordId = idValue;
+          newState.customerId = idValue;
+          
+          if (!newState.isSakaiRoute) {
+              // Auto-determine prefix from ID for Elec/Gas tabs
+              let prefix = 'それ以外';
+              if (idValue.startsWith('STJP:')) prefix = 'STJP:';
+              else if (idValue.startsWith('SR')) prefix = 'SR';
+              else if (idValue.startsWith('code:')) prefix = 'code:';
+              else if (idValue.startsWith('ID:')) prefix = 'ID:';
+              else if (idValue.startsWith('S')) prefix = 'S';
+              
+              if (ELEC_ID_PREFIX_OPTIONS.some(opt => opt.value === prefix)) {
+                  newState.elecRecordIdPrefix = prefix;
+              }
+              if (GAS_ID_PREFIX_OPTIONS.some(opt => opt.value === prefix)) {
+                  newState.gasRecordIdPrefix = prefix;
+              }
+          }
       }
       
       // Handle 'apName' trimming
@@ -66,23 +83,6 @@ export const formReducer = (state: FormData, action: FormAction): FormData => {
               newState.elecRecordIdPrefix = 'それ以外';
               newState.gasRecordIdPrefix = 'それ以外';
               newState.elecImportCompanyName = '';
-          }
-      }
-
-      // Auto-determine prefix from recordId
-      if (name === 'recordId' && !newState.isSakaiRoute) {
-          let prefix = 'それ以外';
-          if (value.startsWith('STJP:')) prefix = 'STJP:';
-          else if (value.startsWith('SR')) prefix = 'SR';
-          else if (value.startsWith('code:')) prefix = 'code:';
-          else if (value.startsWith('ID:')) prefix = 'ID:';
-          else if (value.startsWith('S')) prefix = 'S';
-          
-          if (ELEC_ID_PREFIX_OPTIONS.some(opt => opt.value === prefix)) {
-              newState.elecRecordIdPrefix = prefix;
-          }
-          if (GAS_ID_PREFIX_OPTIONS.some(opt => opt.value === prefix)) {
-              newState.gasRecordIdPrefix = prefix;
           }
       }
 
@@ -222,6 +222,20 @@ export const formReducer = (state: FormData, action: FormAction): FormData => {
       }
       
       return newState;
+    }
+    
+    case 'UPDATE_DERIVED_FIELDS_FROM_ID': {
+      const { recordId, isSakaiRoute } = state;
+      if (!isSakaiRoute && recordId) {
+        if (recordId.startsWith('L')) {
+          return { ...state, greeting: 'ばっちり賃貸入居サポートセンター' };
+        } else if (recordId.startsWith('SR') || recordId.startsWith('STJP')) {
+          return { ...state, greeting: '' };
+        } else if (recordId.startsWith('S')) {
+          return { ...state, greeting: 'レプリス株式会社' };
+        }
+      }
+      return state; // No change
     }
 
     case 'SET_FORM_DATA':

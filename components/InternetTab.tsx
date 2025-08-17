@@ -15,7 +15,7 @@ import { FormInput, FormSelect, FormRadioGroup, FormTextArea, FormDateInput, For
 import OwnerInfo from './OwnerInfo.tsx';
 
 const DefaultInternetForm = () => {
-    const { formData, handleInputChange, handleDateBlur, handleNameBlur, invalidFields } = useContext(AppContext);
+    const { formData, handleInputChange, handleDateBlur, handleNameBlur, handleIdBlur, invalidFields } = useContext(AppContext);
     
     const is10G = formData.product === 'SoftBank光10G';
     const isAir = formData.product === 'SB Air';
@@ -67,6 +67,7 @@ const DefaultInternetForm = () => {
                 )}
                 <FormInput
                     label="顧客ID" name="customerId" value={formData.customerId} onChange={handleInputChange}
+                    onBlur={handleIdBlur}
                     isInvalid={invalidFields.includes('customerId')} 
                     required={!formData.isSakaiRoute}
                     disabled={formData.isSakaiRoute}
@@ -274,7 +275,7 @@ const DefaultInternetForm = () => {
 }
 
 const GmoForm = () => {
-    const { formData, handleInputChange, handleDateBlur, invalidFields } = useContext(AppContext);
+    const { formData, handleInputChange, handleDateBlur, handleIdBlur, invalidFields } = useContext(AppContext);
     const { housingType, gmoIsDocomoOwnerSame } = formData;
     
     const isNoPair = housingType.includes('ペアなし');
@@ -293,6 +294,7 @@ const GmoForm = () => {
                 />
                 <FormInput
                     label="顧客ID" name="customerId" value={formData.customerId} onChange={handleInputChange}
+                    onBlur={handleIdBlur}
                     isInvalid={invalidFields.includes('customerId')} required
                 />
             </div>

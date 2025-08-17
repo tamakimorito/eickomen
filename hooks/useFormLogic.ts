@@ -78,6 +78,10 @@ export const useFormLogic = () => {
         }
     }, []);
 
+    const handleIdBlur = useCallback(() => {
+        dispatch({ type: 'UPDATE_DERIVED_FIELDS_FROM_ID' });
+    }, [dispatch]);
+
     return {
         formData,
         dispatch,
@@ -87,5 +91,6 @@ export const useFormLogic = () => {
         handleDateBlur,
         handleNameBlur,
         resetForm,
+        handleIdBlur,
     };
 };
