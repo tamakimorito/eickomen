@@ -161,7 +161,7 @@ const DefaultInternetForm = () => {
                    {(!isChintai && !isChintaiFree) &&
                     <FormInput
                         label="案内料金" name="serviceFee" value={formData.serviceFee} onChange={handleInputChange}
-                        isInvalid={invalidFields.includes('serviceFee')} disabled={is10G || isAir} required
+                        isInvalid={invalidFields.includes('serviceFee')} disabled={is10G} required
                     />
                    }
                    {(isChintai || isChintaiFree) &&

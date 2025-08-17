@@ -39,7 +39,7 @@ export const generateWtsCommentLogic = (formData: FormData): string => {
         wtsServerColor, wtsFiveYearPlan, wtsFreeWater, wtsCreditCard, wtsCarrier,
         moveInDate, wtsWaterPurifier, wtsMultipleUnits, wtsCustomerType,
         wtsU20HighSchool, wtsU20ParentalConsent, wtsCorporateInvoice, remarks, wtsMailingAddress,
-        recordId, isSakaiRoute, wtsServerType, wtsEmail
+        recordId, isSakaiRoute, wtsServerType, wtsEmail, currentAddress
     } = { ...formData, dob: formatDate(formData.dob), moveInDate: formatDate(formData.moveInDate) };
 
     const idField = isSakaiRoute ? `レコードID：${recordId || ''}` : `顧客ID：${customerId || ''}`;
@@ -92,7 +92,12 @@ export const generateWtsCommentLogic = (formData: FormData): string => {
     commentLines.push(`${currentIndex++}）クレカ：${wtsCreditCard || ''}`);
     commentLines.push(`${currentIndex++}）キャリア：${wtsCarrier || ''}`);
     commentLines.push(`${currentIndex++}）入居予定日：${moveInDate || ''}`);
-    commentLines.push(`${currentIndex++}）書面送付先：${wtsMailingAddress || ''}`);
+    
+    let mailingAddressText = wtsMailingAddress || '';
+    if (wtsMailingAddress === '現住所') {
+        mailingAddressText = `現住所（${currentAddress || ''}）`;
+    }
+    commentLines.push(`${currentIndex++}）書面送付先：${mailingAddressText}`);
 
     if (wtsCustomerType === '法人') {
         commentLines.push(`${currentIndex++}）請求書先：${wtsCorporateInvoice || ''}`);

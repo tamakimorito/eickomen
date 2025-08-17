@@ -384,7 +384,7 @@ const generateAuHikariComment = (formData: FormData): string => {
     const formattedPhone = formatPhoneNumberWithHyphens(phone);
 
     let comment = [
-        '【AUひかり】250811',
+        '【AUひかり】※AUでんき案内禁止250811',
         `獲得者：${apName || ''}`,
         `お客様氏名：${contractorName || ''}`,
         `現状回線/プロバイダ：${existingLineCompany || ''}`,

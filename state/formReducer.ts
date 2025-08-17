@@ -130,6 +130,9 @@ export const formReducer = (state: FormData, action: FormAction): FormData => {
         const elecMailingConfig = {
             'すまいのでんき（ストエネ）': '新居',
             'プラチナでんき（ジャパン）': '新居',
+            'ニチガス電気セット': '新居',
+            '大阪ガス電気セット': '新居',
+            'キューエネスでんき': '新居',
             '東京ガス電気セット': '現住所', 
             '東邦ガスセット': '現住所', 
             'ループでんき': '新居', 
@@ -147,6 +150,9 @@ export const formReducer = (state: FormData, action: FormAction): FormData => {
       if (name === 'gasProvider') {
         const newProvider = value;
         const gasMailingConfig = {
+            'すまいのでんき（ストエネ）': '新居',
+            'ニチガス単品': '新居',
+            '大阪ガス単品': '新居',
             '東邦ガス単品': '現住所', 
             '東急ガス': '現住所'
         };
@@ -179,7 +185,7 @@ export const formReducer = (state: FormData, action: FormAction): FormData => {
       }
 
       if (name === 'product' || name === 'housingType') {
-          if (newProduct.startsWith('SoftBank')) {
+          if (newProduct.startsWith('SoftBank') || newProduct === 'SB Air') {
               if (newProduct === 'SoftBank光10G') {
                   newState.serviceFee = '3カ月0円→6930円';
               } else if (newProduct === 'SB Air') {

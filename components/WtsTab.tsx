@@ -224,15 +224,30 @@ const WtsTab = () => {
                         isInvalid={invalidFields.includes('moveInDate')}
                         required
                     />
-                     <FormRadioGroup
-                        label={isCorporate ? "⑭書面送付先" : "⑬書面送付先"}
-                        name="wtsMailingAddress"
-                        value={formData.wtsMailingAddress}
-                        onChange={handleInputChange}
-                        options={MAILING_OPTIONS}
-                        isInvalid={invalidFields.includes('wtsMailingAddress')}
-                        required
-                    />
+                     <div className="md:col-span-2">
+                        <FormRadioGroup
+                            label={isCorporate ? "⑭書面送付先" : "⑬書面送付先"}
+                            name="wtsMailingAddress"
+                            value={formData.wtsMailingAddress}
+                            onChange={handleInputChange}
+                            options={MAILING_OPTIONS}
+                            isInvalid={invalidFields.includes('wtsMailingAddress')}
+                            required
+                        />
+                        {formData.wtsMailingAddress === '現住所' && (
+                            <div className="mt-2 p-4 bg-blue-50/50 rounded-lg border border-blue-200 grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <FormInput
+                                    label="現住所の郵便番号" name="currentPostalCode" value={formData.currentPostalCode} onChange={handleInputChange}
+                                    isInvalid={invalidFields.includes('currentPostalCode')} required
+                                />
+                                <FormInput
+                                    label="現住所・物件名・部屋番号" name="currentAddress"
+                                    value={formData.currentAddress}
+                                    onChange={handleInputChange} className="md:col-span-2" isInvalid={invalidFields.includes('currentAddress')} required
+                                />
+                            </div>
+                        )}
+                    </div>
                      {isCorporate ? (
                         <FormInput
                             label="⑮請求書先"
