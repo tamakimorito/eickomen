@@ -328,13 +328,13 @@ const generateGmoComment = (formData: FormData): string => {
         commentLines.push(`⑤現在利用回線：${existingLineCompany || ''}`);
     } else {
         if (gmoIsDocomoOwnerSame) {
-            commentLines.push(`④ドコモ名義人：同じ`);
-            commentLines.push(`⑤ドコモ名義人電話番号：同じ`);
+            commentLines.push(`③ドコモ名義人：同じ`);
+            commentLines.push(`④ドコモ名義人電話番号：同じ`);
         } else {
-            commentLines.push(`④ドコモ名義人：${gmoDocomoOwnerName || ''}`);
-            commentLines.push(`⑤ドコモ名義人電話番号：${formattedGmoDocomoOwnerPhone || ''}`);
+            commentLines.push(`③ドコモ名義人：${gmoDocomoOwnerName || ''}`);
+            commentLines.push(`④ドコモ名義人電話番号：${formattedGmoDocomoOwnerPhone || ''}`);
         }
-        commentLines.push(`⑥現在利用回線（必須）：${existingLineCompany || ''}`);
+        commentLines.push(`⑤現在利用回線（必須）：${existingLineCompany || ''}`);
     }
 
     commentLines.push('後確希望時間枠');

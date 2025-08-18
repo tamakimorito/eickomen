@@ -11,26 +11,25 @@ const Header = ({ onManualOpen, onResetRequest }) => {
             </div>
             <div>
             <h1 className="text-2xl sm:text-3xl font-bold tracking-wider">営業コメント作成ツール～エイコメン～</h1>
-            <p className="text-xs text-blue-200 mt-1">最終更新: 2025/08/17 18:54</p>
+            <p className="text-xs text-blue-200 mt-1">最終更新: 2025/08/18 14:01</p>
             </div>
         </div>
         <div className="flex items-center gap-x-3">
           <button 
               onClick={onResetRequest}
-              className="flex items-center gap-2 bg-transparent hover:bg-red-500/30 border border-red-400 text-red-300 hover:text-white transition-colors py-2 px-3 rounded-lg text-sm font-bold"
+              className="flex items-center gap-2 bg-blue-600 text-white font-semibold py-2 px-3 rounded-lg hover:bg-blue-500 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white shadow-sm"
               aria-label="フォームをリセット（終話）"
-          >
-              <ArrowPathIcon className="h-5 w-5"/>
-              <span className="hidden sm:inline">リセット(終話)</span>
-          </button>
-          <button 
+            >
+              <ArrowPathIcon className="h-5 w-5" />
+              <span className="hidden sm:inline">リセット</span>
+            </button>
+            <button 
               onClick={onManualOpen}
-              className="flex items-center gap-2 bg-white/10 hover:bg-white/20 transition-colors py-2 px-4 rounded-lg text-sm font-bold"
-              aria-label="使い方のマニュアルを開く"
-          >
-              <QuestionMarkCircleIcon className="h-6 w-6"/>
-              <span>使い方</span>
-          </button>
+              className="p-2 rounded-full hover:bg-blue-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white"
+              aria-label="使い方を開く"
+            >
+              <QuestionMarkCircleIcon className="h-7 w-7" />
+            </button>
         </div>
       </div>
     </header>

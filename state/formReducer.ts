@@ -110,6 +110,9 @@ export const formReducer = (state: FormData, action: FormAction): FormData => {
       const newElecPrefix = newState.elecRecordIdPrefix;
 
       if (name === 'elecProvider' || name === 'recordId' || name === 'isSakaiRoute') {
+        if (newElecProvider === 'すまいのでんき（ストエネ）' && newElecPrefix === 'code:') {
+            newState.hasContractConfirmation = 'なし';
+        }
         if (newElecProvider === 'プラチナでんき（ジャパン）' && newElecPrefix !== 'SR') {
             newState.hasContractConfirmation = 'なし';
         }
