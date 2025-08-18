@@ -92,6 +92,7 @@ export type FormData = {
   gasPreContact: string;
   gasOpeningTimeSlot: string;
   gasOpeningDate: string;
+  gasIsCorporate: boolean;
 
   // --- Common for Elec/Gas ---
   primaryProductStatus: string;

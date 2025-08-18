@@ -94,6 +94,7 @@ export const INITIAL_FORM_DATA: FormData = {
   gasPreContact: '',
   gasOpeningTimeSlot: '',
   gasOpeningDate: '',
+  gasIsCorporate: false,
 
   // --- Common for Elec/Gas ---
   elecConfirmationTime: '順次',

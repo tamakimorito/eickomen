@@ -6,7 +6,7 @@ import {
     TIME_SLOTS_NICHI, TIME_SLOTS_SUTENE_SR, TIME_SLOTS_TOKYO_GAS
 } from '../constants.ts';
 import { AppContext } from '../context/AppContext.tsx';
-import { FormInput, FormSelect, FormRadioGroup, FormTextArea, FormDateInput } from './FormControls.tsx';
+import { FormInput, FormSelect, FormRadioGroup, FormTextArea, FormDateInput, FormCheckbox } from './FormControls.tsx';
 
 const MailingAddressSection = () => {
     const { formData, handleInputChange, invalidFields } = useContext(AppContext);
@@ -90,7 +90,8 @@ const GasTab = () => {
     const isNichi = gasProvider === 'ニチガス単品';
     const isTokyo = gasProvider === '東京ガス単品';
     const isToho = gasProvider === '東邦ガス単品';
-    const isOsaka = gasProvider === '大阪ガス単品';
+    const isOsakaGas = gasProvider === '大阪ガス単品';
+
     
     const showAttachedOption = useMemo(() => {
         return isSumainoGas && formData.gasHasContractConfirmation === 'なし';
@@ -126,6 +127,11 @@ const GasTab = () => {
         return map[gasRecordIdPrefix] || '';
     }, [gasRecordIdPrefix]);
 
+    // Conditional rendering based on comment templates
+    const showGreeting = !isTokyo && !isOsakaGas;
+    const showEmail = isTokyu;
+    const showPaymentMethod = !isTokyo && !isOsakaGas;
+    const showGender = isSumainoGas;
 
     return (
         <div className="space-y-6">
@@ -198,14 +204,30 @@ const GasTab = () => {
                                     required
                                     className="md:col-span-2"
                                 />
-                                {(isNichi || isTokyo) && (
+                                {isNichi && (
                                     <>
-                                        <FormInput label={isTokyo ? "立ち合い担当者フルネーム" : "立会者"} name="gasWitness" value={formData.gasWitness} onChange={handleInputChange} isInvalid={invalidFields.includes('gasWitness')} required />
-                                        <FormInput label={isTokyo ? "立ち合い連絡先" : "ガス事前連絡先"} name="gasPreContact" value={formData.gasPreContact} onChange={handleInputChange} isInvalid={invalidFields.includes('gasPreContact')} required />
+                                        <FormInput label="立会者" name="gasWitness" value={formData.gasWitness} onChange={handleInputChange} isInvalid={invalidFields.includes('gasWitness')} required />
+                                        <FormInput label="ガス事前連絡先" name="gasPreContact" value={formData.gasPreContact} onChange={handleInputChange} isInvalid={invalidFields.includes('gasPreContact')} required />
+                                        <FormInput label="ガスエリア" name="gasArea" value={formData.gasArea} onChange={handleInputChange} placeholder="例: 東京ガス" isInvalid={invalidFields.includes('gasArea')} required />
                                     </>
                                 )}
-                                {isNichi && (
-                                    <FormInput label="ガスエリア" name="gasArea" value={formData.gasArea} onChange={handleInputChange} placeholder="例: 東京ガス" isInvalid={invalidFields.includes('gasArea')} required />
+                                {isTokyo && (
+                                    <div className="md:col-span-2 space-y-4">
+                                        <FormCheckbox
+                                            label="法人契約"
+                                            name="gasIsCorporate"
+                                            checked={formData.gasIsCorporate}
+                                            onChange={handleInputChange}
+                                            isInvalid={invalidFields.includes('gasIsCorporate')}
+                                            description="法人契約の場合はチェックを入れてください"
+                                        />
+                                        {formData.gasIsCorporate && (
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                                                <FormInput label="立ち合い担当者フルネーム" name="gasWitness" value={formData.gasWitness} onChange={handleInputChange} isInvalid={invalidFields.includes('gasWitness')} required={formData.gasIsCorporate} />
+                                                <FormInput label="立ち合い連絡先" name="gasPreContact" value={formData.gasPreContact} onChange={handleInputChange} isInvalid={invalidFields.includes('gasPreContact')} required={formData.gasIsCorporate} />
+                                            </div>
+                                        )}
+                                    </div>
                                 )}
                             </div>
                         </div>
@@ -216,13 +238,13 @@ const GasTab = () => {
             <div className="border-t-2 border-dashed border-blue-300 pt-6 space-y-4">
                 <h3 className="text-lg font-bold text-blue-700">契約者情報</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormInput label="名乗り" name="greeting" value={formData.greeting} onChange={handleInputChange} isInvalid={invalidFields.includes('greeting')} />
+                    {showGreeting && <FormInput label="名乗り" name="greeting" value={formData.greeting} onChange={handleInputChange} isInvalid={invalidFields.includes('greeting')} />}
                     <FormInput label="契約者名義（漢字）" name="contractorName" value={formData.contractorName} onChange={handleInputChange} onBlur={handleNameBlur} isInvalid={invalidFields.includes('contractorName')} required />
                     <FormInput label="契約者名義（フリガナ）" name="contractorNameKana" value={formData.contractorNameKana} onChange={handleInputChange} onBlur={handleNameBlur} isInvalid={invalidFields.includes('contractorNameKana')} required />
-                    <FormSelect label="性別" name="gender" value={formData.gender} onChange={handleInputChange} options={GENDERS} isInvalid={invalidFields.includes('gender')} />
+                    {showGender && <FormSelect label="性別" name="gender" value={formData.gender} onChange={handleInputChange} options={GENDERS} isInvalid={invalidFields.includes('gender')} />}
                     <FormDateInput label="生年月日（西暦）" name="dob" value={formData.dob} onChange={handleInputChange} onBlur={handleDateBlur} isInvalid={invalidFields.includes('dob')} placeholder="例: 1990/01/01" required />
                     <FormInput label="電話番号" name="phone" value={formData.phone} onChange={handleInputChange} isInvalid={invalidFields.includes('phone')} required />
-                    <FormInput label="メアド" name="email" type="email" value={formData.email} onChange={handleInputChange} isInvalid={invalidFields.includes('email')} />
+                    {showEmail && <FormInput label="メアド" name="email" type="email" value={formData.email} onChange={handleInputChange} isInvalid={invalidFields.includes('email')} required={isTokyu} />}
                 </div>
             </div>
 
@@ -240,19 +262,10 @@ const GasTab = () => {
             <div className="border-t-2 border-dashed border-blue-300 pt-6 space-y-4">
                 <h3 className="text-lg font-bold text-blue-700">その他</h3>
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormSelect label="支払い方法" name="paymentMethod" value={formData.paymentMethod} onChange={handleInputChange} options={PAYMENT_METHOD_OPTIONS_EXTENDED} isInvalid={invalidFields.includes('paymentMethod')} />
+                    {showPaymentMethod && <FormSelect label="支払い方法" name="paymentMethod" value={formData.paymentMethod} onChange={handleInputChange} options={PAYMENT_METHOD_OPTIONS_EXTENDED} isInvalid={invalidFields.includes('paymentMethod')} />}
                     
                     {isSakaiRoute && (
                          <FormInput label="ガス" name="gasArea" value={formData.gasArea} onChange={handleInputChange} placeholder="「なし」と入力" isInvalid={invalidFields.includes('gasArea')} />
-                    )}
-                    {isTokyo && isOsaka && (
-                         <div className="md:col-span-2 p-4 bg-yellow-50 border border-yellow-300 rounded-lg space-y-4">
-                            <p className="text-sm font-bold text-yellow-800">※法人の場合は下記も入力</p>
-                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <FormInput label="立ち合い担当者フルネーム" name="gasWitness" value={formData.gasWitness} onChange={handleInputChange} isInvalid={invalidFields.includes('gasWitness')} />
-                                <FormInput label="立ち合い連絡先" name="gasPreContact" value={formData.gasPreContact} onChange={handleInputChange} isInvalid={invalidFields.includes('gasPreContact')} />
-                            </div>
-                        </div>
                     )}
                      {isTokyu && (
                           <FormInput label="契確時間" name="elecConfirmationTime" value={formData.elecConfirmationTime} onChange={handleInputChange} isInvalid={invalidFields.includes('elecConfirmationTime')} />

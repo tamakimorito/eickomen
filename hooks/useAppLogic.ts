@@ -28,7 +28,7 @@ const FIELD_LABELS = {
     hasContractConfirmation: '契確要否', isGasSet: 'ガスセット', primaryProductStatus: '主商材受注状況',
     attachedOption: '付帯OP', isNewConstruction: '新築', gasOpeningDate: 'ガス開栓日',
     gasOpeningTimeSlot: 'ガス立会時間枠', gasArea: 'ガスエリア', gasWitness: '立会者',
-    gasPreContact: 'ガス事前連絡先',
+    gasPreContact: 'ガス事前連絡先', gasIsCorporate: '法人契約',
     // WTS
     wtsCustomerType: '顧客タイプ', wtsShippingDestination: '発送先', wtsShippingPostalCode: '発送先郵便番号',
     wtsShippingAddress: '発送先住所', wtsServerType: 'サーバー', wtsServerColor: 'サーバー色',
@@ -100,23 +100,37 @@ const getRequiredFields = (formData, activeTab) => {
             }
             break;
 
-        case 'gas':
-            required.push('gasProvider', 'greeting', 'paymentMethod', 'contractorName', 'contractorNameKana', 'dob', 'phone', 'postalCode', 'address', 'buildingInfo', 'moveInDate');
-             if (!isSakaiRoute) required.push('recordId');
-             if(['すまいのでんき（ストエネ）', '東京ガス単品', '東邦ガス単品', '東急ガス', 'ニチガス単品'].includes(formData.gasProvider)) {
+        case 'gas': {
+            const { gasProvider } = formData;
+            required.push('gasProvider', 'contractorName', 'contractorNameKana', 'dob', 'phone', 'postalCode', 'address', 'buildingInfo', 'moveInDate');
+            
+            if (!isSakaiRoute) required.push('recordId');
+
+            if (![ '東京ガス単品', '大阪ガス単品' ].includes(gasProvider)) {
+                required.push('greeting');
+                required.push('paymentMethod');
+            }
+            if (gasProvider === '東急ガス') {
+                required.push('email');
+            }
+            
+             if(['すまいのでんき（ストエネ）', '東京ガス単品', '東邦ガス単品', '東急ガス', 'ニチガス単品'].includes(gasProvider)) {
                  required.push('gasOpeningTimeSlot');
              }
-             if(['東京ガス単品', 'ニチガス単品'].includes(formData.gasProvider)) {
+             if(gasProvider === 'ニチガス単品') {
+                required.push('gasWitness', 'gasPreContact', 'gasArea');
+             }
+             if(gasProvider === '東京ガス単品' && formData.gasIsCorporate) {
                 required.push('gasWitness', 'gasPreContact');
              }
-             if(formData.gasProvider === 'ニチガス単品') required.push('gasArea');
-             if(formData.mailingOption === '現住所' && ['すまいのでんき（ストエネ）', 'ニチガス単品', '東邦ガス単品', '東急ガス'].includes(formData.gasProvider)){
+             if(formData.mailingOption === '現住所' && ['すまいのでんき（ストエネ）', 'ニチガス単品', '東邦ガス単品', '東急ガス'].includes(gasProvider)){
                 required.push('currentPostalCode', 'currentAddress');
              }
-             if(['東邦ガス単品', '東急ガス'].includes(formData.gasProvider)){
+             if(['東邦ガス単品', '東急ガス'].includes(gasProvider)){
                  required.push('currentAddress');
              }
             break;
+        }
             
         case 'wts':
             required.push('wtsCustomerType', 'contractorName', 'dob', 'phone', 'wtsShippingDestination', 'wtsServerType', 'wtsServerColor', 'wtsFiveYearPlan', 'wtsFreeWater', 'wtsCreditCard', 'wtsCarrier', 'moveInDate', 'wtsMailingAddress', 'wtsWaterPurifier', 'wtsMultipleUnits');
@@ -207,6 +221,64 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
         setInvalidFields([]);
         setModalState(prev => ({...prev, isErrorBanner: false}));
 
+        const performCopy = () => {
+            if (!generatedComment) {
+                setToast({ message: 'コメントが空です', type: 'error' });
+                return;
+            }
+            navigator.clipboard.writeText(generatedComment).then(() => {
+                setToast({ message: 'コメントをコピーしました！20分後にフォームはリセットされます。', type: 'success' });
+                if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
+                resetTimerRef.current = setTimeout(() => {
+                    resetForm(true);
+                    setToast({ message: 'フォームが自動リセットされました。', type: 'info' });
+                }, 20 * 60 * 1000);
+            }).catch(err => {
+                setToast({ message: 'コピーに失敗しました', type: 'error' });
+                console.error('Copy failed', err);
+            });
+        };
+
+        // --- DOB / Phone Swap Check ---
+        const dobValue = formData.dob || '';
+        const phoneValue = formData.phone || '';
+        let swapWarningMessage = '';
+
+        const dobDigitsOnly = dobValue.replace(/\D/g, '');
+        if (dobValue.includes('-') || dobDigitsOnly.length === 10 || dobDigitsOnly.length === 11) {
+            swapWarningMessage = '「生年月日」に電話番号のような入力がされています。';
+        }
+
+        if (!swapWarningMessage) {
+            const parsedPhoneAsDate = new Date(phoneValue);
+            const currentYear = new Date().getFullYear();
+            if (phoneValue.includes('/') || (phoneValue.length >= 8 && !isNaN(parsedPhoneAsDate.getTime()) && parsedPhoneAsDate.getFullYear() > 1900 && parsedPhoneAsDate.getFullYear() <= currentYear)) {
+                swapWarningMessage = '「電話番号」に日付のような入力がされています。';
+            }
+        }
+
+        if (swapWarningMessage) {
+            setInvalidFields(prev => [...new Set([...prev, 'dob', 'phone'])]);
+            setModalState({
+                isOpen: true,
+                title: '入力内容の確認',
+                message: `${swapWarningMessage}\n入力内容が正しいか確認してください。`,
+                onConfirm: () => {
+                    closeModal();
+                    setInvalidFields(prev => prev.filter(f => f !== 'dob' && f !== 'phone'));
+                    performCopy();
+                },
+                onCancel: closeModal,
+                confirmText: 'このままコピー',
+                cancelText: '修正する',
+                type: 'warning',
+                isErrorBanner: true,
+                bannerMessage: '生年月日または電話番号の入力内容に誤りの可能性があります。'
+            });
+            return;
+        }
+        // --- End of Swap Check ---
+
         const { moveInDate, dob } = formData;
         const dateErrors = [];
         if (moveInDate) {
@@ -226,24 +298,6 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
             }
         }
     
-        const performCopy = () => {
-            if (!generatedComment) {
-                setToast({ message: 'コメントが空です', type: 'error' });
-                return;
-            }
-            navigator.clipboard.writeText(generatedComment).then(() => {
-                setToast({ message: 'コメントをコピーしました！20分後にフォームはリセットされます。', type: 'success' });
-                if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
-                resetTimerRef.current = setTimeout(() => {
-                    resetForm(true);
-                    setToast({ message: 'フォームが自動リセットされました。', type: 'info' });
-                }, 20 * 60 * 1000);
-            }).catch(err => {
-                setToast({ message: 'コピーに失敗しました', type: 'error' });
-                console.error('Copy failed', err);
-            });
-        };
-
         if (dateErrors.length > 0) {
             setModalState({
                 isOpen: true,

@@ -122,9 +122,10 @@ const ElectricityTab = () => {
 
     const showNewConstructionOption = elecProvider === 'ユーパワー UPOWER';
     const showAttachedOption = useMemo(() => {
-        // Show attached option only when contract confirmation is not required.
-        return formData.hasContractConfirmation === 'なし';
-    }, [formData.hasContractConfirmation]);
+        // Show attached option only when contract confirmation is not required,
+        // and the provider is not 'ニチガス電気セット'.
+        return formData.hasContractConfirmation === 'なし' && elecProvider !== 'ニチガス電気セット';
+    }, [formData.hasContractConfirmation, elecProvider]);
     
     const gasTimeSlotOptions = useMemo(() => {
         if (elecProvider === 'すまいのでんき（ストエネ）' && elecRecordIdPrefix === 'SR') {
@@ -166,6 +167,8 @@ const ElectricityTab = () => {
     const isNichigasSet = elecProvider === 'ニチガス電気セット';
     const emailIsRequired = isQenes || isUpower || isHtb || isRemix || elecProvider === 'ループでんき';
 
+    // Conditional rendering based on comment templates
+    const showGender = ['すまいのでんき（ストエネ）', 'プラチナでんき（ジャパン）'].includes(elecProvider);
 
     return (
         <div className="space-y-6">
@@ -211,7 +214,7 @@ const ElectricityTab = () => {
                     <FormInput label="名乗り" name="greeting" value={formData.greeting} onChange={handleInputChange} isInvalid={invalidFields.includes('greeting')} />
                     <FormInput label="契約者名義（漢字）" name="contractorName" value={formData.contractorName} onChange={handleInputChange} onBlur={handleNameBlur} isInvalid={invalidFields.includes('contractorName')} required />
                     <FormInput label="契約者名義（フリガナ）" name="contractorNameKana" value={formData.contractorNameKana} onChange={handleInputChange} onBlur={handleNameBlur} isInvalid={invalidFields.includes('contractorNameKana')} required />
-                    <FormSelect label="性別" name="gender" value={formData.gender} onChange={handleInputChange} options={GENDERS} isInvalid={invalidFields.includes('gender')} />
+                    {showGender && <FormSelect label="性別" name="gender" value={formData.gender} onChange={handleInputChange} options={GENDERS} isInvalid={invalidFields.includes('gender')} />}
                     <FormDateInput label="生年月日（西暦）" name="dob" value={formData.dob} onChange={handleInputChange} onBlur={handleDateBlur} isInvalid={invalidFields.includes('dob')} placeholder="例: 1990/01/01" required />
                     <FormInput label="電話番号" name="phone" value={formData.phone} onChange={handleInputChange} isInvalid={invalidFields.includes('phone')} required />
                     <FormInput label="メアド" name="email" type="email" value={formData.email} onChange={handleInputChange} isInvalid={invalidFields.includes('email')} required={emailIsRequired}/>
