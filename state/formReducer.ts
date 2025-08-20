@@ -22,7 +22,7 @@ const getRackOptions = (product, housingType) => {
     const isMansionType = housingType.includes('マンション') || housingType === '10G';
     const isFamilyType = housingType.includes('ファミリー');
     
-    if (isMansionType) return baseOptions.filter(option => option.value !== '無し');
+    if (isMansionType && !isChintai) return baseOptions.filter(option => option.value !== '無し');
     if (isFamilyType) return baseOptions.find(option => option.value === '無し') ? [baseOptions.find(option => option.value === '無し')] : [];
 
     return baseOptions;
@@ -76,15 +76,32 @@ export const formReducer = (state: FormData, action: FormAction): FormData => {
           newState.recordId = '';
           newState.customerId = ''; 
           if (value) { // value is the boolean 'checked'
+              newState.greeting = 'ライフイン24';
               newState.elecRecordIdPrefix = 'サカイ';
               newState.gasRecordIdPrefix = 'サカイ';
               newState.elecImportCompanyName = 'サカイ販路';
           } else {
+              newState.greeting = '';
               newState.elecRecordIdPrefix = 'それ以外';
               newState.gasRecordIdPrefix = 'それ以外';
               newState.elecImportCompanyName = '';
           }
       }
+
+      // --- Sakai Route + Platinum Denki Remarks Logic ---
+      const oldIsPlatinumSakai = state.isSakaiRoute && state.elecProvider === 'プラチナでんき（ジャパン）';
+      const newIsPlatinumSakai = newState.isSakaiRoute && newState.elecProvider === 'プラチナでんき（ジャパン）';
+
+      if (!oldIsPlatinumSakai && newIsPlatinumSakai) {
+          // Condition just became true, set remarks
+          newState.remarks = '5000円CB';
+      } else if (oldIsPlatinumSakai && !newIsPlatinumSakai) {
+          // Condition just became false, only clear remarks if it's the default text
+          if (state.remarks === '5000円CB') {
+              newState.remarks = '';
+          }
+      }
+
 
       // --- WTS Specific Logic ---
       if (name === 'wtsCustomerType') {

@@ -8,7 +8,7 @@ import {
     DISCOUNT_OPTIONS, DISCOUNT_OPTIONS_10G_NEW, ROUTER_OPTIONS,
     PAYMENT_METHOD_OPTIONS, CROSS_PATH_ROUTER_OPTIONS,
     HOUSING_TYPES_GMO, GMO_COMPENSATION_OPTIONS, GMO_ROUTER_OPTIONS, GMO_NO_PAIR_ROUTER_OPTIONS,
-    GMO_NO_PAIR_ID_OPTIONS, GMO_CALLBACK_TIME_SLOTS, AU_CONTACT_TYPE_OPTIONS
+    GMO_NO_PAIR_ID_OPTIONS, GMO_CALLBACK_TIME_SLOTS, AU_CONTACT_TYPE_OPTIONS, AU_PLAN_PROVIDER_OPTIONS
 } from '../constants.ts';
 import { AppContext } from '../context/AppContext.tsx';
 import { FormInput, FormSelect, FormRadioGroup, FormTextArea, FormDateInput, FormCheckbox } from './FormControls.tsx';
@@ -42,7 +42,7 @@ const DefaultInternetForm = () => {
         const isMansionType = housingType.includes('マンション') || housingType === '10G';
         const isFamilyType = housingType.includes('ファミリー');
         
-        if (isMansionType) return baseOptions.filter(option => option.value !== '無し');
+        if (isMansionType && !isChintai) return baseOptions.filter(option => option.value !== '無し');
         if (isFamilyType) return baseOptions.find(option => option.value === '無し') ? [baseOptions.find(option => option.value === '無し')] : [];
 
         return baseOptions;
@@ -77,6 +77,7 @@ const DefaultInternetForm = () => {
                     label={(isChintai || isChintaiFree) ? "名乗り" : "名乗り（SMS届くので正確に）"}
                     name="greeting" value={formData.greeting} onChange={handleInputChange}
                     isInvalid={invalidFields.includes('greeting')} required
+                    disabled={formData.isSakaiRoute}
                 />
             </div>
             
@@ -267,7 +268,7 @@ const DefaultInternetForm = () => {
                 />
             </div>
             
-             {((!isAir && !isChintai && !isChintaiFree && formData.housingType.includes('ファミリー')) || (isChintai && formData.housingType === 'ファミリー')) && (
+             {((!isAir && !isChintai && !isChintaiFree && formData.housingType.includes('ファミリー')) || (isChintai && (formData.housingType === 'ファミリー' || (formData.housingType === '10G' && formData.rackType === '無し')))) && (
                 <OwnerInfo isChintai={isChintai} />
             )}
         </div>
@@ -474,9 +475,13 @@ const AuForm = () => {
                     label="住所" name="address" value={formData.address} onChange={handleInputChange}
                     isInvalid={invalidFields.includes('address')} required className="md:col-span-2"
                 />
-                 <FormInput
-                    label="案内プラン/プロバイダ" name="auPlanProvider" value={formData.auPlanProvider} onChange={handleInputChange}
-                    isInvalid={invalidFields.includes('auPlanProvider')} placeholder="（下記からコピペして入力）/ソネット"
+                 <FormSelect
+                    label="案内プラン/プロバイダ"
+                    name="auPlanProvider"
+                    value={formData.auPlanProvider}
+                    onChange={handleInputChange}
+                    options={AU_PLAN_PROVIDER_OPTIONS}
+                    isInvalid={invalidFields.includes('auPlanProvider')}
                 />
                  <FormInput
                     label="案内内容" name="remarks" value={formData.remarks} onChange={handleInputChange}

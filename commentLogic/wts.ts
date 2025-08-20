@@ -32,6 +32,11 @@ const formatPhoneNumberWithHyphens = (phoneStr: string): string => {
   return phoneStr;
 };
 
+const formatPostalCode = (postalCodeStr: string): string => {
+  if (!postalCodeStr) return '';
+  return postalCodeStr.replace(/\D/g, '');
+};
+
 export const generateWtsCommentLogic = (formData: FormData): string => {
     const {
         apName, customerId, contractorName, contractorNameKana, dob, phone, wtsShippingDestination,
@@ -39,13 +44,14 @@ export const generateWtsCommentLogic = (formData: FormData): string => {
         wtsServerColor, wtsFiveYearPlan, wtsFreeWater, wtsCreditCard, wtsCarrier,
         moveInDate, wtsWaterPurifier, wtsMultipleUnits, wtsCustomerType,
         wtsU20HighSchool, wtsU20ParentalConsent, wtsCorporateInvoice, remarks, wtsMailingAddress,
-        recordId, isSakaiRoute, wtsServerType, wtsEmail, currentAddress
+        recordId, isSakaiRoute, wtsServerType, wtsEmail, currentAddress, currentPostalCode
     } = { ...formData, dob: formatDate(formData.dob), moveInDate: formatDate(formData.moveInDate) };
 
     const idField = isSakaiRoute ? `レコードID：${recordId || ''}` : `顧客ID：${customerId || ''}`;
     const serverAndColor = `${wtsServerType || ''} ${wtsServerColor || ''}`.trim();
     
     const formattedPhone = formatPhoneNumberWithHyphens(phone);
+    const formattedShippingPostalCode = formatPostalCode(wtsShippingPostalCode);
     
     let header = '【プレミアムウォーター】';
     if (wtsCustomerType === 'U-20') {
@@ -80,7 +86,7 @@ export const generateWtsCommentLogic = (formData: FormData): string => {
 
     let shippingDestinationText = wtsShippingDestination || '';
     if (wtsShippingDestination === 'その他') {
-        shippingDestinationText = `その他（〒${wtsShippingPostalCode || ''} ${wtsShippingAddress || ''}）`;
+        shippingDestinationText = `その他（〒${formattedShippingPostalCode || ''} ${wtsShippingAddress || ''}）`;
     } else if (wtsShippingDestination === '新住所') {
         shippingDestinationText = '新住所(設置先と同じ)';
     }

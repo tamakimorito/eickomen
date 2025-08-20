@@ -254,6 +254,7 @@ export const DISCOUNT_OPTIONS_10G_NEW = [
 export const ROUTER_OPTIONS = [
     { value: '案内した', label: '案内した' },
     { value: '未案内', label: '未案内' },
+    { value: '持ってる', label: '持ってる' },
 ];
 
 export const PAYMENT_METHOD_OPTIONS = [
@@ -305,6 +306,19 @@ export const GMO_CALLBACK_TIME_SLOTS = [
 export const AU_CONTACT_TYPE_OPTIONS = [
   { value: '携帯宛', label: '携帯宛' },
   { value: '固定宛', label: '固定宛' },
+];
+
+export const AU_PLAN_PROVIDER_OPTIONS = [
+  { value: 'ずっとギガ得プラン（ファミリー）', label: 'ずっとギガ得プラン（ファミリー）' },
+  { value: 'タイプG（16契約以上）', label: 'タイプG（16契約以上）' },
+  { value: '都市機構G（DX-G）', label: '都市機構G（DX-G）' },
+  { value: 'タイプG（8契約以上）', label: 'タイプG（8契約以上）' },
+  { value: 'タイプV（16契約以上）', label: 'タイプV（16契約以上）' },
+  { value: 'タイプV（8契約以上）', label: 'タイプV（8契約以上）' },
+  { value: 'タイプE', label: 'タイプE' },
+  { value: 'タイプF', label: 'タイプF' },
+  { value: 'ギガ', label: 'ギガ' },
+  { value: 'ミニギガ', label: 'ミニギガ' },
 ];
 
 
@@ -406,6 +420,8 @@ export const GAS_OPENING_TIME_SLOTS = [
 
 export const TIME_SLOTS_SUTENE_SR = [
     { value: '9-12', label: '9-12' },
+    { value: '13-15', label: '13-15' },
+    { value: '15-17', label: '15-17' },
     { value: '13-17', label: '午後枠 (13-17)' },
 ];
 

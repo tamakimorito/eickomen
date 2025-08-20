@@ -62,7 +62,9 @@ const getRequiredFields = (formData, activeTab) => {
                     if (product === '賃貸ねっと') required.push('existingLineStatus');
                     if (formData.existingLineStatus === 'あり') required.push('existingLineCompany');
                     if (formData.paymentMethod === '口座') required.push('bankName');
-                    if (formData.housingType === 'ファミリー') required.push('managementCompany', 'managementContact', 'contactPerson');
+                    if (formData.housingType === 'ファミリー' || (formData.housingType === '10G' && formData.rackType === '無し')) {
+                        required.push('managementCompany', 'managementContact', 'contactPerson');
+                    }
                 }
             } else if (product === 'GMOドコモ光') {
                 required.push('housingType', 'customerId', 'gmoCompensation', 'gmoRouter', 'greeting', 'contractorName', 'phone', 'existingLineCompany');
@@ -72,14 +74,17 @@ const getRequiredFields = (formData, activeTab) => {
                     if (!formData.gmoIsDocomoOwnerSame) required.push('gmoDocomoOwnerName', 'gmoDocomoOwnerPhone');
                 }
             } else if (product === 'AUひかり') {
-                required.push('contractorName', 'existingLineCompany', 'postalCode', 'address', 'auPlanProvider', 'phone', 'auContactType');
+                required.push('contractorName', 'existingLineCompany', 'postalCode', 'address', 'phone', 'auContactType');
             }
             break;
 
-        case 'electricity':
-            required.push('elecProvider', 'greeting', 'paymentMethod', 'contractorName', 'contractorNameKana', 'dob', 'phone', 'postalCode', 'address', 'buildingInfo', 'moveInDate');
-            if (!isSakaiRoute) required.push('recordId');
+        case 'electricity': {
             const { elecProvider, elecRecordIdPrefix } = formData;
+            required.push('elecProvider', 'greeting', 'contractorName', 'contractorNameKana', 'dob', 'phone', 'postalCode', 'address', 'buildingInfo', 'moveInDate');
+            if (elecProvider !== '東京ガス電気セット') {
+                required.push('paymentMethod');
+            }
+            if (!isSakaiRoute) required.push('recordId');
             if (elecProvider === 'すまいのでんき（ストエネ）' || (elecProvider === 'プラチナでんき（ジャパン）' && elecRecordIdPrefix === 'SR')) {
                 required.push('hasContractConfirmation');
             }
@@ -99,6 +104,7 @@ const getRequiredFields = (formData, activeTab) => {
                 required.push('currentAddress');
             }
             break;
+        }
 
         case 'gas': {
             const { gasProvider } = formData;
@@ -108,13 +114,15 @@ const getRequiredFields = (formData, activeTab) => {
 
             if (![ '東京ガス単品', '大阪ガス単品' ].includes(gasProvider)) {
                 required.push('greeting');
+            }
+             if (gasProvider !== '東京ガス単品') {
                 required.push('paymentMethod');
             }
             if (gasProvider === '東急ガス') {
                 required.push('email');
             }
             
-             if(['すまいのでんき（ストエネ）', '東京ガス単品', '東邦ガス単品', '東急ガス', 'ニチガス単品'].includes(gasProvider)) {
+             if(['すまいのでんき（ストエネ）', '東京ガス単品', '東邦ガス単品', '東急ガス', 'ニチガス単品', '大阪ガス単品'].includes(gasProvider)) {
                  required.push('gasOpeningTimeSlot');
              }
              if(gasProvider === 'ニチガス単品') {
@@ -197,6 +205,34 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
         }
         setGeneratedComment(newComment);
     }, [formData, activeTab]);
+
+    useEffect(() => {
+        const { postalCode, isSakaiRoute, address } = formData;
+        if (isSakaiRoute && postalCode && /^\d{7}$/.test(postalCode.replace(/\D/g, ''))) {
+            const fetchAddress = async () => {
+                try {
+                    const response = await fetch(`https://zipcloud.ibsnet.co.jp/api/search?zipcode=${postalCode.replace(/\D/g, '')}`);
+                    if (!response.ok) throw new Error('API response was not ok.');
+                    const data = await response.json();
+                    if (data.status === 200 && data.results) {
+                        const { address1, address2, address3 } = data.results[0];
+                        const fullAddress = `${address1}${address2}${address3}`;
+                        if (fullAddress !== address) {
+                            dispatch({ type: 'UPDATE_FIELD', payload: { name: 'address', value: fullAddress } });
+                        }
+                    } else {
+                        if(!address) {
+                            setToast({ message: '郵便番号に対応する住所が見つかりません。', type: 'error' });
+                        }
+                    }
+                } catch (error) {
+                    console.error('Failed to fetch address:', error);
+                    setToast({ message: '住所の自動入力に失敗しました。', type: 'error' });
+                }
+            };
+            fetchAddress();
+        }
+    }, [formData.postalCode, formData.isSakaiRoute, formData.address, dispatch, setToast]);
     
     const handleCopy = useCallback(() => {
         const { missingFields, missingLabels } = getRequiredFields(formData, activeTab);
@@ -238,6 +274,28 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
                 console.error('Copy failed', err);
             });
         };
+        
+        // --- Address Number Check ---
+        if (formData.address && !/\d/.test(formData.address)) {
+            setInvalidFields(prev => [...new Set([...prev, 'address'])]);
+            setModalState({
+                isOpen: true,
+                title: '入力内容の確認',
+                message: '住所に番地などの数字が含まれていません。入力内容を確認してください。',
+                onConfirm: () => {
+                    closeModal();
+                    setInvalidFields(prev => prev.filter(f => f !== 'address'));
+                    performCopy();
+                },
+                onCancel: closeModal,
+                confirmText: 'このままコピー',
+                cancelText: '修正する',
+                type: 'warning',
+                isErrorBanner: true,
+                bannerMessage: '住所に番地などの数字が含まれていない可能性があります。'
+            });
+            return;
+        }
 
         // --- DOB / Phone Swap Check ---
         const dobValue = formData.dob || '';

@@ -98,7 +98,7 @@ const GasTab = () => {
     }, [isSumainoGas, formData.gasHasContractConfirmation]);
 
     const needsWitness = useMemo(() => {
-        return ['すまいのでんき（ストエネ）', '東京ガス単品', '東邦ガス単品', '東急ガス', 'ニチガス単品'].includes(gasProvider);
+        return ['すまいのでんき（ストエネ）', '東京ガス単品', '東邦ガス単品', '東急ガス', 'ニチガス単品', '大阪ガス単品'].includes(gasProvider);
     }, [gasProvider]);
 
     const gasTimeSlotOptions = useMemo(() => {
@@ -111,7 +111,7 @@ const GasTab = () => {
         if (gasProvider === 'ニチガス単品') {
             return TIME_SLOTS_NICHI;
         }
-        if (['東急ガス', '東邦ガス単品', 'すまいのでんき（ストエネ）'].includes(gasProvider)) {
+        if (['東急ガス', '東邦ガス単品', 'すまいのでんき（ストエネ）', '大阪ガス単品'].includes(gasProvider)) {
             return GAS_OPENING_TIME_SLOTS;
         }
         return [];
@@ -130,7 +130,7 @@ const GasTab = () => {
     // Conditional rendering based on comment templates
     const showGreeting = !isTokyo && !isOsakaGas;
     const showEmail = isTokyu;
-    const showPaymentMethod = !isTokyo && !isOsakaGas;
+    const showPaymentMethod = !isTokyo;
     const showGender = isSumainoGas;
 
     return (

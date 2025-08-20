@@ -32,6 +32,12 @@ const formatPhoneNumberWithHyphens = (phoneStr: string): string => {
   return phoneStr;
 };
 
+const formatPostalCode = (postalCodeStr: string): string => {
+  if (!postalCodeStr) return '';
+  return postalCodeStr.replace(/\D/g, '');
+};
+
+
 const generateDefaultInternetComment = (formData: FormData): string => {
     const {
         product,
@@ -85,6 +91,9 @@ const generateDefaultInternetComment = (formData: FormData): string => {
     
     const isChintaiProduct = product && product.includes('賃貸ねっと');
     const formattedPhone = isChintaiProduct ? (phone || '').replace(/\D/g, '') : formatPhoneNumberWithHyphens(phone);
+    
+    const formattedPostalCode = formatPostalCode(postalCode);
+    const formattedCurrentPostalCode = formatPostalCode(currentPostalCode);
 
 
     switch (product) {
@@ -102,14 +111,14 @@ const generateDefaultInternetComment = (formData: FormData): string => {
                 `生年月日(西暦)：${dob || ''}`,
                 `電話番号(ハイフンあり)：${formattedPhone || ''}`,
                 `➤設置先`,
-                `郵便番号(〒・ハイフン無し)：${postalCode || ''}`,
+                `郵便番号(〒・ハイフン無し)：${formattedPostalCode || ''}`,
                 `住所：${address || ''}`,
                 `物件名＋部屋番号：${buildingInfo || ''}`,
                 `入居予定日：${moveInDate || ''}`,
                 `■書面発送先：${mailingOptionLabel || ''}`,
             ];
             if (mailingOption === '現住所') {
-                commentLines.push(`現住所の場合郵便番号(〒・ハイフン無し)：${currentPostalCode || ''}`);
+                commentLines.push(`現住所の場合郵便番号(〒・ハイフン無し)：${formattedCurrentPostalCode || ''}`);
                 commentLines.push(`住所・物件名・部屋番号：${currentAddress || ''}`);
             }
             commentLines.push(
@@ -138,14 +147,14 @@ const generateDefaultInternetComment = (formData: FormData): string => {
                 `生年月日(西暦)：${dob || ''}`,
                 `電話番号(ハイフンあり)：${formattedPhone || ''}`,
                 `➤設置先`,
-                `郵便番号(〒・ハイフン無し)：${postalCode || ''}`,
+                `郵便番号(〒・ハイフン無し)：${formattedPostalCode || ''}`,
                 `住所：${address || ''}`,
                 `物件名＋部屋番号：${buildingInfo || ''}`,
                 `入居予定日：${moveInDate || ''}`,
                 `■書面発送先：${mailingOptionLabel || ''}`,
             ];
             if (mailingOption === '現住所') {
-                commentLines.push(`現住所の場合郵便番号(〒・ハイフン無し)：${currentPostalCode || ''}`);
+                commentLines.push(`現住所の場合郵便番号(〒・ハイフン無し)：${formattedCurrentPostalCode || ''}`);
                 commentLines.push(`住所・物件名・部屋番号：${currentAddress || ''}`);
             }
             commentLines.push(
@@ -172,14 +181,14 @@ const generateDefaultInternetComment = (formData: FormData): string => {
                 `生年月日(西暦)：${dob || ''}`,
                 `電話番号(ハイフンあり)：${formattedPhone || ''}`,
                 `➤設置先`,
-                `郵便番号(〒・ハイフン無し)：${postalCode || ''}`,
+                `郵便番号(〒・ハイフン無し)：${formattedPostalCode || ''}`,
                 `住所：${address || ''}`,
                 `物件名＋部屋番号：${buildingInfo || ''}`,
                 `入居予定日：${moveInDate || ''}`,
                 `■書面発送先：${mailingOptionLabel || ''}`,
             ];
             if (mailingOption === '現住所') {
-                commentLines.push(`現住所の場合郵便番号(〒・ハイフン無し)：${currentPostalCode || ''}`);
+                commentLines.push(`現住所の場合郵便番号(〒・ハイフン無し)：${formattedCurrentPostalCode || ''}`);
                 commentLines.push(`住所・物件名・部屋番号：${currentAddress || ''}`);
             }
             commentLines.push(
@@ -217,14 +226,14 @@ const generateDefaultInternetComment = (formData: FormData): string => {
                     commentLines.push(`生年月日(西暦)：${dob || ''}`);
                     commentLines.push(`電話番号(ハイフン無し)：${formattedPhone || ''}`);
                     commentLines.push(`➤設置先`);
-                    commentLines.push(`郵便番号(〒・ハイフン無し)：${postalCode || ''}`);
+                    commentLines.push(`郵便番号(〒・ハイフン無し)：${formattedPostalCode || ''}`);
                     commentLines.push(`住所：${address || ''}`);
                     commentLines.push(`物件名＋部屋番号：${buildingInfo || ''}`);
                     commentLines.push(`利用開始日(必ず引っ越し日を記載)：${moveInDate || ''}`);
                     commentLines.push(`■書面発送先：${mailingOptionLabel || ''}`);
 
                     if (mailingOption === '現住所') {
-                        commentLines.push(`現住所の場合郵便番号(〒・ハイフン無し)：${currentPostalCode || ''}`);
+                        commentLines.push(`現住所の場合郵便番号(〒・ハイフン無し)：${formattedCurrentPostalCode || ''}`);
                         commentLines.push(`住所・物件名・部屋番号：${currentAddress || ''}`);
                     }
 
@@ -233,8 +242,10 @@ const generateDefaultInternetComment = (formData: FormData): string => {
                     commentLines.push(`支払方法：${paymentText}`);
                     commentLines.push(`クロスパス無線ルーター：${crossPathRouter || ''}`);
                     commentLines.push(`備考：${remarks || ''}`);
+                    
+                    const showChintaiOwnerInfo = housingType === 'ファミリー' || (housingType === '10G' && rackType === '無し');
 
-                    if (isFamily) {
+                    if (showChintaiOwnerInfo) {
                         commentLines.push(
                             ``,
                             `ファミリータイプはオーナー確認①②③必須！`,
@@ -382,15 +393,16 @@ const generateAuHikariComment = (formData: FormData): string => {
     } = formData;
 
     const formattedPhone = formatPhoneNumberWithHyphens(phone);
+    const formattedPostalCode = formatPostalCode(postalCode);
 
     let comment = [
         '【AUひかり】※AUでんき案内禁止250811',
         `獲得者：${apName || ''}`,
         `お客様氏名：${contractorName || ''}`,
         `現状回線/プロバイダ：${existingLineCompany || ''}`,
-        `郵便番号：${postalCode || ''}`,
+        `郵便番号：${formattedPostalCode || ''}`,
         `住所：${address || ''}`,
-        `案内プラン/プロバイダ：${auPlanProvider || ''}`,
+        `案内プラン/プロバイダ：${auPlanProvider ? `${auPlanProvider}/ソネット` : ''}`,
         `案内内容：${remarks || ''}`, // remarks field is used here
         `Wi-Fiルーター：${auWifiRouter || ''}`,
         `オプション付帯：${auOptions || ''}`,
