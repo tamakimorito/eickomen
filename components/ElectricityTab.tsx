@@ -132,13 +132,16 @@ const ElectricityTab = () => {
             return TIME_SLOTS_SUTENE_SR;
         }
         if (elecProvider === '東邦ガスセット') {
-            return GAS_OPENING_TIME_SLOTS;
+            return TIME_SLOTS_TOHO;
         }
         if (elecProvider === 'ニチガス電気セット') {
             return TIME_SLOTS_NICHI;
         }
         if (elecProvider === '東京ガス電気セット') {
             return TIME_SLOTS_TOKYO_GAS;
+        }
+        if (elecProvider === '大阪ガス電気セット') {
+            return GAS_OPENING_TIME_SLOTS;
         }
         if (isElecGasSetSelected) {
             return GAS_OPENING_TIME_SLOTS;
@@ -230,7 +233,7 @@ const ElectricityTab = () => {
                 </div>
             </div>
             
-            {isElecGasSetSelected || elecProvider === 'ニチガス電気セット' || elecProvider === '東邦ガスセット' || elecProvider === '東京ガス電気セット' ? (
+            {isElecGasSetSelected || elecProvider === 'ニチガス電気セット' || elecProvider === '東邦ガスセット' || elecProvider === '東京ガス電気セット' || elecProvider === '大阪ガス電気セット' ? (
                 <div className="border-t-2 border-dashed border-blue-300 pt-6 space-y-4">
                     <h3 className="text-lg font-bold text-blue-700">利用開始日・開栓日</h3>
                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-blue-50/50 rounded-lg border border-blue-200">

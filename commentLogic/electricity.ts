@@ -67,7 +67,7 @@ export const generateElectricityCommentLogic = (formData: FormData): string => {
     let comment = '該当するテンプレートがありません。';
     const tag = "250811";
 
-    const isSet = isGasSet === 'セット' || elecProvider === 'ニチガス電気セット' || elecProvider === '東邦ガスセット' || elecProvider === '東京ガス電気セット';
+    const isSet = isGasSet === 'セット' || ['ニチガス電気セット', '東邦ガスセット', '東京ガス電気セット', '大阪ガス電気セット'].includes(elecProvider);
     
     const formattedPhone = formatPhoneNumberWithHyphens(phone);
     const formattedGasPreContact = formatPhoneNumberWithHyphens(gasPreContact);

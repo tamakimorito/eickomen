@@ -206,6 +206,7 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
         setGeneratedComment(newComment);
     }, [formData, activeTab]);
 
+    // Sakai route postal code -> new address auto-fill
     useEffect(() => {
         const { postalCode, isSakaiRoute, address } = formData;
         if (isSakaiRoute && postalCode && /^\d{7}$/.test(postalCode.replace(/\D/g, ''))) {
@@ -217,12 +218,14 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
                     if (data.status === 200 && data.results) {
                         const { address1, address2, address3 } = data.results[0];
                         const fullAddress = `${address1}${address2}${address3}`;
-                        if (fullAddress !== address) {
+                        // To prevent overwriting user's manual input (like adding building number),
+                        // only update if the address field is empty or doesn't already start with the fetched address.
+                        if (fullAddress && (!address || !address.startsWith(fullAddress))) {
                             dispatch({ type: 'UPDATE_FIELD', payload: { name: 'address', value: fullAddress } });
                         }
                     } else {
-                        if(!address) {
-                            setToast({ message: '郵便番号に対応する住所が見つかりません。', type: 'error' });
+                        if (!address) {
+                             setToast({ message: '郵便番号に対応する住所が見つかりません。', type: 'error' });
                         }
                     }
                 } catch (error) {
@@ -232,7 +235,36 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
             };
             fetchAddress();
         }
-    }, [formData.postalCode, formData.isSakaiRoute, formData.address, dispatch, setToast]);
+    }, [formData.postalCode, formData.isSakaiRoute, dispatch, setToast]);
+
+    // Sakai route postal code -> current address auto-fill
+    useEffect(() => {
+        const { currentPostalCode, isSakaiRoute, currentAddress } = formData;
+        if (isSakaiRoute && currentPostalCode && /^\d{7}$/.test(currentPostalCode.replace(/\D/g, ''))) {
+            const fetchAddress = async () => {
+                try {
+                    const response = await fetch(`https://zipcloud.ibsnet.co.jp/api/search?zipcode=${currentPostalCode.replace(/\D/g, '')}`);
+                    if (!response.ok) throw new Error('API response was not ok.');
+                    const data = await response.json();
+                    if (data.status === 200 && data.results) {
+                        const { address1, address2, address3 } = data.results[0];
+                        const fullAddress = `${address1}${address2}${address3}`;
+                        if (fullAddress && (!currentAddress || !currentAddress.startsWith(fullAddress))) {
+                            dispatch({ type: 'UPDATE_FIELD', payload: { name: 'currentAddress', value: fullAddress } });
+                        }
+                    } else {
+                        if (!currentAddress) {
+                            setToast({ message: '現住所の郵便番号に対応する住所が見つかりません。', type: 'error' });
+                        }
+                    }
+                } catch (error) {
+                    console.error('Failed to fetch current address:', error);
+                    setToast({ message: '現住所の自動入力に失敗しました。', type: 'error' });
+                }
+            };
+            fetchAddress();
+        }
+    }, [formData.currentPostalCode, formData.isSakaiRoute, dispatch, setToast]);
     
     const handleCopy = useCallback(() => {
         const { missingFields, missingLabels } = getRequiredFields(formData, activeTab);

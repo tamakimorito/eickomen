@@ -62,6 +62,10 @@ export type FormData = {
   gmoCallbackDate3: string;
   gmoNoPairIdType: string;
   
+  // --- GMO Tokutoku Specific ---
+  gmoTokutokuPlan: string;
+  gmoTokutokuCampaign: string;
+
   // --- AU Hikari Specific ---
   auPlanProvider: string;
   auWifiRouter: string;

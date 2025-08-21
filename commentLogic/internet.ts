@@ -421,11 +421,74 @@ const generateAuHikariComment = (formData: FormData): string => {
     return comment;
 };
 
+const generateGmoTokutokuComment = (formData: FormData): string => {
+    const {
+        apName,
+        customerId,
+        gmoTokutokuPlan,
+        contractorName,
+        dob,
+        moveInDate,
+        mailingOption,
+        buildingInfo,
+        serviceFee,
+        gmoTokutokuCampaign,
+        existingLineStatus,
+        existingLineCompany,
+        email,
+        paymentMethod,
+        remarks,
+        // Owner Info
+        managementCompany,
+        managementNumber,
+        contactPerson,
+        noDrilling,
+    } = formData;
+
+    const mailingOptionLabel = mailingOption === '新居' ? '新居' : '現住所';
+
+    const commentLines = [
+        `■GMO光`,
+        `AP名：${apName || ''}`,
+        `顧客ID：${customerId || ''}`,
+        `プラン：${gmoTokutokuPlan || ''}`,
+        `①名義：${contractorName || ''}`,
+        `②生年月日：${dob || ''}`,
+        `③引越日：${moveInDate || ''}`,
+        `④書面送付先：${mailingOptionLabel || ''}`,
+        `⑤設置先号室：${buildingInfo || ''}`,
+        `⑥案内料金：${serviceFee || ''}`,
+        `⑦ＣＰ：${gmoTokutokuCampaign || ''}`,
+        `⑧既存回線：${existingLineStatus === 'あり' ? `あり（${existingLineCompany || ''}）` : (existingLineStatus || '無し')}`,
+        `⑨メアド必須：${email || ''}`,
+        `⑩支払い方法：${paymentMethod || ''}`,
+    ];
+
+    if (gmoTokutokuPlan === 'ファミリー') {
+        commentLines.push(
+            ``,
+            `オーナー情報`,
+            `・管理会社：${managementCompany || ''}`,
+            `・管理番号：${managementNumber || ''}`,
+            `・担当者：${contactPerson || ''}`
+        );
+        if (noDrilling) {
+            commentLines.push(`穴あけ・ビス止めNG`);
+        }
+    }
+
+    commentLines.push(`備考：${remarks || ''}`);
+    
+    return commentLines.join('\n');
+};
+
 export const generateInternetCommentLogic = (formData: FormData): string => {
     const { product } = formData;
     switch (product) {
         case 'GMOドコモ光':
             return generateGmoComment(formData);
+        case 'GMOとくとく光':
+            return generateGmoTokutokuComment(formData);
         case 'AUひかり':
             return generateAuHikariComment(formData);
         case 'SoftBank光1G':

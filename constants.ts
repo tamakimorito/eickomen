@@ -64,6 +64,10 @@ export const INITIAL_FORM_DATA: FormData = {
   gmoCallbackDate3: '',
   gmoNoPairIdType: '',
   
+  // --- GMO Tokutoku Specific ---
+  gmoTokutokuPlan: '',
+  gmoTokutokuCampaign: '',
+
   // --- AU Hikari Specific ---
   auPlanProvider: '',
   auWifiRouter: '',
@@ -136,6 +140,7 @@ export const PRODUCTS = [
     { value: '賃貸ねっと【無料施策】', label: '賃貸ねっと【無料施策】' },
     { type: 'break' },
     { value: 'GMOドコモ光', label: 'GMOドコモ光' },
+    { value: 'GMOとくとく光', label: 'GMOとくとく光' },
     { value: 'AUひかり', label: 'AUひかり' },
 ];
 
@@ -167,11 +172,18 @@ export const HOUSING_TYPES_CHINTAI_FREE = [
 export const HOUSING_TYPES_GMO = [
     { value: '1Gマンション', label: '1Gマンション' },
     { value: '1Gファミリー', label: '1Gファミリー' },
-    { value: '10G', label: '10G' },
+    { value: '10Gマンション', label: '10Gマンション' },
+    { value: '10Gファミリー', label: '10Gファミリー' },
     { type: 'break' },
     { value: 'ペアなし1Gマンション', label: 'ペアなし1Gマンション' },
     { value: 'ペアなし1Gファミリー', label: 'ペアなし1Gファミリー' },
-    { value: 'ペアなし10G', label: 'ペアなし10G' },
+    { value: 'ペアなし10Gマンション', label: 'ペアなし10Gマンション' },
+    { value: 'ペアなし10Gファミリー', label: 'ペアなし10Gファミリー' },
+];
+
+export const GMO_TOKUTOKU_PLANS = [
+    {value: 'マンション', label: 'マンション'}, 
+    {value: 'ファミリー', label: 'ファミリー'}
 ];
 
 export const RACK_OPTIONS_1G = [
@@ -409,7 +421,7 @@ export const TIME_SLOTS_NICHI = [
     { value: '9-12', label: '9-12' },
     { value: '13-15', label: '13-15' },
     { value: '15-17', label: '15-17' },
-    { value: '17-19', label: '17-19 (日祝以外)' },
+    { value: '17-19 (日祝以外)' },
 ];
 
 export const GAS_OPENING_TIME_SLOTS = [
