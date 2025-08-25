@@ -417,6 +417,12 @@ export const TIME_SLOTS_TOHO = [
     { value: '18-21', label: '18-21' },
 ];
 
+export const TIME_SLOTS_TOHO_GAS_SETUP = [
+    { value: '9-12', label: '①9-12時' },
+    { value: '13-15', label: '②13-15時' },
+    { value: '15-17', label: '③15-17時' },
+];
+
 export const TIME_SLOTS_NICHI = [
     { value: '9-12', label: '9-12' },
     { value: '13-15', label: '13-15' },

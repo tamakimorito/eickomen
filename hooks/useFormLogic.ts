@@ -79,8 +79,9 @@ export const useFormLogic = () => {
     }, []);
 
     const handleIdBlur = useCallback(() => {
-        dispatch({ type: 'UPDATE_DERIVED_FIELDS_FROM_ID' });
-    }, [dispatch]);
+        // dispatch({ type: 'UPDATE_DERIVED_FIELDS_FROM_ID' });
+        // This logic is now handled inside the main formReducer for consistency.
+    }, []);
 
     return {
         formData,

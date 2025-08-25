@@ -38,10 +38,32 @@ export const formReducer = (state: FormData, action: FormAction): FormData => {
 
       // Create a temporary new state to calculate dependent fields
       let newState = { ...state, ...updates };
+      
+      // --- Greeting logic based on recordId and product ---
+      if (['recordId', 'customerId', 'product', 'isSakaiRoute'].includes(name)) {
+          const { recordId, product, isSakaiRoute } = newState;
+          if (!isSakaiRoute && recordId) {
+              if (recordId.startsWith('ID:')) {
+                  const isSbHikari = product === 'SoftBank光1G' || product === 'SoftBank光10G';
+                  newState.greeting = isSbHikari ? '' : 'すまえる';
+              } else if (recordId.startsWith('L')) {
+                  newState.greeting = 'ばっちり賃貸入居サポートセンター';
+              } else if (recordId.startsWith('S')) {
+                  newState.greeting = 'レプリス株式会社';
+              } else if (recordId.startsWith('SR') || recordId.startsWith('STJP')) {
+                   // Only clear if it was an auto-set greeting
+                  const autoGreetings = ['すまえる', 'ばっちり賃貸入居サポートセンター', 'レプリス株式会社'];
+                  if (autoGreetings.includes(state.greeting)) {
+                      newState.greeting = '';
+                  }
+              }
+          }
+      }
+
 
       // --- Logic for dependent field updates ---
       
-      // Sync recordId/customerId and update prefix (greeting is handled on blur)
+      // Sync recordId/customerId and update prefix
       if (name === 'recordId' || name === 'customerId') {
           const idValue = value;
           // Sync both fields
@@ -123,19 +145,37 @@ export const formReducer = (state: FormData, action: FormAction): FormData => {
       }
       
       // --- Electricity/Gas Contract Confirmation Logic ---
-      const newElecProvider = name === 'elecProvider' ? value : newState.elecProvider;
-      const newElecPrefix = newState.elecRecordIdPrefix;
+      if (name === 'elecProvider' || name === 'recordId' || name === 'isSakaiRoute' || name === 'isAllElectric') {
+        const newElecProvider = name === 'elecProvider' ? value : newState.elecProvider;
+        const newElecPrefix = newState.elecRecordIdPrefix;
+        const newIsAllElectric = name === 'isAllElectric' ? value : newState.isAllElectric;
 
-      if (name === 'elecProvider' || name === 'recordId' || name === 'isSakaiRoute') {
-        if (newElecProvider === 'すまいのでんき（ストエネ）' && newElecPrefix === 'code:') {
+        if (newElecProvider === 'プラチナでんき（ジャパン）') {
+            if (newElecPrefix === 'SR') {
+                newState.hasContractConfirmation = 'あり';
+            } else { // Not SR route
+                if (newIsAllElectric === 'あり') {
+                    // When user switches to all-electric, default to 'あり'.
+                    // They can then change it. This won't override their subsequent choices.
+                    if (name === 'isAllElectric' && value === 'あり') {
+                        newState.hasContractConfirmation = 'あり';
+                    }
+                } else {
+                    // If not all-electric, no confirmation choice is available.
+                    newState.hasContractConfirmation = ''; 
+                }
+            }
+        } else if (newElecProvider === 'すまいのでんき（ストエネ）' && newElecPrefix === 'code:') {
             newState.hasContractConfirmation = 'なし';
-        }
-        if (newElecProvider === 'プラチナでんき（ジャパン）' && newElecPrefix !== 'SR') {
-            newState.hasContractConfirmation = 'なし';
-        }
-        if (newElecProvider === 'キューエネスでんき') {
+        } else if (newElecProvider === 'キューエネスでんき') {
             newState.hasContractConfirmation = (newElecPrefix === 'ID:') ? 'なし' : 'あり';
         }
+      }
+
+
+       // Clear attachedOption if hasContractConfirmation becomes 'あり'
+      if (newState.hasContractConfirmation === 'あり' && state.hasContractConfirmation !== 'あり') {
+        newState.attachedOption = '';
       }
 
       if (name === 'gasProvider') {
@@ -251,17 +291,9 @@ export const formReducer = (state: FormData, action: FormAction): FormData => {
     }
     
     case 'UPDATE_DERIVED_FIELDS_FROM_ID': {
-      const { recordId, isSakaiRoute } = state;
-      if (!isSakaiRoute && recordId) {
-        if (recordId.startsWith('L')) {
-          return { ...state, greeting: 'ばっちり賃貸入居サポートセンター' };
-        } else if (recordId.startsWith('SR') || recordId.startsWith('STJP')) {
-          return { ...state, greeting: '' };
-        } else if (recordId.startsWith('S')) {
-          return { ...state, greeting: 'レプリス株式会社' };
-        }
-      }
-      return state; // No change
+        // This action is deprecated and its logic is merged into 'UPDATE_FIELD' for better consistency.
+        // Kept to avoid breaking older parts of the code if they still call it.
+        return state;
     }
 
     case 'SET_FORM_DATA':

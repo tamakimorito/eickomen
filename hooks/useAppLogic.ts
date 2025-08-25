@@ -1,5 +1,3 @@
-
-
 import { useState, useCallback, useRef, useEffect } from 'https://esm.sh/react@^19.1.0';
 import { BUG_REPORT_SCRIPT_URL } from '../constants.ts';
 import { generateElectricityCommentLogic } from '../commentLogic/electricity.ts';
@@ -74,18 +72,18 @@ const getRequiredFields = (formData, activeTab) => {
                     if (!formData.gmoIsDocomoOwnerSame) required.push('gmoDocomoOwnerName', 'gmoDocomoOwnerPhone');
                 }
             } else if (product === 'AUひかり') {
-                required.push('contractorName', 'existingLineCompany', 'postalCode', 'address', 'phone', 'auContactType');
+                required.push('greeting', 'contractorName', 'existingLineCompany', 'postalCode', 'address', 'phone', 'auContactType', 'auPlanProvider');
             }
             break;
 
         case 'electricity': {
-            const { elecProvider, elecRecordIdPrefix } = formData;
+            const { elecProvider, elecRecordIdPrefix, isAllElectric } = formData;
             required.push('elecProvider', 'greeting', 'contractorName', 'contractorNameKana', 'dob', 'phone', 'postalCode', 'address', 'buildingInfo', 'moveInDate');
             if (elecProvider !== '東京ガス電気セット') {
                 required.push('paymentMethod');
             }
             if (!isSakaiRoute) required.push('recordId');
-            if (elecProvider === 'すまいのでんき（ストエネ）' || (elecProvider === 'プラチナでんき（ジャパン）' && elecRecordIdPrefix === 'SR')) {
+            if (elecProvider === 'すまいのでんき（ストエネ）' || (elecProvider === 'プラチナでんき（ジャパン）' && (elecRecordIdPrefix === 'SR' || isAllElectric === 'あり'))) {
                 required.push('hasContractConfirmation');
             }
             if (['キューエネスでんき', 'ユーパワー UPOWER', 'HTBエナジー', 'リミックスでんき', 'ループでんき'].includes(elecProvider)) {
@@ -206,10 +204,10 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
         setGeneratedComment(newComment);
     }, [formData, activeTab]);
 
-    // Sakai route postal code -> new address auto-fill
+    // Postal code -> new address auto-fill for all routes
     useEffect(() => {
-        const { postalCode, isSakaiRoute, address } = formData;
-        if (isSakaiRoute && postalCode && /^\d{7}$/.test(postalCode.replace(/\D/g, ''))) {
+        const { postalCode, address } = formData;
+        if (postalCode && /^\d{7}$/.test(postalCode.replace(/\D/g, ''))) {
             const fetchAddress = async () => {
                 try {
                     const response = await fetch(`https://zipcloud.ibsnet.co.jp/api/search?zipcode=${postalCode.replace(/\D/g, '')}`);
@@ -218,8 +216,6 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
                     if (data.status === 200 && data.results) {
                         const { address1, address2, address3 } = data.results[0];
                         const fullAddress = `${address1}${address2}${address3}`;
-                        // To prevent overwriting user's manual input (like adding building number),
-                        // only update if the address field is empty or doesn't already start with the fetched address.
                         if (fullAddress && (!address || !address.startsWith(fullAddress))) {
                             dispatch({ type: 'UPDATE_FIELD', payload: { name: 'address', value: fullAddress } });
                         }
@@ -235,12 +231,12 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
             };
             fetchAddress();
         }
-    }, [formData.postalCode, formData.isSakaiRoute, dispatch, setToast]);
+    }, [formData.postalCode, dispatch, setToast]);
 
-    // Sakai route postal code -> current address auto-fill
+    // currentPostalCode -> currentAddress auto-fill for all routes
     useEffect(() => {
-        const { currentPostalCode, isSakaiRoute, currentAddress } = formData;
-        if (isSakaiRoute && currentPostalCode && /^\d{7}$/.test(currentPostalCode.replace(/\D/g, ''))) {
+        const { currentPostalCode, currentAddress } = formData;
+        if (currentPostalCode && /^\d{7}$/.test(currentPostalCode.replace(/\D/g, ''))) {
             const fetchAddress = async () => {
                 try {
                     const response = await fetch(`https://zipcloud.ibsnet.co.jp/api/search?zipcode=${currentPostalCode.replace(/\D/g, '')}`);
@@ -264,7 +260,7 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
             };
             fetchAddress();
         }
-    }, [formData.currentPostalCode, formData.isSakaiRoute, dispatch, setToast]);
+    }, [formData.currentPostalCode, dispatch, setToast]);
     
     const handleCopy = useCallback(() => {
         const { missingFields, missingLabels } = getRequiredFields(formData, activeTab);
@@ -288,6 +284,24 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
         
         setInvalidFields([]);
         setModalState(prev => ({...prev, isErrorBanner: false}));
+
+        // --- Address Number Check for AU Hikari ---
+        if (activeTab === 'internet' && formData.product === 'AUひかり' && formData.address && !/\d/.test(formData.address)) {
+            setInvalidFields(['address']);
+            setModalState({
+                isOpen: true,
+                title: '入力エラー',
+                message: '「住所※物件名部屋番号まで全部」に番地などの数字が含まれていません。修正してください。',
+                onConfirm: closeModal,
+                onCancel: null,
+                confirmText: 'OK',
+                cancelText: null,
+                type: 'warning',
+                isErrorBanner: true,
+                bannerMessage: '住所に数字が含まれていません。'
+            });
+            return; // Stop copy
+        }
 
         const performCopy = () => {
             if (!generatedComment) {
@@ -325,6 +339,28 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
                 type: 'warning',
                 isErrorBanner: true,
                 bannerMessage: '住所に番地などの数字が含まれていない可能性があります。'
+            });
+            return;
+        }
+
+        // --- Current Address Number Check ---
+        if (formData.mailingOption === '現住所' && formData.currentAddress && !/\d/.test(formData.currentAddress)) {
+            setInvalidFields(prev => [...new Set([...prev, 'currentAddress'])]);
+            setModalState({
+                isOpen: true,
+                title: '入力内容の確認',
+                message: '現住所に番地などの数字が含まれていません。入力内容を確認してください。',
+                onConfirm: () => {
+                    closeModal();
+                    setInvalidFields(prev => prev.filter(f => f !== 'currentAddress'));
+                    performCopy();
+                },
+                onCancel: closeModal,
+                confirmText: 'このままコピー',
+                cancelText: '修正する',
+                type: 'warning',
+                isErrorBanner: true,
+                bannerMessage: '現住所に番地などの数字が含まれていない可能性があります。'
             });
             return;
         }

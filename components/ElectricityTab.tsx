@@ -3,7 +3,7 @@ import {
     ELEC_PROVIDERS, YES_NO_OPTIONS,
     SET_NONE_OPTIONS, PRIMARY_PRODUCT_STATUS_OPTIONS, ATTACHED_OPTION_OPTIONS, 
     PAYMENT_METHOD_OPTIONS_EXTENDED, GENDERS, NEW_CONSTRUCTION_OPTIONS, TIME_SLOTS_TOHO, MAILING_OPTIONS,
-    TIME_SLOTS_NICHI, TIME_SLOTS_SUTENE_SR, GAS_OPENING_TIME_SLOTS, TIME_SLOTS_TOKYO_GAS
+    TIME_SLOTS_NICHI, TIME_SLOTS_SUTENE_SR, GAS_OPENING_TIME_SLOTS, TIME_SLOTS_TOKYO_GAS, TIME_SLOTS_TOHO_GAS_SETUP
 } from '../constants.ts';
 import { AppContext } from '../context/AppContext.tsx';
 import { FormInput, FormSelect, FormRadioGroup, FormTextArea, FormDateInput } from './FormControls.tsx';
@@ -99,10 +99,9 @@ const ElectricityTab = () => {
     
     const showContractConfirmationOption = useMemo(() => {
         if (elecProvider === 'すまいのでんき（ストエネ）') return true;
-        if (elecProvider === 'プラチナでんき（ジャパン）' && elecRecordIdPrefix === 'SR') return true;
-        // For Qenes and others, it's determined automatically, so never show the option.
+        if (elecProvider === 'プラチナでんき（ジャパン）' && (elecRecordIdPrefix === 'SR' || formData.isAllElectric === 'あり')) return true;
         return false;
-    }, [elecProvider, elecRecordIdPrefix]);
+    }, [elecProvider, elecRecordIdPrefix, formData.isAllElectric]);
 
     const isElecGasSetSelected = useMemo(() => {
         return elecProvider === 'すまいのでんき（ストエネ）' && formData.isGasSet === 'セット';
@@ -122,9 +121,13 @@ const ElectricityTab = () => {
 
     const showNewConstructionOption = elecProvider === 'ユーパワー UPOWER';
     const showAttachedOption = useMemo(() => {
-        // Show attached option only when contract confirmation is not required,
-        // and the provider is not 'ニチガス電気セット'.
-        return formData.hasContractConfirmation === 'なし' && elecProvider !== 'ニチガス電気セット';
+        if (formData.hasContractConfirmation === 'あり') {
+            return false;
+        }
+        if (['ニチガス電気セット', '東邦ガスセット', '大阪ガス電気セット'].includes(elecProvider)) {
+            return false;
+        }
+        return true;
     }, [formData.hasContractConfirmation, elecProvider]);
     
     const gasTimeSlotOptions = useMemo(() => {
@@ -132,7 +135,7 @@ const ElectricityTab = () => {
             return TIME_SLOTS_SUTENE_SR;
         }
         if (elecProvider === '東邦ガスセット') {
-            return TIME_SLOTS_TOHO;
+            return TIME_SLOTS_TOHO_GAS_SETUP;
         }
         if (elecProvider === 'ニチガス電気セット') {
             return TIME_SLOTS_NICHI;
@@ -165,6 +168,7 @@ const ElectricityTab = () => {
     const isUpower = elecProvider === 'ユーパワー UPOWER';
     const isHapie = elecProvider === 'はぴe';
     const isToho = elecProvider === '東邦ガスセット';
+    const isOsakaGasSet = elecProvider === '大阪ガス電気セット';
     const isQenes = elecProvider === 'キューエネスでんき';
     const isRemix = elecProvider === 'リミックスでんき';
     const isNichigasSet = elecProvider === 'ニチガス電気セット';
@@ -172,6 +176,8 @@ const ElectricityTab = () => {
 
     // Conditional rendering based on comment templates
     const showGender = ['すまいのでんき（ストエネ）', 'プラチナでんき（ジャパン）'].includes(elecProvider);
+
+    const isContractConfirmationDisabled = elecProvider === 'プラチナでんき（ジャパン）' && elecRecordIdPrefix === 'SR';
 
     return (
         <div className="space-y-6">
@@ -203,7 +209,7 @@ const ElectricityTab = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 p-4 bg-blue-50/50 rounded-lg border border-blue-200">
                     {showAllElectricOption && <FormRadioGroup label="オール電化" name="isAllElectric" value={formData.isAllElectric} onChange={handleInputChange} options={YES_NO_OPTIONS} isInvalid={invalidFields.includes('isAllElectric')} />}
                     {showVacancyOption && <FormRadioGroup label="空室" name="isVacancy" value={formData.isVacancy} onChange={handleInputChange} options={YES_NO_OPTIONS} isInvalid={invalidFields.includes('isVacancy')} />}
-                    {showContractConfirmationOption && <FormRadioGroup label="契確は必要ですか？" name="hasContractConfirmation" value={formData.hasContractConfirmation} onChange={handleInputChange} options={YES_NO_OPTIONS} isInvalid={invalidFields.includes('hasContractConfirmation')} required />}
+                    {showContractConfirmationOption && <FormRadioGroup label="契確は必要ですか？" name="hasContractConfirmation" value={formData.hasContractConfirmation} onChange={handleInputChange} options={YES_NO_OPTIONS} isInvalid={invalidFields.includes('hasContractConfirmation')} required disabled={isContractConfirmationDisabled} />}
                     {showGasSetOption && <FormRadioGroup label="ガスセット" name="isGasSet" value={isGasSet} onChange={handleInputChange} options={SET_NONE_OPTIONS} isInvalid={invalidFields.includes('isGasSet')} />}
                     <FormRadioGroup label="主商材受注状況" name="primaryProductStatus" value={formData.primaryProductStatus} onChange={handleInputChange} options={PRIMARY_PRODUCT_STATUS_OPTIONS} isInvalid={invalidFields.includes('primaryProductStatus')} />
                     {showAttachedOption && <FormRadioGroup label="付帯OP" name="attachedOption" value={formData.attachedOption} onChange={handleInputChange} options={ATTACHED_OPTION_OPTIONS} isInvalid={invalidFields.includes('attachedOption')} />}
@@ -266,7 +272,11 @@ const ElectricityTab = () => {
                 <h3 className="text-lg font-bold text-blue-700">その他</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormInput label="契確時間" name="elecConfirmationTime" value={formData.elecConfirmationTime} onChange={handleInputChange} isInvalid={invalidFields.includes('elecConfirmationTime')} />
-                    <FormSelect label="支払い方法" name="paymentMethod" value={formData.paymentMethod} onChange={handleInputChange} options={PAYMENT_METHOD_OPTIONS_EXTENDED} isInvalid={invalidFields.includes('paymentMethod')} />
+                    
+                    {(elecProvider !== '東京ガス電気セット' || isOsakaGasSet) && (
+                        <FormSelect label="支払い方法" name="paymentMethod" value={formData.paymentMethod} onChange={handleInputChange} options={PAYMENT_METHOD_OPTIONS_EXTENDED} isInvalid={invalidFields.includes('paymentMethod')} />
+                    )}
+                    
                     {isSakaiRoute && (
                         <>
                             <FormInput label="FM取込社名" name="elecImportCompanyName" value={formData.elecImportCompanyName} onChange={handleInputChange} isInvalid={invalidFields.includes('elecImportCompanyName')} disabled={isSakaiRoute} />

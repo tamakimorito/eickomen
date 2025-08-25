@@ -376,6 +376,7 @@ const generateGmoComment = (formData: FormData): string => {
 const generateAuHikariComment = (formData: FormData): string => {
     const {
         apName,
+        greeting,
         contractorName,
         existingLineCompany,
         postalCode,
@@ -392,12 +393,22 @@ const generateAuHikariComment = (formData: FormData): string => {
         serviceFee
     } = formData;
 
+    const formatPostalCodeWithHyphen = (pc: string): string => {
+        if (!pc) return '';
+        const digits = pc.replace(/\D/g, '');
+        if (digits.length === 7) {
+            return `${digits.substring(0, 3)}-${digits.substring(3)}`;
+        }
+        return pc;
+    };
+
     const formattedPhone = formatPhoneNumberWithHyphens(phone);
-    const formattedPostalCode = formatPostalCode(postalCode);
+    const formattedPostalCode = formatPostalCodeWithHyphen(postalCode);
 
     let comment = [
         '【AUひかり】※AUでんき案内禁止250811',
         `獲得者：${apName || ''}`,
+        `名乗り：${greeting || ''}`,
         `お客様氏名：${contractorName || ''}`,
         `現状回線/プロバイダ：${existingLineCompany || ''}`,
         `郵便番号：${formattedPostalCode || ''}`,
@@ -412,11 +423,6 @@ const generateAuHikariComment = (formData: FormData): string => {
         `前確希望時間：${auPreCheckTime || ''}`,
         `案内料金：${serviceFee || ''}`,
     ].join('\n');
-
-    // Even though remarks is used for 案内内容, we add a generic 備考 at the end for consistency if it's filled.
-    if (remarks) {
-        comment += `\n備考：${remarks}`;
-    }
 
     return comment;
 };
