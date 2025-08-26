@@ -83,7 +83,8 @@ const generateDefaultInternetComment = (formData: FormData): string => {
         managementContact,
         buildingSurveyRequest,
     } = formData;
-
+    
+    const tag = "250811";
     const idField = isSakaiRoute ? `レコードID：${recordId || ''}` : `顧客ID：${customerId || ''}`;
     const isFamily = housingType && housingType.includes('ファミリー');
     const mailingOptionLabel = mailingOption === '新居' ? '新居(設置先と同じ)' : '現住所';
@@ -99,7 +100,7 @@ const generateDefaultInternetComment = (formData: FormData): string => {
     switch (product) {
         case 'SoftBank光1G':
             commentLines = [
-                `〓SoftBank光1G〓250811`,
+                `〓SoftBank光1G〓${tag}`,
                 `タイプ：${housingType || ''}`,
                 `AP名：${apName || ''}`,
                 idField,
@@ -135,7 +136,7 @@ const generateDefaultInternetComment = (formData: FormData): string => {
 
         case 'SoftBank光10G':
             commentLines = [
-                `〓SoftBank光10ギガ〓250731`,
+                `〓SoftBank光10ギガ〓${tag}`,
                 `タイプ：${housingType || ''}`,
                 `AP名：${apName || ''}`,
                 idField,
@@ -170,7 +171,7 @@ const generateDefaultInternetComment = (formData: FormData): string => {
 
         case 'SB Air':
             commentLines = [
-                `〓SB Air〓250811`,
+                `〓SB Air〓${tag}`,
                 `タイプ：${housingType || ''}`,
                 `AP名：${apName || ''}`,
                 idField,
@@ -205,8 +206,8 @@ const generateDefaultInternetComment = (formData: FormData): string => {
                 if (isChintaiProduct) {
                     const isChintaiFree = product === '賃貸ねっと【無料施策】';
                     const header = isChintaiFree
-                        ? '【ちんむりょ賃貸ねっと無料施策】250811'
-                        : '【賃貸ねっと】250811';
+                        ? `【ちんむりょ賃貸ねっと無料施策】${tag}`
+                        : `【賃貸ねっと】${tag}`;
 
                     commentLines.push(header);
                     commentLines.push(`タイプ：${housingType || ''}`);
@@ -292,7 +293,8 @@ const generateGmoComment = (formData: FormData): string => {
         gmoNoPairIdType, mobileCarrier, paymentMethod,
         managementCompany, managementNumber, contactPerson, noDrilling, remarks
     } = formData;
-
+    
+    const tag = "250811";
     const isNoPair = housingType.includes('ペアなし');
     const isFamily = housingType.includes('ファミリー');
     const is1G = housingType.includes('1G');
@@ -302,7 +304,7 @@ const generateGmoComment = (formData: FormData): string => {
     const formattedGmoDocomoOwnerPhone = formatPhoneNumberWithHyphens(gmoDocomoOwnerPhone);
 
 
-    let header = '■GMOドコモ光';
+    let header = `■GMOドコモ光 ${tag}`;
     if (housingType) {
         header += `（${housingType}）`;
     }
@@ -392,6 +394,8 @@ const generateAuHikariComment = (formData: FormData): string => {
         auPreCheckTime,
         serviceFee
     } = formData;
+    
+    const tag = "250811";
 
     const formatPostalCodeWithHyphen = (pc: string): string => {
         if (!pc) return '';
@@ -406,7 +410,7 @@ const generateAuHikariComment = (formData: FormData): string => {
     const formattedPostalCode = formatPostalCodeWithHyphen(postalCode);
 
     let comment = [
-        '【AUひかり】※AUでんき案内禁止250811',
+        `【AUひかり】※AUでんき案内禁止${tag}`,
         `獲得者：${apName || ''}`,
         `名乗り：${greeting || ''}`,
         `お客様氏名：${contractorName || ''}`,
@@ -450,11 +454,12 @@ const generateGmoTokutokuComment = (formData: FormData): string => {
         contactPerson,
         noDrilling,
     } = formData;
-
+    
+    const tag = "250811";
     const mailingOptionLabel = mailingOption === '新居' ? '新居' : '現住所';
 
     const commentLines = [
-        `■GMO光`,
+        `■GMO光 ${tag}`,
         `AP名：${apName || ''}`,
         `顧客ID：${customerId || ''}`,
         `プラン：${gmoTokutokuPlan || ''}`,

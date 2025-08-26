@@ -48,14 +48,14 @@ export const formReducer = (state: FormData, action: FormAction): FormData => {
                   newState.greeting = isSbHikari ? '' : 'すまえる';
               } else if (recordId.startsWith('L')) {
                   newState.greeting = 'ばっちり賃貸入居サポートセンター';
-              } else if (recordId.startsWith('S')) {
-                  newState.greeting = 'レプリス株式会社';
-              } else if (recordId.startsWith('SR') || recordId.startsWith('STJP')) {
+              } else if (recordId.startsWith('SR') || recordId.startsWith('STJP:')) {
                    // Only clear if it was an auto-set greeting
                   const autoGreetings = ['すまえる', 'ばっちり賃貸入居サポートセンター', 'レプリス株式会社'];
                   if (autoGreetings.includes(state.greeting)) {
                       newState.greeting = '';
                   }
+              } else if (/^S\d/.test(recordId)) { // Check for 'S' followed by a digit
+                  newState.greeting = 'レプリス株式会社';
               }
           }
       }
@@ -77,7 +77,7 @@ export const formReducer = (state: FormData, action: FormAction): FormData => {
               else if (idValue.startsWith('SR')) prefix = 'SR';
               else if (idValue.startsWith('code:')) prefix = 'code:';
               else if (idValue.startsWith('ID:')) prefix = 'ID:';
-              else if (idValue.startsWith('S')) prefix = 'S';
+              else if (/^S\d/.test(idValue)) prefix = 'S'; // Use regex to check for 'S' followed by a digit.
               
               if (ELEC_ID_PREFIX_OPTIONS.some(opt => opt.value === prefix)) {
                   newState.elecRecordIdPrefix = prefix;

@@ -46,18 +46,19 @@ export const generateWtsCommentLogic = (formData: FormData): string => {
         wtsU20HighSchool, wtsU20ParentalConsent, wtsCorporateInvoice, remarks, wtsMailingAddress,
         recordId, isSakaiRoute, wtsServerType, wtsEmail, currentAddress, currentPostalCode
     } = { ...formData, dob: formatDate(formData.dob), moveInDate: formatDate(formData.moveInDate) };
-
+    
+    const tag = "250811";
     const idField = isSakaiRoute ? `レコードID：${recordId || ''}` : `顧客ID：${customerId || ''}`;
     const serverAndColor = `${wtsServerType || ''} ${wtsServerColor || ''}`.trim();
     
     const formattedPhone = formatPhoneNumberWithHyphens(phone);
     const formattedShippingPostalCode = formatPostalCode(wtsShippingPostalCode);
     
-    let header = '【プレミアムウォーター】';
+    let header = `【プレミアムウォーター】${tag}`;
     if (wtsCustomerType === 'U-20') {
-        header = '【プレミアムウォーターU20】';
+        header = `【プレミアムウォーターU20】${tag}`;
     } else if (wtsCustomerType === '法人') {
-        header = '【プレミアムウォーター法人】';
+        header = `【プレミアムウォーター法人】${tag}`;
     }
     
     const commentLines = [header];
