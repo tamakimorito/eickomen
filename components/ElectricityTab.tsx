@@ -113,7 +113,7 @@ const ElectricityTab = () => {
         if (['すまいのでんき（ストエネ）', 'プラチナでんき（ジャパン）'].includes(elecProvider)) {
             return true;
         }
-        if (elecProvider === 'キューエネスでんき' && recordId?.includes('No.')) {
+        if (elecProvider === 'キューエネスでんき' && recordId?.startsWith('No.')) {
             return true;
         }
         return false;

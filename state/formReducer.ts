@@ -77,6 +77,7 @@ export const formReducer = (state: FormData, action: FormAction): FormData => {
               else if (idValue.startsWith('SR')) prefix = 'SR';
               else if (idValue.startsWith('code:')) prefix = 'code:';
               else if (idValue.startsWith('ID:')) prefix = 'ID:';
+              else if (idValue.startsWith('No.')) prefix = 'No.';
               else if (/^S\d/.test(idValue)) prefix = 'S'; // Use regex to check for 'S' followed by a digit.
               
               if (ELEC_ID_PREFIX_OPTIONS.some(opt => opt.value === prefix)) {
@@ -85,6 +86,9 @@ export const formReducer = (state: FormData, action: FormAction): FormData => {
               if (GAS_ID_PREFIX_OPTIONS.some(opt => opt.value === prefix)) {
                   newState.gasRecordIdPrefix = prefix;
               }
+          }
+          if (idValue.startsWith('code:')) {
+            newState.isVacancy = 'あり';
           }
       }
       

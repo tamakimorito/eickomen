@@ -284,7 +284,7 @@ const generateDefaultInternetComment = (formData: FormData): string => {
     return commentLines.filter(line => line !== null && line !== undefined).join('\n');
 };
 
-const generateGmoComment = (formData: FormData): string => {
+const generateGmoDocomoComment = (formData: FormData): string => {
     const {
         housingType, apName, customerId, gmoConstructionSplit, gmoCompensation, gmoRouter, greeting,
         contractorName, phone, gmoIsDocomoOwnerSame, gmoDocomoOwnerName, gmoDocomoOwnerPhone,
@@ -497,7 +497,7 @@ export const generateInternetCommentLogic = (formData: FormData): string => {
     const { product } = formData;
     switch (product) {
         case 'GMOドコモ光':
-            return generateGmoComment(formData);
+            return generateGmoDocomoComment(formData);
         case 'GMOとくとく光':
             return generateGmoTokutokuComment(formData);
         case 'AUひかり':

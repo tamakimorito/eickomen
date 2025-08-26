@@ -399,6 +399,7 @@ export const ELEC_ID_PREFIX_OPTIONS = [
     { value: 'ID:', label: 'ID:' },
     { value: 'それ以外', label: 'それ以外' },
     { value: '全販路', label: '全販路' },
+    { value: 'No.', label: 'No.'},
 ];
 
 export const GAS_ID_PREFIX_OPTIONS = [
