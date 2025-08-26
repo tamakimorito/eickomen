@@ -89,10 +89,10 @@ const getRequiredFields = (formData, activeTab) => {
             if (['キューエネスでんき', 'ユーパワー UPOWER', 'HTBエナジー', 'リミックスでんき', 'ループでんき'].includes(elecProvider)) {
                 required.push('email');
             }
-             if (elecProvider === 'すまいのでんき（ストエネ）' && formData.isGasSet === 'セット' || ['ニチガス電気セット', '東邦ガスセット', '東京ガス電気セット'].includes(elecProvider)) {
+             if (elecProvider === 'すまいのでんき（ストエネ）' && formData.isGasSet === 'セット' || ['ニチガス電気セット', '東邦ガスセット', '東京ガス電気セット', '大阪ガス電気セット'].includes(elecProvider)) {
                 required.push('gasOpeningDate', 'gasOpeningTimeSlot');
             }
-             if (formData.mailingOption === '現住所' && ['すまいのでんき（ストエネ）', 'プラチナでんき（ジャパン）', 'ニチガス電気セット', '東京ガス電気セット', '東邦ガスセット'].includes(elecProvider)) {
+             if (formData.mailingOption === '現住所' && ['すまいのでんき（ストエネ）', 'プラチナでんき（ジャパン）', 'ニチガス電気セット', '東京ガス電気セット', '東邦ガスセット', '大阪ガス電気セット'].includes(elecProvider)) {
                 required.push('currentPostalCode', 'currentAddress');
             }
             if (['ニチガス電気セット'].includes(elecProvider)) {
@@ -129,7 +129,7 @@ const getRequiredFields = (formData, activeTab) => {
              if(gasProvider === '東京ガス単品' && formData.gasIsCorporate) {
                 required.push('gasWitness', 'gasPreContact');
              }
-             if(formData.mailingOption === '現住所' && ['すまいのでんき（ストエネ）', 'ニチガス単品', '東邦ガス単品', '東急ガス'].includes(gasProvider)){
+             if(formData.mailingOption === '現住所' && ['すまいのでんき（ストエネ）', 'ニチガス単品', '東邦ガス単品', '東急ガス', '大阪ガス単品'].includes(gasProvider)){
                 required.push('currentPostalCode', 'currentAddress');
              }
              if(['東邦ガス単品', '東急ガス'].includes(gasProvider)){
@@ -204,10 +204,11 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
         setGeneratedComment(newComment);
     }, [formData, activeTab]);
 
-    // Postal code -> new address auto-fill for all routes
+    // 設置先住所の自動入力（サカイ販路の場合のみ）
     useEffect(() => {
-        const { postalCode, address } = formData;
-        if (postalCode && /^\d{7}$/.test(postalCode.replace(/\D/g, ''))) {
+        const { postalCode, address, isSakaiRoute } = formData;
+        // サカイ販路が選択されている場合のみ住所を自動入力
+        if (isSakaiRoute && postalCode && /^\d{7}$/.test(postalCode.replace(/\D/g, ''))) {
             const fetchAddress = async () => {
                 try {
                     const response = await fetch(`https://zipcloud.ibsnet.co.jp/api/search?zipcode=${postalCode.replace(/\D/g, '')}`);
@@ -216,6 +217,7 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
                     if (data.status === 200 && data.results) {
                         const { address1, address2, address3 } = data.results[0];
                         const fullAddress = `${address1}${address2}${address3}`;
+                        // 既に手動で入力されている場合や、取得した住所が同じ場合は更新しない
                         if (fullAddress && (!address || !address.startsWith(fullAddress))) {
                             dispatch({ type: 'UPDATE_FIELD', payload: { name: 'address', value: fullAddress } });
                         }
@@ -231,9 +233,9 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
             };
             fetchAddress();
         }
-    }, [formData.postalCode, dispatch, setToast]);
+    }, [formData.isSakaiRoute, formData.postalCode, dispatch, setToast]);
 
-    // currentPostalCode -> currentAddress auto-fill for all routes
+    // 現住所の自動入力（販路問わず）
     useEffect(() => {
         const { currentPostalCode, currentAddress } = formData;
         if (currentPostalCode && /^\d{7}$/.test(currentPostalCode.replace(/\D/g, ''))) {

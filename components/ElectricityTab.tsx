@@ -93,15 +93,26 @@ const MailingAddressSection = () => {
 
 const ElectricityTab = () => {
     const { formData, handleInputChange, handleDateBlur, handleNameBlur, handleIdBlur, invalidFields } = useContext(AppContext);
-    const { elecProvider, elecRecordIdPrefix, isGasSet, isSakaiRoute, recordId } = formData;
+    const { elecProvider, elecRecordIdPrefix, isGasSet, isSakaiRoute, recordId, hasContractConfirmation, isAllElectric } = formData;
 
     const showGasSetOption = elecProvider === 'すまいのでんき（ストエネ）';
     
     const showContractConfirmationOption = useMemo(() => {
-        if (elecProvider === 'すまいのでんき（ストエネ）') return true;
-        if (elecProvider === 'プラチナでんき（ジャパン）' && (elecRecordIdPrefix === 'SR' || formData.isAllElectric === 'あり')) return true;
+        if (elecProvider === 'すまいのでんき（ストエネ）') {
+             // For 'code:', it's always 'なし', so hide option.
+            if (elecRecordIdPrefix === 'code:') return false;
+            // For others like 'S', 'STJP', 'サカイ', there's no such option in the sheet.
+            if (['S', 'STJP:', 'サカイ', 'ID:', 'それ以外'].includes(elecRecordIdPrefix) && isAllElectric !== 'あり' && formData.isVacancy !== 'あり') return false;
+            return true;
+        }
+        if (elecProvider === 'プラチナでんき（ジャパン）') {
+            if (['S', 'STJP:'].includes(elecRecordIdPrefix)) return false;
+            if (elecRecordIdPrefix === 'サカイ' && isAllElectric !== 'あり') return false;
+             if (elecRecordIdPrefix === 'それ以外' && isAllElectric !== 'あり') return false;
+            return true;
+        }
         return false;
-    }, [elecProvider, elecRecordIdPrefix, formData.isAllElectric]);
+    }, [elecProvider, elecRecordIdPrefix, isAllElectric, formData.isVacancy]);
 
     const isElecGasSetSelected = useMemo(() => {
         return elecProvider === 'すまいのでんき（ストエネ）' && formData.isGasSet === 'セット';
@@ -120,16 +131,39 @@ const ElectricityTab = () => {
     }, [elecProvider, recordId]);
 
     const showNewConstructionOption = elecProvider === 'ユーパワー UPOWER';
-    const showAttachedOption = useMemo(() => {
-        if (formData.hasContractConfirmation === 'あり') {
-            return false;
+    
+    const isImportOnlyCase = useMemo(() => {
+        if (hasContractConfirmation === 'なし') return true;
+        if (elecProvider === 'すまいのでんき（ストエネ）' && elecRecordIdPrefix === 'code:') return true;
+        if (elecProvider === 'プラチナでんき（ジャパン）') {
+            if (['S', 'STJP:'].includes(elecRecordIdPrefix)) return true;
+            if (elecRecordIdPrefix === 'SR' && hasContractConfirmation !== 'あり') return true;
+            if (elecRecordIdPrefix === 'サカイ' && isAllElectric !== 'あり') return true;
+             if (elecRecordIdPrefix === 'それ以外' && hasContractConfirmation !== 'あり') return true;
         }
+        return false;
+    }, [hasContractConfirmation, elecProvider, elecRecordIdPrefix, isAllElectric]);
+
+    const showAttachedOption = useMemo(() => {
         if (['ニチガス電気セット', '東邦ガスセット', '大阪ガス電気セット'].includes(elecProvider)) {
             return false;
         }
-        return true;
-    }, [formData.hasContractConfirmation, elecProvider]);
+        return isImportOnlyCase;
+    }, [isImportOnlyCase, elecProvider]);
     
+    // Gender field is shown for almost all "import only" templates.
+    const showGender = useMemo(() => {
+        if (!['すまいのでんき（ストエネ）', 'プラチナでんき（ジャパン）'].includes(elecProvider)) return false;
+
+        // Exception case for Platinum Sakai
+        if (elecProvider === 'プラチナでんき（ジャパン）' && elecRecordIdPrefix === 'サカイ' && isAllElectric === 'あり' && hasContractConfirmation === 'あり') {
+            return true;
+        }
+
+        return isImportOnlyCase;
+    }, [elecProvider, elecRecordIdPrefix, isImportOnlyCase, isAllElectric, hasContractConfirmation]);
+
+
     const gasTimeSlotOptions = useMemo(() => {
         if (elecProvider === 'すまいのでんき（ストエネ）' && elecRecordIdPrefix === 'SR') {
             return TIME_SLOTS_SUTENE_SR;
@@ -173,9 +207,6 @@ const ElectricityTab = () => {
     const isRemix = elecProvider === 'リミックスでんき';
     const isNichigasSet = elecProvider === 'ニチガス電気セット';
     const emailIsRequired = isQenes || isUpower || isHtb || isRemix || elecProvider === 'ループでんき';
-
-    // Conditional rendering based on comment templates
-    const showGender = ['すまいのでんき（ストエネ）', 'プラチナでんき（ジャパン）'].includes(elecProvider);
 
     const isContractConfirmationDisabled = elecProvider === 'プラチナでんき（ジャパン）' && elecRecordIdPrefix === 'SR';
 
