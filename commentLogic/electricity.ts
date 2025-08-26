@@ -224,7 +224,7 @@ export const generateElectricityCommentLogic = (formData: FormData): string => {
                     comment = `【キューエネスでんき】 ${tag}\n${qenesBase}\n${qenesAddress}\n${qenesEnd}`;
                  }
             } else if (recordId?.startsWith('ID:')) {
-                comment = `【キューエネスでんき/★インポートのみ】 ${tag}\n${qenesBase}\n${qenesAddressImport}\n利用開始日：${moveInDate || ''}\nメアド：${email || ''}\n支払い方法：${paymentMethod || ''}\n備考：※法人の場合は電話対応者名を記載\n対応者（漢字）：${contactPersonName || ''}\n対応者（フリガナ）：${contactPersonNameKana || ''}\n${remarks || ''}`;
+                comment = `【キューエネスでんき/★インポートのみ】 ${tag}\n${qenesBase}\n${qenesAddressImport}\n利用開始日：${moveInDate || ''}\nメアド：${email || ''}\n${attachedOptionLine}支払い方法：${paymentMethod || ''}\n備考：※法人の場合は電話対応者名を記載\n対応者（漢字）：${contactPersonName || ''}\n対応者（フリガナ）：${contactPersonNameKana || ''}\n${remarks || ''}`;
             } else {
                  comment = `【キューエネスでんき】 ${tag}\n${qenesBase}\n${qenesAddress}\n${qenesEnd}`;
             }
