@@ -173,6 +173,63 @@
         "その他必須項目（性別含む）を埋める。"
       ],
       "expectedResult": "生成されたコメントのヘッダーが「【JAPAN電力/★インポートのみ】HAHZZT259...」で始まり、備考が「5000CB」で固定されていること。フォームに「性別」の入力欄が表示されること。"
+    },
+    {
+      "id": "TC-015",
+      "feature": "Itanji Route Greeting Auto-fill",
+      "description": "When record ID starts with 'ID:', the greeting field in Elec/Gas tab should auto-fill with 'すまえる'.",
+      "steps": [
+        "Navigate to the '電気' tab.",
+        "Ensure 'サカイ販路' is unchecked.",
+        "In the 'レコードID' field, type 'ID:12345'."
+      ],
+      "expectedResult": "The '名乗り' field should automatically be populated with 'すまえる'."
+    },
+    {
+      "id": "TC-016",
+      "feature": "Itanji Route Greeting Isolation",
+      "description": "The 'すまえる' greeting from Elec/Gas tabs should not carry over to the Internet tab for 'ID:' records.",
+      "steps": [
+        "Complete the steps for TC-015.",
+        "Verify the '名乗り' field is 'すまえる'.",
+        "Switch to the 'インターネット' tab."
+      ],
+      "expectedResult": "The '名乗り' field on the Internet tab should be empty."
+    },
+    {
+      "id": "TC-017",
+      "feature": "Date of Birth Validation (Under 15)",
+      "description": "Show a confirmation modal if the entered date of birth results in an age less than 15.",
+      "steps": [
+        "Navigate to any tab with a '生年月日' field.",
+        "Enter a date that makes the person 14 years old (e.g., if today is 2024-08-28, enter '2010/08/28').",
+        "Click or tab away from the input field to trigger the blur event."
+      ],
+      "expectedResult": "A modal dialog should appear with the message '生年月日は正しいですか？ (15歳未満です)'."
+    },
+    {
+      "id": "TC-018",
+      "feature": "Move-in Date Validation (5+ Years Ago)",
+      "description": "Show a confirmation modal if the entered move-in date is 5 or more years in the past.",
+      "steps": [
+        "Navigate to any tab with an '入居予定日' or '利用開始日' field.",
+        "Enter a date that is exactly 5 years ago from today.",
+        "Click or tab away from the input field."
+      ],
+      "expectedResult": "A modal dialog should appear with the message '入居予定日は正しいですか？ (5年以上前です)'."
+    },
+    {
+      "id": "TC-019",
+      "feature": "Qenes Denki Plan Name Fix",
+      "description": "The plan name for 'キューエネスでんき' should always be 'エコhome' in the generated comment.",
+      "steps": [
+        "Navigate to the '電気' tab.",
+        "Select 'キューエネスでんき' as the provider.",
+        "Enter 'ID:12345' as the record ID.",
+        "Fill in other required fields.",
+        "Check the '生成コメント'."
+      ],
+      "expectedResult": "The generated comment should contain the line 'プラン：エコhome'."
     }
   ]
 }

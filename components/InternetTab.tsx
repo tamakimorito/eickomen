@@ -15,7 +15,7 @@ import { FormInput, FormSelect, FormRadioGroup, FormTextArea, FormDateInput, For
 import OwnerInfo from './OwnerInfo.tsx';
 
 const DefaultInternetForm = () => {
-    const { formData, handleInputChange, handleDateBlur, handleNameBlur, handleIdBlur, invalidFields } = useContext(AppContext);
+    const { formData, handleInputChange, handleDateBlurWithValidation, handleNameBlur, handleIdBlur, invalidFields } = useContext(AppContext);
     
     const is10G = formData.product === 'SoftBank光10G';
     const isAir = formData.product === 'SB Air';
@@ -100,7 +100,7 @@ const DefaultInternetForm = () => {
                     }
                     <FormInput
                         label="生年月日（西暦）" name="dob" type="text" value={formData.dob} onChange={handleInputChange}
-                        onBlur={handleDateBlur} placeholder="例: 1990/01/01" isInvalid={invalidFields.includes('dob')} required
+                        onBlur={handleDateBlurWithValidation} placeholder="例: 1990/01/01" isInvalid={invalidFields.includes('dob')} required
                     />
                     <FormInput
                         label="電話番号" name="phone" value={formData.phone} onChange={handleInputChange}
@@ -132,7 +132,7 @@ const DefaultInternetForm = () => {
                     />
                      <FormDateInput
                         label={(isChintai || isChintaiFree) ? "利用開始日(必ず引っ越し日を記載)" : "入居予定日"}
-                        name="moveInDate" type="text" value={formData.moveInDate} onChange={handleInputChange} onBlur={handleDateBlur}
+                        name="moveInDate" type="text" value={formData.moveInDate} onChange={handleInputChange} onBlur={handleDateBlurWithValidation}
                         placeholder="例: 2024/08/01 または 8/1" isInvalid={invalidFields.includes('moveInDate')}
                         className="md:col-span-2" required
                     />
@@ -270,7 +270,7 @@ const DefaultInternetForm = () => {
 };
 
 const GmoDocomoForm = () => {
-    const { formData, handleInputChange, handleDateBlur, invalidFields } = useContext(AppContext);
+    const { formData, handleInputChange, handleDateBlurWithValidation, invalidFields } = useContext(AppContext);
     const isNoPair = formData.housingType.includes('ペアなし');
     const isFamily = formData.housingType.includes('ファミリー');
 
@@ -328,13 +328,13 @@ const GmoDocomoForm = () => {
             <div className="border-t-2 border-dashed border-blue-300 pt-6 space-y-4">
                 <h3 className="text-lg font-bold text-blue-700">後確希望時間枠</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <FormDateInput label="第一希望 日付" name="gmoCallbackDate1" value={formData.gmoCallbackDate1} onChange={handleInputChange} onBlur={handleDateBlur} isInvalid={invalidFields.includes('gmoCallbackDate1')} />
+                    <FormDateInput label="第一希望 日付" name="gmoCallbackDate1" value={formData.gmoCallbackDate1} onChange={handleInputChange} onBlur={handleDateBlurWithValidation} isInvalid={invalidFields.includes('gmoCallbackDate1')} />
                     <FormSelect label="第一希望 時間" name="gmoCallback1" value={formData.gmoCallback1} onChange={handleInputChange} options={GMO_CALLBACK_TIME_SLOTS} isInvalid={invalidFields.includes('gmoCallback1')} />
                     <div></div>
-                    <FormDateInput label="第二希望 日付" name="gmoCallbackDate2" value={formData.gmoCallbackDate2} onChange={handleInputChange} onBlur={handleDateBlur} isInvalid={invalidFields.includes('gmoCallbackDate2')} />
+                    <FormDateInput label="第二希望 日付" name="gmoCallbackDate2" value={formData.gmoCallbackDate2} onChange={handleInputChange} onBlur={handleDateBlurWithValidation} isInvalid={invalidFields.includes('gmoCallbackDate2')} />
                     <FormSelect label="第二希望 時間" name="gmoCallback2" value={formData.gmoCallback2} onChange={handleInputChange} options={GMO_CALLBACK_TIME_SLOTS} isInvalid={invalidFields.includes('gmoCallback2')} />
                     <div></div>
-                    <FormDateInput label="第三希望 日付" name="gmoCallbackDate3" value={formData.gmoCallbackDate3} onChange={handleInputChange} onBlur={handleDateBlur} isInvalid={invalidFields.includes('gmoCallbackDate3')} />
+                    <FormDateInput label="第三希望 日付" name="gmoCallbackDate3" value={formData.gmoCallbackDate3} onChange={handleInputChange} onBlur={handleDateBlurWithValidation} isInvalid={invalidFields.includes('gmoCallbackDate3')} />
                     <FormSelect label="第三希望 時間" name="gmoCallback3" value={formData.gmoCallback3} onChange={handleInputChange} options={GMO_CALLBACK_TIME_SLOTS} isInvalid={invalidFields.includes('gmoCallback3')} />
                 </div>
             </div>
@@ -345,7 +345,7 @@ const GmoDocomoForm = () => {
 };
 
 const GmoTokutokuForm = () => {
-    const { formData, handleInputChange, handleDateBlur, invalidFields } = useContext(AppContext);
+    const { formData, handleInputChange, handleDateBlurWithValidation, invalidFields } = useContext(AppContext);
     return (
         <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -355,8 +355,8 @@ const GmoTokutokuForm = () => {
             <div className="border-t-2 border-dashed border-blue-300 pt-6 space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormInput label="① 名義" name="contractorName" value={formData.contractorName} onChange={handleInputChange} isInvalid={invalidFields.includes('contractorName')} required />
-                    <FormDateInput label="② 生年月日" name="dob" value={formData.dob} onChange={handleInputChange} onBlur={handleDateBlur} isInvalid={invalidFields.includes('dob')} placeholder="YYYY/MM/DD" required />
-                    <FormDateInput label="③ 引越日" name="moveInDate" value={formData.moveInDate} onChange={handleInputChange} onBlur={handleDateBlur} isInvalid={invalidFields.includes('moveInDate')} placeholder="YYYY/MM/DD" required />
+                    <FormDateInput label="② 生年月日" name="dob" value={formData.dob} onChange={handleInputChange} onBlur={handleDateBlurWithValidation} isInvalid={invalidFields.includes('dob')} placeholder="YYYY/MM/DD" required />
+                    <FormDateInput label="③ 引越日" name="moveInDate" value={formData.moveInDate} onChange={handleInputChange} onBlur={handleDateBlurWithValidation} isInvalid={invalidFields.includes('moveInDate')} placeholder="YYYY/MM/DD" required />
                     <FormRadioGroup label="④ 書面送付先" name="mailingOption" value={formData.mailingOption} onChange={handleInputChange} options={MAILING_OPTIONS} isInvalid={invalidFields.includes('mailingOption')} required />
                     <FormInput label="⑤ 設置先号室" name="buildingInfo" value={formData.buildingInfo} onChange={handleInputChange} isInvalid={invalidFields.includes('buildingInfo')} required />
                     <FormInput label="⑥ 案内料金" name="serviceFee" value={formData.serviceFee} onChange={handleInputChange} isInvalid={invalidFields.includes('serviceFee')} required />

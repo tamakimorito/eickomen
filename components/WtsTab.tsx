@@ -10,7 +10,7 @@ import { FormInput, FormSelect, FormRadioGroup, FormTextArea, FormDateInput } fr
 
 
 const WtsTab = () => {
-    const { formData, handleInputChange, handleDateBlur, handleNameBlur, handleIdBlur, invalidFields } = useContext(AppContext);
+    const { formData, handleInputChange, handleDateBlurWithValidation, handleNameBlur, handleIdBlur, invalidFields } = useContext(AppContext);
     const { wtsCustomerType, isSakaiRoute, wtsServerType } = formData;
     
     const colorOptions = useMemo(() => {
@@ -104,7 +104,7 @@ const WtsTab = () => {
                         name="dob"
                         value={formData.dob}
                         onChange={handleInputChange}
-                        onBlur={handleDateBlur}
+                        onBlur={handleDateBlurWithValidation}
                         placeholder="YYYY/MM/DD"
                         isInvalid={invalidFields.includes('dob')}
                         required
@@ -219,7 +219,7 @@ const WtsTab = () => {
                         name="moveInDate"
                         value={formData.moveInDate}
                         onChange={handleInputChange}
-                        onBlur={handleDateBlur}
+                        onBlur={handleDateBlurWithValidation}
                         placeholder="YYYY/MM/DD"
                         isInvalid={invalidFields.includes('moveInDate')}
                         required

@@ -38,28 +38,6 @@ export const formReducer = (state: FormData, action: FormAction): FormData => {
 
       // Create a temporary new state to calculate dependent fields
       let newState = { ...state, ...updates };
-      
-      // --- Greeting logic based on recordId and product ---
-      if (['recordId', 'customerId', 'product', 'isSakaiRoute'].includes(name)) {
-          const { recordId, product, isSakaiRoute } = newState;
-          if (!isSakaiRoute && recordId) {
-              if (recordId.startsWith('ID:')) {
-                  const isSbHikari = product === 'SoftBank光1G' || product === 'SoftBank光10G';
-                  newState.greeting = isSbHikari ? '' : 'すまえる';
-              } else if (recordId.startsWith('L')) {
-                  newState.greeting = 'ばっちり賃貸入居サポートセンター';
-              } else if (recordId.startsWith('SR') || recordId.startsWith('STJP:')) {
-                   // Only clear if it was an auto-set greeting
-                  const autoGreetings = ['すまえる', 'ばっちり賃貸入居サポートセンター', 'レプリス株式会社'];
-                  if (autoGreetings.includes(state.greeting)) {
-                      newState.greeting = '';
-                  }
-              } else if (/^S\d/.test(recordId)) { // Check for 'S' followed by a digit
-                  newState.greeting = 'レプリス株式会社';
-              }
-          }
-      }
-
 
       // --- Logic for dependent field updates ---
       
@@ -85,6 +63,25 @@ export const formReducer = (state: FormData, action: FormAction): FormData => {
               }
               if (GAS_ID_PREFIX_OPTIONS.some(opt => opt.value === prefix)) {
                   newState.gasRecordIdPrefix = prefix;
+              }
+
+               // Greeting logic based on recordId
+               if (idValue.startsWith('ID:')) {
+                  newState.greeting = 'すまえる';
+              } else if (idValue.startsWith('L')) {
+                  newState.greeting = 'ばっちり賃貸入居サポートセンター';
+              } else if (idValue.startsWith('SR') || idValue.startsWith('STJP:')) {
+                  const autoGreetings = ['すまえる', 'ばっちり賃貸入居サポートセンター', 'レプリス株式会社'];
+                  if (autoGreetings.includes(state.greeting)) {
+                      newState.greeting = '';
+                  }
+              } else if (/^S\d/.test(idValue)) {
+                  newState.greeting = 'レプリス株式会社';
+              } else if (state.recordId && state.recordId.startsWith('ID:') && !idValue.startsWith('ID:')) {
+                  // If changing away from an ID: record, clear the greeting if it was the default
+                  if (state.greeting === 'すまえる') {
+                     newState.greeting = '';
+                  }
               }
           }
           if (idValue.startsWith('code:')) {

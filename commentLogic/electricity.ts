@@ -212,16 +212,21 @@ export const generateElectricityCommentLogic = (formData: FormData): string => {
             }
             break;
         case 'キューエネスでんき':
+            const qenesBase = `レコードID：${recordId || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：エコhome\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${formattedPhone || ''}`;
+            const qenesAddress = `郵便番号：${formattedPostalCode || ''}\n引越し先住所：${address || ''}\n物件名：${buildingInfo || ''}`;
+            const qenesAddressImport = `郵便番号：${formattedPostalCode || ''}\n住所：${address || ''}\n物件名：${buildingInfo || ''}`;
+            const qenesEnd = `利用開始日：${moveInDate || ''}\nメアド：${email || ''}\n支払い方法：${paymentMethod || ''}\n備考：${remarks || ''}`;
+
             if (recordId?.startsWith('No.')) {
                  if (isVacancy === 'あり') {
-                    comment = `【キューエネスでんき】※ケイアイ空室通電 ${tag}\nレコードID：${recordId || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${formattedPhone || ''}\n郵便番号：${formattedPostalCode || ''}\n引越し先住所：${address || ''}\n物件名：${buildingInfo || ''}\n利用開始日：${moveInDate || ''}\nメアド：${email || ''}\n支払い方法：${paymentMethod || ''}\n備考：${remarks || ''}`;
+                    comment = `【キューエネスでんき】※ケイアイ空室通電 ${tag}\n${qenesBase}\n${qenesAddress}\n${qenesEnd}`;
                  } else {
-                    comment = `【キューエネスでんき】 ${tag}\nレコードID：${recordId || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${formattedPhone || ''}\n郵便番号：${formattedPostalCode || ''}\n引越し先住所：${address || ''}\n物件名：${buildingInfo || ''}\n利用開始日：${moveInDate || ''}\nメアド：${email || ''}\n支払い方法：${paymentMethod || ''}\n備考：${remarks || ''}`;
+                    comment = `【キューエネスでんき】 ${tag}\n${qenesBase}\n${qenesAddress}\n${qenesEnd}`;
                  }
             } else if (recordId?.startsWith('ID:')) {
-                comment = `【キューエネスでんき/★インポートのみ】 ${tag}\nレコードID：${recordId || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：スマ電\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${formattedPhone || ''}\n郵便番号：${formattedPostalCode || ''}\n住所：${address || ''}\n物件名：${buildingInfo || ''}\n利用開始日：${moveInDate || ''}\nメアド：${email || ''}\n支払い方法：${paymentMethod || ''}\n備考：※法人の場合は電話対応者名を記載\n対応者（漢字）：${contactPersonName || ''}\n対応者（フリガナ）：${contactPersonNameKana || ''}\n${remarks || ''}`;
+                comment = `【キューエネスでんき/★インポートのみ】 ${tag}\n${qenesBase}\n${qenesAddressImport}\n利用開始日：${moveInDate || ''}\nメアド：${email || ''}\n支払い方法：${paymentMethod || ''}\n備考：※法人の場合は電話対応者名を記載\n対応者（漢字）：${contactPersonName || ''}\n対応者（フリガナ）：${contactPersonNameKana || ''}\n${remarks || ''}`;
             } else {
-                 comment = `【キューエネスでんき】 ${tag}\nレコードID：${recordId || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${formattedPhone || ''}\n郵便番号：${formattedPostalCode || ''}\n引越し先住所：${address || ''}\n物件名：${buildingInfo || ''}\n利用開始日：${moveInDate || ''}\nメアド：${email || ''}\n支払い方法：${paymentMethod || ''}\n備考：${remarks || ''}`;
+                 comment = `【キューエネスでんき】 ${tag}\n${qenesBase}\n${qenesAddress}\n${qenesEnd}`;
             }
             break;
         case 'リミックスでんき':

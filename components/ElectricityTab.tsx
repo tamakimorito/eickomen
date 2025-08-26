@@ -92,7 +92,7 @@ const MailingAddressSection = () => {
 
 
 const ElectricityTab = () => {
-    const { formData, handleInputChange, handleDateBlur, handleNameBlur, handleIdBlur, invalidFields } = useContext(AppContext);
+    const { formData, handleInputChange, handleDateBlurWithValidation, handleNameBlur, handleIdBlur, invalidFields } = useContext(AppContext);
     const { elecProvider, elecRecordIdPrefix, isGasSet, isSakaiRoute, recordId, hasContractConfirmation, isAllElectric } = formData;
 
     const showGasSetOption = elecProvider === 'すまいのでんき（ストエネ）';
@@ -255,7 +255,7 @@ const ElectricityTab = () => {
                     <FormInput label="契約者名義（漢字）" name="contractorName" value={formData.contractorName} onChange={handleInputChange} onBlur={handleNameBlur} isInvalid={invalidFields.includes('contractorName')} required />
                     <FormInput label="契約者名義（フリガナ）" name="contractorNameKana" value={formData.contractorNameKana} onChange={handleInputChange} onBlur={handleNameBlur} isInvalid={invalidFields.includes('contractorNameKana')} required />
                     {showGender && <FormSelect label="性別" name="gender" value={formData.gender} onChange={handleInputChange} options={GENDERS} isInvalid={invalidFields.includes('gender')} />}
-                    <FormDateInput label="生年月日（西暦）" name="dob" value={formData.dob} onChange={handleInputChange} onBlur={handleDateBlur} isInvalid={invalidFields.includes('dob')} placeholder="例: 1990/01/01" required />
+                    <FormDateInput label="生年月日（西暦）" name="dob" value={formData.dob} onChange={handleInputChange} onBlur={handleDateBlurWithValidation} isInvalid={invalidFields.includes('dob')} placeholder="例: 1990/01/01" required />
                     <FormInput label="電話番号" name="phone" value={formData.phone} onChange={handleInputChange} isInvalid={invalidFields.includes('phone')} required />
                     <FormInput label="メアド" name="email" type="email" value={formData.email} onChange={handleInputChange} isInvalid={invalidFields.includes('email')} required={emailIsRequired}/>
                 </div>
@@ -274,8 +274,8 @@ const ElectricityTab = () => {
                 <div className="border-t-2 border-dashed border-blue-300 pt-6 space-y-4">
                     <h3 className="text-lg font-bold text-blue-700">利用開始日・開栓日</h3>
                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-blue-50/50 rounded-lg border border-blue-200">
-                        <FormDateInput label="電気利用開始日" name="moveInDate" value={formData.moveInDate} onChange={handleInputChange} onBlur={handleDateBlur} isInvalid={invalidFields.includes('moveInDate')} placeholder="例: 2024/08/01" required />
-                        <FormDateInput label="ガス開栓日" name="gasOpeningDate" value={formData.gasOpeningDate} onChange={handleInputChange} onBlur={handleDateBlur} isInvalid={invalidFields.includes('gasOpeningDate')} placeholder="例: 2024/08/01" required />
+                        <FormDateInput label="電気利用開始日" name="moveInDate" value={formData.moveInDate} onChange={handleInputChange} onBlur={handleDateBlurWithValidation} isInvalid={invalidFields.includes('moveInDate')} placeholder="例: 2024/08/01" required />
+                        <FormDateInput label="ガス開栓日" name="gasOpeningDate" value={formData.gasOpeningDate} onChange={handleInputChange} onBlur={handleDateBlurWithValidation} isInvalid={invalidFields.includes('gasOpeningDate')} placeholder="例: 2024/08/01" required />
                         <FormSelect label="ガス立会時間枠" name="gasOpeningTimeSlot" value={formData.gasOpeningTimeSlot} onChange={handleInputChange} options={gasTimeSlotOptions} isInvalid={invalidFields.includes('gasOpeningTimeSlot')} required className="md:col-span-2" />
                         {isNichigasSet && (
                             <>
@@ -292,7 +292,7 @@ const ElectricityTab = () => {
             ) : (
                 <div className="border-t-2 border-dashed border-blue-300 pt-6 space-y-4">
                      <h3 className="text-lg font-bold text-blue-700">利用開始日</h3>
-                     <FormDateInput label="電気利用開始日" name="moveInDate" value={formData.moveInDate} onChange={handleInputChange} onBlur={handleDateBlur} isInvalid={invalidFields.includes('moveInDate')} placeholder="例: 2024/08/01" required />
+                     <FormDateInput label="電気利用開始日" name="moveInDate" value={formData.moveInDate} onChange={handleInputChange} onBlur={handleDateBlurWithValidation} isInvalid={invalidFields.includes('moveInDate')} placeholder="例: 2024/08/01" required />
                 </div>
             )}
 

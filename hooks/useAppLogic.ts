@@ -166,6 +166,7 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
     const resetTimerRef = useRef(null);
     const [isManualOpen, setIsManualOpen] = useState(false);
     const [isBugReportOpen, setIsBugReportOpen] = useState(false);
+    const elecGasGreetingRef = useRef('');
     
     const [bugReportState, setBugReportState] = useState({
         text: '',
@@ -470,11 +471,22 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
             setToast({ message: 'タブを切り替えたため、自動リセットはキャンセルされました。', type: 'info' });
         }
         
-        const { recordId } = formData;
+        const { recordId, greeting } = formData;
         const fromElecOrGas = activeTab === 'electricity' || activeTab === 'gas';
-        
-        if (fromElecOrGas && newTab === 'internet' && recordId && recordId.startsWith('ID:')) {
-             dispatch({ type: 'UPDATE_FIELD', payload: { name: 'greeting', value: '' } });
+        const toElecOrGas = newTab === 'electricity' || newTab === 'gas';
+        const fromInternet = activeTab === 'internet';
+        const toInternet = newTab === 'internet';
+
+        // Itanji route (`ID:`) special greeting handling
+        if (recordId && recordId.startsWith('ID:')) {
+            if (fromElecOrGas && toInternet) {
+                // Save the elec/gas greeting and clear it for internet tab
+                elecGasGreetingRef.current = greeting;
+                dispatch({ type: 'UPDATE_FIELD', payload: { name: 'greeting', value: '' } });
+            } else if (fromInternet && toElecOrGas) {
+                // Restore the elec/gas greeting
+                dispatch({ type: 'UPDATE_FIELD', payload: { name: 'greeting', value: elecGasGreetingRef.current || 'すまえる' } });
+            }
         }
 
         setActiveTab(newTab);
@@ -526,6 +538,78 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
             setBugReportState(prev => ({ ...prev, isSubmitting: false }));
         }
     }, [bugReportState.text, formData]);
+
+    const handleDateBlurWithValidation = useCallback((e) => {
+        const { name, value } = e.target;
+        if (!value) return;
+
+        // 1. Formatting Logic
+        let processedValue = value;
+        const match = value.match(/^(?<month>\d{1,2})\/(?<day>\d{1,2})$/);
+        if (match?.groups) {
+            const { month, day } = match.groups;
+            const m = parseInt(month, 10);
+            const d = parseInt(day, 10);
+            if (m >= 1 && m <= 12 && d >= 1 && d <= 31) {
+                const today = new Date();
+                const currentYear = today.getFullYear();
+                const targetDate = new Date(currentYear, m - 1, d);
+                if (targetDate.getMonth() === m - 1) {
+                    processedValue = `${targetDate.getFullYear()}/${String(targetDate.getMonth() + 1).padStart(2, '0')}/${String(targetDate.getDate()).padStart(2, '0')}`;
+                }
+            }
+        } else {
+            const targetDate = new Date(value);
+            if (!isNaN(targetDate.getTime())) {
+                processedValue = `${targetDate.getFullYear()}/${String(targetDate.getMonth() + 1).padStart(2, '0')}/${String(targetDate.getDate()).padStart(2, '0')}`;
+            }
+        }
+        if (processedValue !== value) {
+            dispatch({ type: 'UPDATE_FIELD', payload: { name, value: processedValue } });
+        }
+
+        // 2. Validation Logic
+        const dateToValidate = new Date(processedValue);
+        if (isNaN(dateToValidate.getTime())) return;
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        // DOB check (under 15)
+        if (name === 'dob') {
+            const fifteenYearsAgo = new Date(today.getFullYear() - 15, today.getMonth(), today.getDate());
+            if (dateToValidate > fifteenYearsAgo) {
+                setModalState({
+                    isOpen: true,
+                    title: '入力内容の確認',
+                    message: '生年月日は正しいですか？ (15歳未満です)',
+                    onConfirm: closeModal,
+                    onCancel: closeModal,
+                    confirmText: 'このまま進む',
+                    cancelText: '修正する',
+                    type: 'warning'
+                });
+            }
+        }
+
+        // Move-in date check (5+ years ago)
+        const moveInDateFields = ['moveInDate', 'gasOpeningDate'];
+        if (moveInDateFields.includes(name)) {
+            const fiveYearsAgo = new Date(today.getFullYear() - 5, today.getMonth(), today.getDate());
+            if (dateToValidate <= fiveYearsAgo) {
+                setModalState({
+                    isOpen: true,
+                    title: '入力内容の確認',
+                    message: `${FIELD_LABELS[name] || '日付'}は正しいですか？ (5年以上前です)`,
+                    onConfirm: closeModal,
+                    onCancel: closeModal,
+                    confirmText: 'このまま進む',
+                    cancelText: '修正する',
+                    type: 'warning'
+                });
+            }
+        }
+    }, [dispatch, setModalState, closeModal]);
     
     
     return {
@@ -548,5 +632,6 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
         handleBugReportSubmit,
         handleCopy,
         handleResetRequest,
+        handleDateBlurWithValidation,
     };
 };
