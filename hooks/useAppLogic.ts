@@ -26,7 +26,7 @@ const FIELD_LABELS = {
     hasContractConfirmation: '契確要否', isGasSet: 'ガスセット', primaryProductStatus: '主商材受注状況',
     attachedOption: '付帯OP', isNewConstruction: '新築', gasOpeningDate: 'ガス開栓日',
     gasOpeningTimeSlot: 'ガス立会時間枠', gasArea: 'ガスエリア', gasWitness: '立会者',
-    gasPreContact: 'ガス事前連絡先', gasIsCorporate: '法人契約',
+    gasPreContact: 'ガス事前連絡先', gasIsCorporate: '法人契約', elecConfirmationTime: '契確時間',
     // WTS
     wtsCustomerType: '顧客タイプ', wtsShippingDestination: '発送先', wtsShippingPostalCode: '発送先郵便番号',
     wtsShippingAddress: '発送先住所', wtsServerType: 'サーバー', wtsServerColor: 'サーバー色',
@@ -77,15 +77,30 @@ const getRequiredFields = (formData, activeTab) => {
             break;
 
         case 'electricity': {
-            const { elecProvider, elecRecordIdPrefix, isAllElectric } = formData;
+            const { elecProvider, elecRecordIdPrefix, isAllElectric, hasContractConfirmation, recordId } = formData;
             required.push('elecProvider', 'greeting', 'contractorName', 'contractorNameKana', 'dob', 'phone', 'postalCode', 'address', 'buildingInfo', 'moveInDate');
-            if (elecProvider !== '東京ガス電気セット') {
+            
+            if (elecProvider !== '東京ガス電気セット' && !['すまいのでんき（ストエネ）', 'プラチナでんき（ジャパン）'].includes(elecProvider)) {
                 required.push('paymentMethod');
             }
             if (!isSakaiRoute) required.push('recordId');
-            if (elecProvider === 'すまいのでんき（ストエネ）' || (elecProvider === 'プラチナでんき（ジャパン）' && (elecRecordIdPrefix === 'SR' || isAllElectric === 'あり'))) {
+
+            if (['すまいのでんき（ストエネ）', 'プラチナでんき（ジャパン）'].includes(elecProvider)) {
+                if(hasContractConfirmation === 'なし') required.push('gender');
+            }
+
+            if (elecProvider === 'すまいのでんき（ストエネ）' || (elecProvider === 'プラチナでんき（ジャパン）' && (elecRecordIdPrefix === 'SR' || isAllElectric === 'あり' || (['それ以外', 'No.'].includes(elecRecordIdPrefix) && isAllElectric !== 'あり') ))) {
                 required.push('hasContractConfirmation');
             }
+
+            if (elecProvider === 'キューエネスでんき') {
+                if (recordId?.startsWith('ID:')) {
+                    required.push('attachedOption');
+                } else {
+                    required.push('primaryProductStatus', 'elecConfirmationTime');
+                }
+            }
+
             if (['キューエネスでんき', 'ユーパワー UPOWER', 'HTBエナジー', 'リミックスでんき', 'ループでんき'].includes(elecProvider)) {
                 required.push('email');
             }

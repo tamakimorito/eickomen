@@ -92,7 +92,7 @@ export const generateElectricityCommentLogic = (formData: FormData): string => {
         (elecProvider === 'すまいのでんき（ストエネ）' && elecRecordIdPrefix === 'code:') ||
         (elecProvider === 'プラチナでんき（ジャパン）' && ['STJP:', 'S'].includes(elecRecordIdPrefix)) ||
         (elecProvider === 'プラチナでんき（ジャパン）' && elecRecordIdPrefix === 'サカイ' && isAllElectric !== 'あり') ||
-        (elecProvider === 'プラチナでんき（ジャパン）' && elecRecordIdPrefix === 'それ以外' && hasContractConfirmation !== 'あり')
+        (elecProvider === 'プラチナでんき（ジャパン）' && ['それ以外', 'No.'].includes(elecRecordIdPrefix) && hasContractConfirmation !== 'あり')
     );
 
     const showPrimaryProductStatus = hasContractConfirmation === 'あり';
@@ -150,6 +150,7 @@ export const generateElectricityCommentLogic = (formData: FormData): string => {
                     break;
                 case 'それ以外':
                 case 'ID:':
+                case 'No.':
                     if (isVacancy === 'あり') {
                         const planF = isAllElectric === 'あり'
                             ? 'すまいのでんきオール電化プラン'
@@ -198,6 +199,7 @@ export const generateElectricityCommentLogic = (formData: FormData): string => {
                     break;
                 case 'それ以外':
                 case 'ID:':
+                case 'No.':
                     const planElse = isAllElectric === 'あり' ? 'プラチナでんきオール電化プラン' : 'プラチナでんき';
                     if (hasContractConfirmation === 'あり') {
                         const headerElse = isVacancy === 'あり' ? `【JAPAN電力※空室プランHZEZZT011】` : `【JAPAN電力】`;
@@ -212,21 +214,16 @@ export const generateElectricityCommentLogic = (formData: FormData): string => {
             }
             break;
         case 'キューエネスでんき':
-            const qenesBase = `レコードID：${recordId || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：エコhome\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${formattedPhone || ''}`;
-            const qenesAddress = `郵便番号：${formattedPostalCode || ''}\n引越し先住所：${address || ''}\n物件名：${buildingInfo || ''}`;
-            const qenesAddressImport = `郵便番号：${formattedPostalCode || ''}\n住所：${address || ''}\n物件名：${buildingInfo || ''}`;
-            const qenesEnd = `利用開始日：${moveInDate || ''}\nメアド：${email || ''}\n支払い方法：${paymentMethod || ''}\n備考：${remarks || ''}`;
-
-            if (recordId?.startsWith('No.')) {
-                 if (isVacancy === 'あり') {
-                    comment = `【キューエネスでんき】※ケイアイ空室通電 ${tag}\n${qenesBase}\n${qenesAddress}\n${qenesEnd}`;
-                 } else {
-                    comment = `【キューエネスでんき】 ${tag}\n${qenesBase}\n${qenesAddress}\n${qenesEnd}`;
-                 }
-            } else if (recordId?.startsWith('ID:')) {
-                comment = `【キューエネスでんき/★インポートのみ】 ${tag}\n${qenesBase}\n${qenesAddressImport}\n利用開始日：${moveInDate || ''}\nメアド：${email || ''}\n${attachedOptionLine}支払い方法：${paymentMethod || ''}\n備考：※法人の場合は電話対応者名を記載\n対応者（漢字）：${contactPersonName || ''}\n対応者（フリガナ）：${contactPersonNameKana || ''}\n${remarks || ''}`;
+            if (recordId?.startsWith('ID:')) {
+                // Itanji route
+                comment = `【キューエネスでんき/★インポートのみ】 ${tag}\nレコードID：${recordId || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：エコhome\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${formattedPhone || ''}\n郵便番号：${formattedPostalCode || ''}\n住所：${address || ''}\n物件名：${buildingInfo || ''}\n利用開始日：${moveInDate || ''}\nメアド：${email || ''}\n付帯OP：${attachedOption || ''}\n支払い方法：${paymentMethod || ''}\n備考：※法人の場合は電話対応者名を記載\n対応者（漢字）：${contactPersonName || ''}\n対応者（フリガナ）：${contactPersonNameKana || ''}\n${remarks || ''}`;
             } else {
-                 comment = `【キューエネスでんき】 ${tag}\n${qenesBase}\n${qenesAddress}\n${qenesEnd}`;
+                // Other routes (No., etc.)
+                const header = (recordId?.startsWith('No.') && isVacancy === 'あり') 
+                    ? `【キューエネスでんき】※ケイアイ空室通電 ${tag}`
+                    : `【キューエネスでんき】 ${tag}`;
+                
+                comment = `${header}\n契確時間：${elecConfirmationTime || ''}\nレコードID：${recordId || ''}\n主商材受注状況：${primaryProductStatus || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：エコhome\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${formattedPhone || ''}\n郵便番号：${formattedPostalCode || ''}\n引越し先住所：${address || ''}\n物件名：${buildingInfo || ''}\n利用開始日：${moveInDate || ''}\nメアド：${email || ''}\n支払い方法：${paymentMethod || ''}\n備考：${remarks || ''}`;
             }
             break;
         case 'リミックスでんき':
