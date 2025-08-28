@@ -77,7 +77,7 @@ const getRequiredFields = (formData, activeTab) => {
             break;
 
         case 'electricity': {
-            const { elecProvider, elecRecordIdPrefix, isAllElectric, hasContractConfirmation, recordId } = formData;
+            const { elecProvider, elecRecordIdPrefix, isAllElectric, hasContractConfirmation, recordId, isVacancy } = formData;
             required.push('elecProvider', 'greeting', 'contractorName', 'contractorNameKana', 'dob', 'phone', 'postalCode', 'address', 'buildingInfo', 'moveInDate');
             
             if (elecProvider !== '東京ガス電気セット' && !['すまいのでんき（ストエネ）', 'プラチナでんき（ジャパン）'].includes(elecProvider)) {
@@ -89,7 +89,29 @@ const getRequiredFields = (formData, activeTab) => {
                 if(hasContractConfirmation === 'なし') required.push('gender');
             }
 
-            if (elecProvider === 'すまいのでんき（ストエネ）' || (elecProvider === 'プラチナでんき（ジャパン）' && (elecRecordIdPrefix === 'SR' || isAllElectric === 'あり' || (['それ以外', 'No.'].includes(elecRecordIdPrefix) && isAllElectric !== 'あり') ))) {
+            // Replicate the showContractConfirmationOption logic to determine if the field is required.
+            let isContractConfirmationVisible = false;
+            if (elecProvider === 'すまいのでんき（ストエネ）') {
+                if (elecRecordIdPrefix === 'code:') {
+                    isContractConfirmationVisible = false;
+                } else if (['S', 'STJP:', 'サカイ', 'ID:', 'それ以外', 'No.'].includes(elecRecordIdPrefix) && isAllElectric !== 'あり' && isVacancy !== 'あり') {
+                    isContractConfirmationVisible = false;
+                } else {
+                    isContractConfirmationVisible = true;
+                }
+            } else if (elecProvider === 'プラチナでんき（ジャパン）') {
+                if (['S', 'STJP:'].includes(elecRecordIdPrefix)) {
+                    isContractConfirmationVisible = false;
+                } else if (elecRecordIdPrefix === 'サカイ' && isAllElectric !== 'あり') {
+                    isContractConfirmationVisible = false;
+                } else if (['それ以外', 'No.'].includes(elecRecordIdPrefix) && isAllElectric !== 'あり') {
+                    isContractConfirmationVisible = false;
+                } else {
+                    isContractConfirmationVisible = true;
+                }
+            }
+
+            if (isContractConfirmationVisible) {
                 required.push('hasContractConfirmation');
             }
 

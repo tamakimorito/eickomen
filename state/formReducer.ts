@@ -153,7 +153,7 @@ export const formReducer = (state: FormData, action: FormAction): FormData => {
 
         if (newElecProvider === 'プラチナでんき（ジャパン）') {
             if (newElecPrefix === 'SR') {
-                newState.hasContractConfirmation = 'あり';
+                newState.hasContractConfirmation = 'なし';
             } else { // Not SR route
                 if (newIsAllElectric === 'あり') {
                     // When user switches to all-electric, default to 'あり'.
