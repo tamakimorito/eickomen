@@ -18,6 +18,7 @@ export const INITIAL_FORM_DATA: FormData = {
   mailingOption: '現住所',
   currentPostalCode: '',
   currentAddress: '',
+  mailingBuildingInfo: '',
   existingLineStatus: '',
   existingLineCompany: '',
   mobileCarrier: '',
@@ -342,8 +343,8 @@ export const YES_NO_OPTIONS = [
 ];
 
 export const YES_NO_OPTIONS_2 = [
-    { value: '有', label: '有' },
-    { value: '無', label: '無' },
+    { value: 'あり', label: 'あり' },
+    { value: 'なし', label: 'なし' },
 ];
 
 export const PRIMARY_PRODUCT_STATUS_OPTIONS = [
@@ -352,8 +353,8 @@ export const PRIMARY_PRODUCT_STATUS_OPTIONS = [
 ];
 
 export const ATTACHED_OPTION_OPTIONS = [
-    { value: '有', label: '有' },
-    { value: '無', label: '無' },
+    { value: 'あり', label: 'あり' },
+    { value: 'なし', label: 'なし' },
 ];
 
 export const SET_NONE_OPTIONS = [

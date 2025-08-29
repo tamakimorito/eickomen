@@ -16,6 +16,7 @@ export type FormData = {
   mailingOption: string;
   currentPostalCode: string;
   currentAddress: string;
+  mailingBuildingInfo: string;
   existingLineStatus: string;
   existingLineCompany: string;
   mobileCarrier: string;

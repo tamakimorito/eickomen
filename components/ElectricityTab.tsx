@@ -1,7 +1,7 @@
 import React, { useMemo, useContext } from 'https://esm.sh/react@^19.1.0';
 import { 
-    ELEC_PROVIDERS, YES_NO_OPTIONS,
-    SET_NONE_OPTIONS, PRIMARY_PRODUCT_STATUS_OPTIONS, ATTACHED_OPTION_OPTIONS, 
+    ELEC_PROVIDERS, YES_NO_OPTIONS, ATTACHED_OPTION_OPTIONS,
+    SET_NONE_OPTIONS, PRIMARY_PRODUCT_STATUS_OPTIONS, 
     PAYMENT_METHOD_OPTIONS_EXTENDED, GENDERS, NEW_CONSTRUCTION_OPTIONS, TIME_SLOTS_TOHO, MAILING_OPTIONS,
     TIME_SLOTS_NICHI, TIME_SLOTS_SUTENE_SR, GAS_OPENING_TIME_SLOTS, TIME_SLOTS_TOKYO_GAS, TIME_SLOTS_TOHO_GAS_SETUP
 } from '../constants.ts';
@@ -11,7 +11,7 @@ import { FormInput, FormSelect, FormRadioGroup, FormTextArea, FormDateInput } fr
 // A component to render the mailing address section based on provider rules
 const MailingAddressSection = () => {
     const { formData, handleInputChange, invalidFields } = useContext(AppContext);
-    const { elecProvider, mailingOption, currentPostalCode, currentAddress } = formData;
+    const { elecProvider, mailingOption, currentPostalCode, currentAddress, mailingBuildingInfo } = formData;
     
     const config = useMemo(() => {
         const defaultConfig = { showOptions: false, showFields: false, isRequired: false, fixedValue: null, description: null };
@@ -84,6 +84,16 @@ const MailingAddressSection = () => {
                         isInvalid={invalidFields.includes('currentAddress')}
                         required={config.isRequired}
                     />
+                    {elecProvider === 'リミックスでんき' && (
+                        <FormInput
+                            label="郵送先物件名"
+                            name="mailingBuildingInfo"
+                            value={mailingBuildingInfo}
+                            onChange={handleInputChange}
+                            className="md:col-span-2"
+                            isInvalid={invalidFields.includes('mailingBuildingInfo')}
+                        />
+                    )}
                 </div>
             )}
         </div>
@@ -100,6 +110,7 @@ const ElectricityTab = () => {
     const isQenes = elecProvider === 'キューエネスでんき';
     const isQenesItanji = isQenes && recordId?.startsWith('ID:');
     const isQenesOther = isQenes && !recordId?.startsWith('ID:');
+    const isRemix = elecProvider === 'リミックスでんき';
 
 
     const showGasSetOption = elecProvider === 'すまいのでんき（ストエネ）';
@@ -115,7 +126,7 @@ const ElectricityTab = () => {
         if (elecProvider === 'プラチナでんき（ジャパン）') {
             if (['S', 'STJP:'].includes(elecRecordIdPrefix)) return false;
             if (elecRecordIdPrefix === 'サカイ' && isAllElectric !== 'あり') return false;
-             if (['それ以外', 'No.'].includes(elecRecordIdPrefix) && isAllElectric !== 'あり') return false;
+             if (['それ以外', 'No.'].includes(elecRecordIdPrefix) && hasContractConfirmation !== 'あり') return false;
             return true;
         }
         return false;
@@ -152,12 +163,13 @@ const ElectricityTab = () => {
     }, [hasContractConfirmation, elecProvider, elecRecordIdPrefix, isAllElectric]);
 
     const showAttachedOption = useMemo(() => {
+        if (isRemix) return true;
         if (['ニチガス電気セット', '東邦ガスセット', '大阪ガス電気セット'].includes(elecProvider)) {
             return false;
         }
          if (isQenesItanji) return true;
         return isImportOnlyCase;
-    }, [isImportOnlyCase, elecProvider, isQenesItanji]);
+    }, [isImportOnlyCase, elecProvider, isQenesItanji, isRemix]);
     
     // Gender field is shown for almost all "import only" templates.
     const showGender = useMemo(() => {
@@ -212,7 +224,6 @@ const ElectricityTab = () => {
     const isHapie = elecProvider === 'はぴe';
     const isToho = elecProvider === '東邦ガスセット';
     const isOsakaGasSet = elecProvider === '大阪ガス電気セット';
-    const isRemix = elecProvider === 'リミックスでんき';
     const isNichigasSet = elecProvider === 'ニチガス電気セット';
     const emailIsRequired = isQenes || isUpower || isHtb || isRemix || elecProvider === 'ループでんき';
 
@@ -251,9 +262,9 @@ const ElectricityTab = () => {
                     {showContractConfirmationOption && <FormRadioGroup label="契確は必要ですか？" name="hasContractConfirmation" value={formData.hasContractConfirmation} onChange={handleInputChange} options={YES_NO_OPTIONS} isInvalid={invalidFields.includes('hasContractConfirmation')} required disabled={isContractConfirmationDisabled} />}
                     {showGasSetOption && <FormRadioGroup label="ガスセット" name="isGasSet" value={isGasSet} onChange={handleInputChange} options={SET_NONE_OPTIONS} isInvalid={invalidFields.includes('isGasSet')} />}
                     
-                    { !isQenesItanji && <FormRadioGroup label="主商材受注状況" name="primaryProductStatus" value={formData.primaryProductStatus} onChange={handleInputChange} options={PRIMARY_PRODUCT_STATUS_OPTIONS} isInvalid={invalidFields.includes('primaryProductStatus')} required={isQenesOther} /> }
+                    { !isQenesItanji && !isRemix && <FormRadioGroup label="主商材受注状況" name="primaryProductStatus" value={formData.primaryProductStatus} onChange={handleInputChange} options={PRIMARY_PRODUCT_STATUS_OPTIONS} isInvalid={invalidFields.includes('primaryProductStatus')} required={isQenesOther} /> }
 
-                    { showAttachedOption && <FormRadioGroup label="付帯OP" name="attachedOption" value={formData.attachedOption} onChange={handleInputChange} options={ATTACHED_OPTION_OPTIONS} isInvalid={invalidFields.includes('attachedOption')} required={isQenesItanji} /> }
+                    { showAttachedOption && <FormRadioGroup label={isRemix ? "付帯" : "付帯OP"} name="attachedOption" value={formData.attachedOption} onChange={handleInputChange} options={ATTACHED_OPTION_OPTIONS} isInvalid={invalidFields.includes('attachedOption')} required={isQenesItanji || isRemix} /> }
                     
                     {showNewConstructionOption && <FormRadioGroup label="新築" name="isNewConstruction" value={formData.isNewConstruction} onChange={handleInputChange} options={NEW_CONSTRUCTION_OPTIONS} isInvalid={invalidFields.includes('isNewConstruction')} />}
                 </div>
@@ -313,7 +324,7 @@ const ElectricityTab = () => {
             <div className="border-t-2 border-dashed border-blue-300 pt-6 space-y-4">
                 <h3 className="text-lg font-bold text-blue-700">その他</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    { !isQenesItanji && <FormInput label="契確時間" name="elecConfirmationTime" value={formData.elecConfirmationTime} onChange={handleInputChange} isInvalid={invalidFields.includes('elecConfirmationTime')} required={isQenesOther} /> }
+                    { !isQenesItanji && !isRemix && <FormInput label="契確時間" name="elecConfirmationTime" value={formData.elecConfirmationTime} onChange={handleInputChange} isInvalid={invalidFields.includes('elecConfirmationTime')} required={isQenesOther} /> }
                     
                     {(elecProvider !== '東京ガス電気セット' || isOsakaGasSet) && (
                         <FormSelect label="支払い方法" name="paymentMethod" value={formData.paymentMethod} onChange={handleInputChange} options={PAYMENT_METHOD_OPTIONS_EXTENDED} isInvalid={invalidFields.includes('paymentMethod')} />
