@@ -117,17 +117,18 @@ const ElectricityTab = () => {
     
     const showContractConfirmationOption = useMemo(() => {
         if (elecProvider === 'すまいのでんき（ストエネ）') {
-             // For 'code:', it's always 'なし', so hide option.
             if (elecRecordIdPrefix === 'code:') return false;
-            // For others like 'S', 'STJP', 'サカイ', there's no such option in the sheet.
             if (['S', 'STJP:', 'サカイ', 'ID:', 'それ以外', 'No.'].includes(elecRecordIdPrefix) && isAllElectric !== 'あり' && formData.isVacancy !== 'あり') return false;
             return true;
         }
         if (elecProvider === 'プラチナでんき（ジャパン）') {
-            if (['S', 'STJP:'].includes(elecRecordIdPrefix)) return false;
-            if (elecRecordIdPrefix === 'サカイ' && isAllElectric !== 'あり') return false;
-             if (['それ以外', 'No.'].includes(elecRecordIdPrefix) && hasContractConfirmation !== 'あり') return false;
-            return true;
+            if (elecRecordIdPrefix === 'SR') return true; // Always show for SR (but it's disabled)
+            if (['S', 'STJP:'].includes(elecRecordIdPrefix)) return false; // Never show for S, STJP
+            // For Sakai and other channels, only show if all-electric is selected
+            if (['サカイ', 'それ以外', 'ID:', 'No.'].includes(elecRecordIdPrefix)) {
+                return isAllElectric === 'あり';
+            }
+            return false; // Default to false for any other case
         }
         return false;
     }, [elecProvider, elecRecordIdPrefix, isAllElectric, formData.isVacancy]);

@@ -203,8 +203,7 @@ export const generateElectricityCommentLogic = (formData: FormData): string => {
                     const planElse = isAllElectric === 'あり' ? 'プラチナでんきオール電化プラン' : 'プラチナでんき';
                     if (hasContractConfirmation === 'あり') {
                         const headerElse = isVacancy === 'あり' ? `【JAPAN電力※空室プランHZEZZT011】` : `【JAPAN電力】`;
-                        const codeElse = isVacancy !== 'あり' ? `HAHZZT259\n` : '';
-                        comment = `${headerElse}${tag}\n${codeElse}契確時間：${elecConfirmationTime || ''}\n${baseInfoPlat}\n${primaryProductStatusLine}名乗り：${greeting || ''}\nプラン：${planElse}\n${contractInfoPlat}\n${contactInfoPlat}\n${addressInfoPlat}\n利用開始日：${isVacancy === 'あり' ? `電気→${moveInDate}` : moveInDate}\n支払い方法：${paymentMethod || ''}\n備考：${remarks || ''}`;
+                        comment = `${headerElse}${tag}\n契確時間：${elecConfirmationTime || ''}\n${baseInfoPlat}\n${primaryProductStatusLine}名乗り：${greeting || ''}\nプラン：${planElse}\n${contractInfoPlat}\n${contactInfoPlat}\n${addressInfoPlat}\n利用開始日：${isVacancy === 'あり' ? `電気→${moveInDate}` : moveInDate}\n支払い方法：${paymentMethod || ''}\n備考：${remarks || ''}`;
                     } else { // インポートのみ
                         const headerElseImp = isVacancy === 'あり' ? `【JAPAN電力/★インポートのみ※空室プランHZEZZT011】` : `【JAPAN電力/★インポートのみ】`;
                         const planElseImp = isAllElectric === 'あり' ? 'プラチナでんきオール電化' : 'プラチナでんき';
