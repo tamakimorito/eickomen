@@ -425,17 +425,15 @@ export const TIME_SLOTS_TOHO_GAS_SETUP = [
     { value: '15-17', label: '③15-17時' },
 ];
 
-export const TIME_SLOTS_NICHI = [
-    { value: '9-12', label: '9-12' },
-    { value: '13-15', label: '13-15' },
-    { value: '15-17', label: '15-17' },
-    { value: '17-19 (日祝以外)' },
-];
-
 export const GAS_OPENING_TIME_SLOTS = [
     { value: '9-12', label: '9-12' },
     { value: '13-15', label: '13-15' },
     { value: '15-17', label: '15-17' },
+];
+
+export const TIME_SLOTS_NICHI = [
+    ...GAS_OPENING_TIME_SLOTS,
+    { value: '17-19 (日祝以外)', label: '17-19 (日祝以外)' },
 ];
 
 export const TIME_SLOTS_SUTENE_SR = [
@@ -447,7 +445,7 @@ export const TIME_SLOTS_SUTENE_SR = [
 
 export const TIME_SLOTS_TOKYO_GAS = [
     ...GAS_OPENING_TIME_SLOTS,
-    { value: '17-19', label: '17-19 (日祝除く)' },
+    { value: '17-19 (日祝除く)', label: '17-19 (日祝除く)' },
 ];
 
 // --- WTS Constants ---

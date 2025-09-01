@@ -146,37 +146,37 @@ export const formReducer = (state: FormData, action: FormAction): FormData => {
       }
       
       // --- Electricity/Gas Contract Confirmation Logic ---
-      if (name === 'elecProvider' || name === 'recordId' || name === 'isSakaiRoute' || name === 'isAllElectric') {
-        const newElecProvider = name === 'elecProvider' ? value : newState.elecProvider;
-        const newElecPrefix = newState.elecRecordIdPrefix;
-        const newIsAllElectric = name === 'isAllElectric' ? value : newState.isAllElectric;
+      const newElecProvider = name === 'elecProvider' ? value : newState.elecProvider;
+      const oldPrefix = state.elecRecordIdPrefix;
+      const newPrefix = newState.elecRecordIdPrefix;
+      const newIsAllElectric = name === 'isAllElectric' ? value : newState.isAllElectric;
+      const otherPlatinumChannels = ['それ以外', 'ID:', 'No.'];
 
+      if (name === 'elecProvider' || name === 'recordId' || name === 'isSakaiRoute') {
+        if (newElecProvider === 'プラチナでんき（ジャパン）' && otherPlatinumChannels.includes(newPrefix) && !otherPlatinumChannels.includes(oldPrefix)) {
+            newState.hasContractConfirmation = 'なし';
+        }
+      }
+      
+      if (name === 'elecProvider' || name === 'recordId' || name === 'isSakaiRoute' || name === 'isAllElectric') {
         if (newElecProvider === 'プラチナでんき（ジャパン）') {
-            if (newElecPrefix === 'SR') {
+            if (newPrefix === 'SR') {
                 newState.hasContractConfirmation = 'なし';
-            } else { // Not SR route
-                if (newIsAllElectric === 'あり') {
-                    // When user switches to all-electric, default to 'あり'.
-                    // They can then change it. This won't override their subsequent choices.
-                    if (name === 'isAllElectric' && value === 'あり') {
-                        newState.hasContractConfirmation = 'あり';
-                    }
-                } else {
-                    // If not all-electric, no confirmation choice is available.
-                    newState.hasContractConfirmation = ''; 
-                }
+            } else if (newIsAllElectric !== 'あり' && !otherPlatinumChannels.includes(newPrefix)) {
+                newState.hasContractConfirmation = ''; 
             }
-        } else if (newElecProvider === 'すまいのでんき（ストエネ）' && newElecPrefix === 'code:') {
+        } else if (newElecProvider === 'すまいのでんき（ストエネ）' && newPrefix === 'code:') {
             newState.hasContractConfirmation = 'なし';
         } else if (newElecProvider === 'キューエネスでんき') {
-            newState.hasContractConfirmation = (newElecPrefix === 'ID:') ? 'なし' : 'あり';
+            newState.hasContractConfirmation = (newPrefix === 'ID:') ? 'なし' : 'あり';
         }
       }
 
 
-       // Clear attachedOption if hasContractConfirmation becomes 'あり'
-      if (newState.hasContractConfirmation === 'あり' && state.hasContractConfirmation !== 'あり') {
+       // Clear attachedOption and gender if hasContractConfirmation becomes 'あり' for Platinum other channels
+      if (name === 'hasContractConfirmation' && value === 'あり' && newElecProvider === 'プラチナでんき（ジャパン）' && otherPlatinumChannels.includes(newPrefix)) {
         newState.attachedOption = '';
+        newState.gender = '';
       }
 
       if (name === 'gasProvider') {

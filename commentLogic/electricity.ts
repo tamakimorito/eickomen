@@ -200,11 +200,26 @@ export const generateElectricityCommentLogic = (formData: FormData): string => {
                 case 'それ以外':
                 case 'ID:':
                 case 'No.':
-                    const planElse = isAllElectric === 'あり' ? 'プラチナでんきオール電化プラン' : 'プラチナでんき';
-                    if (hasContractConfirmation === 'あり') {
-                        const headerElse = isVacancy === 'あり' ? `【JAPAN電力※空室プランHZEZZT011】` : `【JAPAN電力】`;
-                        comment = `${headerElse}${tag}\n契確時間：${elecConfirmationTime || ''}\n${baseInfoPlat}\n${primaryProductStatusLine}名乗り：${greeting || ''}\nプラン：${planElse}\n${contractInfoPlat}\n${contactInfoPlat}\n${addressInfoPlat}\n利用開始日：${isVacancy === 'あり' ? `電気→${moveInDate}` : moveInDate}\n支払い方法：${paymentMethod || ''}\n備考：${remarks || ''}`;
-                    } else { // インポートのみ
+                     if (hasContractConfirmation === 'あり') {
+                        comment = `【JAPAN電力】${tag}
+契確時間：順次
+レコードID：${recordId || ''}
+主商材受注状況：${primaryProductStatus || ''}
+担当者：${apName || ''}
+名乗り：${greeting || ''}
+プラン：プラチナでんき
+契約者名義（漢字）：${contractorName || ''}
+契約者名義（フリガナ）：${contractorNameKana || ''}
+生年月日(西暦)：${dob || ''}
+電話番号：${formattedPhone || ''}
+郵便番号：${formattedPostalCode || ''}
+住所：${address || ''}
+物件名：${buildingInfo || ''}
+利用開始日：${moveInDate || ''}
+支払い方法：${paymentMethod || ''}
+備考：${remarks || ''}`;
+                        comment = comment.replace(/^\s*\n/gm, '');
+                    } else { // インポートのみ (契確なし)
                         const headerElseImp = isVacancy === 'あり' ? `【JAPAN電力/★インポートのみ※空室プランHZEZZT011】` : `【JAPAN電力/★インポートのみ】`;
                         const planElseImp = isAllElectric === 'あり' ? 'プラチナでんきオール電化' : 'プラチナでんき';
                         comment = `${headerElseImp}${tag}\n${baseInfoPlat}\n名乗り：${greeting || ''}\nプラン：${planElseImp}\n${contractInfoPlat}\n性別：${gender || ''}\n${contactInfoPlat}\n${importAddressInfoPlat}\n利用開始日：${moveInDate || ''}\n${attachedOptionLine}支払い方法：${paymentMethod || ''}\n備考：${remarks || ''}`;
@@ -298,7 +313,7 @@ export const generateElectricityCommentLogic = (formData: FormData): string => {
 電話番号：${formattedPhone || ''}
 郵便番号：${formattedPostalCode || ''}
 引越し先住所：${address || ''}${buildingInfo ? ` ${buildingInfo}` : ''}
-利用開始日：電気→${moveInDate || ''}　ガス→${gasOpeningDate || ''}
+利用開始日：電気→${moveInDate || ''}　ガス→${gasOpeningDate || ''}${gasOpeningTimeSlot ? ` ${gasOpeningTimeSlot}` : ''}
 支払方法：${paymentMethod || ''}
 備考：${remarks || ''}`;
             comment = comment.replace(/^\s*\n/gm, '');

@@ -85,9 +85,13 @@ const getRequiredFields = (formData, activeTab) => {
             }
             if (!isSakaiRoute) required.push('recordId');
 
-            if (['すまいのでんき（ストエネ）', 'プラチナでんき（ジャパン）'].includes(elecProvider)) {
-                if(hasContractConfirmation === 'なし') required.push('gender');
+            if (elecProvider === 'すまいのでんき（ストエネ）' && hasContractConfirmation === 'なし') {
+                required.push('gender');
             }
+            if (elecProvider === 'プラチナでんき（ジャパン）' && hasContractConfirmation === 'なし') {
+                required.push('gender');
+            }
+
 
             // Replicate the showContractConfirmationOption logic to determine if the field is required.
             let isContractConfirmationVisible = false;
@@ -102,11 +106,9 @@ const getRequiredFields = (formData, activeTab) => {
             } else if (elecProvider === 'プラチナでんき（ジャパン）') {
                 if (['S', 'STJP:'].includes(elecRecordIdPrefix)) {
                     isContractConfirmationVisible = false;
-                } else if (elecRecordIdPrefix === 'サカイ' && isAllElectric !== 'あり') {
-                    isContractConfirmationVisible = false;
-                } else if (['それ以外', 'No.'].includes(elecRecordIdPrefix) && isAllElectric !== 'あり') {
-                    isContractConfirmationVisible = false;
-                } else {
+                } else if (['サカイ'].includes(elecRecordIdPrefix)) {
+                     isContractConfirmationVisible = isAllElectric === 'あり';
+                } else if (['それ以外', 'ID:', 'No.', 'SR'].includes(elecRecordIdPrefix)) {
                     isContractConfirmationVisible = true;
                 }
             }

@@ -105,8 +105,9 @@ const ElectricityTab = () => {
     const { formData, handleInputChange, handleDateBlurWithValidation, handleNameBlur, handleIdBlur, invalidFields } = useContext(AppContext);
     const { elecProvider, elecRecordIdPrefix, isGasSet, isSakaiRoute, recordId, hasContractConfirmation, isAllElectric } = formData;
     
-    const isSumaiOrPlatinum = ['すまいのでんき（ストエネ）', 'プラチナでんき（ジャパン）'].includes(elecProvider);
-    const isGenderRequired = isSumaiOrPlatinum && hasContractConfirmation === 'なし';
+    const isSumai = elecProvider === 'すまいのでんき（ストエネ）';
+    const isPlatinum = elecProvider === 'プラチナでんき（ジャパン）';
+    const isGenderRequired = (isSumai && hasContractConfirmation === 'なし') || (isPlatinum && hasContractConfirmation === 'なし');
     const isQenes = elecProvider === 'キューエネスでんき';
     const isQenesItanji = isQenes && recordId?.startsWith('ID:');
     const isQenesOther = isQenes && !recordId?.startsWith('ID:');
@@ -116,22 +117,31 @@ const ElectricityTab = () => {
     const showGasSetOption = elecProvider === 'すまいのでんき（ストエネ）';
     
     const showContractConfirmationOption = useMemo(() => {
-        if (elecProvider === 'すまいのでんき（ストエネ）') {
+        if (isSumai) {
             if (elecRecordIdPrefix === 'code:') return false;
             if (['S', 'STJP:', 'サカイ', 'ID:', 'それ以外', 'No.'].includes(elecRecordIdPrefix) && isAllElectric !== 'あり' && formData.isVacancy !== 'あり') return false;
             return true;
         }
-        if (elecProvider === 'プラチナでんき（ジャパン）') {
-            if (elecRecordIdPrefix === 'SR') return true; // Always show for SR (but it's disabled)
-            if (['S', 'STJP:'].includes(elecRecordIdPrefix)) return false; // Never show for S, STJP
-            // For Sakai and other channels, only show if all-electric is selected
-            if (['サカイ', 'それ以外', 'ID:', 'No.'].includes(elecRecordIdPrefix)) {
+        if (isPlatinum) {
+            if (elecRecordIdPrefix === 'SR') return true;
+            if (['S', 'STJP:'].includes(elecRecordIdPrefix)) return false;
+             if (['それ以外', 'ID:', 'No.'].includes(elecRecordIdPrefix)) {
+                return true;
+            }
+            if (elecRecordIdPrefix === 'サカイ') {
                 return isAllElectric === 'あり';
             }
-            return false; // Default to false for any other case
+            return false;
         }
         return false;
     }, [elecProvider, elecRecordIdPrefix, isAllElectric, formData.isVacancy]);
+
+    const isPlatinumOtherConfirmed = useMemo(() => {
+        return isPlatinum &&
+               ['それ以外', 'ID:', 'No.'].includes(elecRecordIdPrefix) &&
+               hasContractConfirmation === 'あり';
+    }, [isPlatinum, elecRecordIdPrefix, hasContractConfirmation]);
+
 
     const isElecGasSetSelected = useMemo(() => {
         return elecProvider === 'すまいのでんき（ストエネ）' && formData.isGasSet === 'セット';
@@ -153,36 +163,39 @@ const ElectricityTab = () => {
     
     const isImportOnlyCase = useMemo(() => {
         if (hasContractConfirmation === 'なし') return true;
-        if (elecProvider === 'すまいのでんき（ストエネ）' && elecRecordIdPrefix === 'code:') return true;
-        if (elecProvider === 'プラチナでんき（ジャパン）') {
+        if (isSumai && elecRecordIdPrefix === 'code:') return true;
+        if (isPlatinum) {
             if (['S', 'STJP:'].includes(elecRecordIdPrefix)) return true;
             if (elecRecordIdPrefix === 'SR' && hasContractConfirmation !== 'あり') return true;
             if (elecRecordIdPrefix === 'サカイ' && isAllElectric !== 'あり') return true;
              if (['それ以外', 'No.'].includes(elecRecordIdPrefix) && hasContractConfirmation !== 'あり') return true;
         }
         return false;
-    }, [hasContractConfirmation, elecProvider, elecRecordIdPrefix, isAllElectric]);
+    }, [hasContractConfirmation, elecProvider, elecRecordIdPrefix, isAllElectric, isSumai, isPlatinum]);
 
     const showAttachedOption = useMemo(() => {
+        if (isPlatinumOtherConfirmed) return false;
         if (isRemix) return true;
         if (['ニチガス電気セット', '東邦ガスセット', '大阪ガス電気セット'].includes(elecProvider)) {
             return false;
         }
          if (isQenesItanji) return true;
         return isImportOnlyCase;
-    }, [isImportOnlyCase, elecProvider, isQenesItanji, isRemix]);
+    }, [isImportOnlyCase, elecProvider, isQenesItanji, isRemix, isPlatinumOtherConfirmed]);
     
     // Gender field is shown for almost all "import only" templates.
     const showGender = useMemo(() => {
-        if (!isSumaiOrPlatinum) return false;
+        if (isPlatinumOtherConfirmed) return false;
+        
+        if (!isSumai && !isPlatinum) return false;
 
         // Exception case for Platinum Sakai
-        if (elecProvider === 'プラチナでんき（ジャパン）' && elecRecordIdPrefix === 'サカイ' && isAllElectric === 'あり' && hasContractConfirmation === 'あり') {
+        if (isPlatinum && elecRecordIdPrefix === 'サカイ' && isAllElectric === 'あり' && hasContractConfirmation === 'あり') {
             return true;
         }
 
         return isImportOnlyCase;
-    }, [elecProvider, elecRecordIdPrefix, isImportOnlyCase, isAllElectric, hasContractConfirmation, isSumaiOrPlatinum]);
+    }, [elecProvider, elecRecordIdPrefix, isImportOnlyCase, isAllElectric, hasContractConfirmation, isSumai, isPlatinum, isPlatinumOtherConfirmed]);
 
 
     const gasTimeSlotOptions = useMemo(() => {
@@ -228,7 +241,7 @@ const ElectricityTab = () => {
     const isNichigasSet = elecProvider === 'ニチガス電気セット';
     const emailIsRequired = isQenes || isUpower || isHtb || isRemix || elecProvider === 'ループでんき';
 
-    const isContractConfirmationDisabled = elecProvider === 'プラチナでんき（ジャパン）' && elecRecordIdPrefix === 'SR';
+    const isContractConfirmationDisabled = isPlatinum && elecRecordIdPrefix === 'SR';
 
     return (
         <div className="space-y-6">
@@ -280,7 +293,7 @@ const ElectricityTab = () => {
                     {showGender && <FormSelect label="性別" name="gender" value={formData.gender} onChange={handleInputChange} options={GENDERS} isInvalid={invalidFields.includes('gender')} required={isGenderRequired} />}
                     <FormDateInput label="生年月日（西暦）" name="dob" value={formData.dob} onChange={handleInputChange} onBlur={handleDateBlurWithValidation} isInvalid={invalidFields.includes('dob')} placeholder="例: 1990/01/01" required />
                     <FormInput label="電話番号" name="phone" value={formData.phone} onChange={handleInputChange} isInvalid={invalidFields.includes('phone')} required />
-                    { !isSumaiOrPlatinum && <FormInput label="メアド" name="email" type="email" value={formData.email} onChange={handleInputChange} isInvalid={invalidFields.includes('email')} required={emailIsRequired}/> }
+                    { !isSumai && !isPlatinum && <FormInput label="メアド" name="email" type="email" value={formData.email} onChange={handleInputChange} isInvalid={invalidFields.includes('email')} required={emailIsRequired}/> }
                 </div>
             </div>
 
