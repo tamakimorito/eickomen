@@ -64,25 +64,6 @@ export const formReducer = (state: FormData, action: FormAction): FormData => {
               if (GAS_ID_PREFIX_OPTIONS.some(opt => opt.value === prefix)) {
                   newState.gasRecordIdPrefix = prefix;
               }
-
-               // Greeting logic based on recordId
-               if (idValue.startsWith('ID:')) {
-                  newState.greeting = 'すまえる';
-              } else if (idValue.startsWith('L')) {
-                  newState.greeting = 'ばっちり賃貸入居サポートセンター';
-              } else if (idValue.startsWith('SR') || idValue.startsWith('STJP:')) {
-                  const autoGreetings = ['すまえる', 'ばっちり賃貸入居サポートセンター', 'レプリス株式会社'];
-                  if (autoGreetings.includes(state.greeting)) {
-                      newState.greeting = '';
-                  }
-              } else if (/^S\d/.test(idValue)) {
-                  newState.greeting = 'レプリス株式会社';
-              } else if (state.recordId && state.recordId.startsWith('ID:') && !idValue.startsWith('ID:')) {
-                  // If changing away from an ID: record, clear the greeting if it was the default
-                  if (state.greeting === 'すまえる') {
-                     newState.greeting = '';
-                  }
-              }
           }
           if (idValue.startsWith('code:')) {
             newState.isVacancy = 'あり';
@@ -123,6 +104,20 @@ export const formReducer = (state: FormData, action: FormAction): FormData => {
           if (state.remarks === '5000円CB') {
               newState.remarks = '';
           }
+      }
+      
+      // --- CB Remarks Logic for ID:/CC: records ---
+      if (name === 'elecProvider' || name === 'recordId') {
+        const cbEligibleProviders = ['すまいのでんき（ストエネ）', 'プラチナでんき（ジャパン）', 'キューエネスでんき'];
+        const isEligibleProvider = cbEligibleProviders.includes(newState.elecProvider);
+        const recordId = newState.recordId || '';
+        const isEligibleId = recordId.startsWith('ID:') || /^CC\d+/.test(recordId);
+
+        if (isEligibleProvider && isEligibleId) {
+            if (newState.remarks === '') {
+                newState.remarks = '5,000円CB';
+            }
+        }
       }
 
 

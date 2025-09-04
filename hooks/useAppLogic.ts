@@ -144,7 +144,7 @@ const getRequiredFields = (formData, activeTab) => {
         }
 
         case 'gas': {
-            const { gasProvider } = formData;
+            const { gasProvider, gasHasContractConfirmation } = formData;
             required.push('gasProvider', 'contractorName', 'contractorNameKana', 'dob', 'phone', 'postalCode', 'address', 'buildingInfo', 'moveInDate');
             
             if (!isSakaiRoute) required.push('recordId');
@@ -173,6 +173,9 @@ const getRequiredFields = (formData, activeTab) => {
              }
              if(['東邦ガス単品', '東急ガス'].includes(gasProvider)){
                  required.push('currentAddress');
+             }
+             if (gasProvider === 'すまいのでんき（ストエネ）' && gasHasContractConfirmation === 'あり') {
+                required.push('elecConfirmationTime');
              }
             break;
         }
@@ -205,7 +208,6 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
     const resetTimerRef = useRef(null);
     const [isManualOpen, setIsManualOpen] = useState(false);
     const [isBugReportOpen, setIsBugReportOpen] = useState(false);
-    const elecGasGreetingRef = useRef('');
     
     const [bugReportState, setBugReportState] = useState({
         text: '',
@@ -303,6 +305,44 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
             fetchAddress();
         }
     }, [formData.currentPostalCode, dispatch, setToast]);
+
+    // 名乗り（Greeting）の自動設定ロジック
+    const { recordId, greeting, isSakaiRoute } = formData;
+    const previousRecordIdRef = useRef(recordId);
+
+    useEffect(() => {
+        const previousRecordId = previousRecordIdRef.current;
+        if (isSakaiRoute || recordId === previousRecordId) {
+            previousRecordIdRef.current = recordId;
+            return;
+        }
+
+        let newGreeting; // undefined means no change
+        const autoGreetings = ['すまえる', 'ばっちり賃貸入居サポートセンター', 'レプリス株式会社'];
+        
+        // Logic for setting greeting based on new recordId
+        if (recordId.startsWith('ID:')) {
+            if (activeTab === 'electricity' || activeTab === 'gas') newGreeting = 'すまえる';
+        } else if (recordId.startsWith('L')) {
+            newGreeting = 'ばっちり賃貸入居サポートセンター';
+        } else if (/^S\d/.test(recordId)) {
+            if (activeTab === 'electricity' || activeTab === 'gas') newGreeting = 'レプリス株式会社';
+        } else if (recordId.startsWith('SR') || recordId.startsWith('STJP:')) {
+            if (autoGreetings.includes(greeting)) newGreeting = '';
+        }
+
+        // Logic for clearing greeting when changing away from a pattern
+        if (previousRecordId && previousRecordId.startsWith('ID:') && !recordId.startsWith('ID:')) {
+            if (greeting === 'すまえる') newGreeting = '';
+        }
+        
+        if (newGreeting !== undefined && newGreeting !== greeting) {
+            dispatch({ type: 'UPDATE_FIELD', payload: { name: 'greeting', value: newGreeting } });
+        }
+        
+        previousRecordIdRef.current = recordId;
+
+    }, [recordId, greeting, activeTab, isSakaiRoute, dispatch]);
     
     const handleCopy = useCallback(() => {
         const { missingFields, missingLabels } = getRequiredFields(formData, activeTab);
@@ -510,28 +550,16 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
             setToast({ message: 'タブを切り替えたため、自動リセットはキャンセルされました。', type: 'info' });
         }
         
-        const { recordId, greeting } = formData;
-        const fromElecOrGas = activeTab === 'electricity' || activeTab === 'gas';
-        const toElecOrGas = newTab === 'electricity' || newTab === 'gas';
-        const fromInternet = activeTab === 'internet';
-        const toInternet = newTab === 'internet';
-
-        // Itanji route (`ID:`) special greeting handling
-        if (recordId && recordId.startsWith('ID:')) {
-            if (fromElecOrGas && toInternet) {
-                // Save the elec/gas greeting and clear it for internet tab
-                elecGasGreetingRef.current = greeting;
-                dispatch({ type: 'UPDATE_FIELD', payload: { name: 'greeting', value: '' } });
-            } else if (fromInternet && toElecOrGas) {
-                // Restore the elec/gas greeting
-                dispatch({ type: 'UPDATE_FIELD', payload: { name: 'greeting', value: elecGasGreetingRef.current || 'すまえる' } });
-            }
+        // If switching to the internet tab and the record ID indicates an "Itanji" case,
+        // clear the greeting field as it should not be carried over.
+        if (newTab === 'internet' && formData.recordId.startsWith('ID:')) {
+            dispatch({ type: 'UPDATE_FIELD', payload: { name: 'greeting', value: '' } });
         }
-
+        
         setActiveTab(newTab);
         setInvalidFields([]);
         setModalState(prev => ({...prev, isErrorBanner: false }));
-    }, [activeTab, formData, dispatch, setInvalidFields, setToast]);
+    }, [formData.recordId, dispatch, setInvalidFields, setToast]);
 
     const handleOpenBugReport = () => setIsBugReportOpen(true);
     const handleCloseBugReport = () => {

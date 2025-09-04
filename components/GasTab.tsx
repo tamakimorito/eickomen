@@ -264,6 +264,16 @@ const GasTab = () => {
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {showPaymentMethod && <FormSelect label="支払い方法" name="paymentMethod" value={formData.paymentMethod} onChange={handleInputChange} options={PAYMENT_METHOD_OPTIONS_EXTENDED} isInvalid={invalidFields.includes('paymentMethod')} />}
                     
+                    {isSumainoGas && formData.gasHasContractConfirmation === 'あり' && (
+                        <FormInput 
+                            label="契確時間" 
+                            name="elecConfirmationTime" 
+                            value={formData.elecConfirmationTime} 
+                            onChange={handleInputChange} 
+                            isInvalid={invalidFields.includes('elecConfirmationTime')}
+                            required
+                        />
+                    )}
                     {isSakaiRoute && (
                          <FormInput label="ガス" name="gasArea" value={formData.gasArea} onChange={handleInputChange} placeholder="「なし」と入力" isInvalid={invalidFields.includes('gasArea')} />
                     )}

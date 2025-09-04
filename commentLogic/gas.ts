@@ -53,7 +53,7 @@ export const generateGasCommentLogic = (formData: FormData): string => {
         gasProvider, gasRecordIdPrefix, gasIsVacancy, gasHasContractConfirmation,
         recordId, primaryProductStatus, greeting, apName, contractorName, contractorNameKana, gender, dob, phone,
         postalCode, address, buildingInfo, moveInDate, paymentMethod, remarks, attachedOption,
-        elecConfirmationTime, email, gasArea, gasWitness, gasPreContact, gasOpeningTimeSlot, postConfirmationTime, currentAddress, mailingOption,
+        elecConfirmationTime, email, gasArea, gasWitness, gasPreContact, gasOpeningTimeSlot, postConfirmationTime, currentAddress, mailingOption, currentPostalCode,
         gasIsCorporate
     } = { ...formData, dob: formatDate(formData.dob), moveInDate: formatDate(formData.moveInDate) };
 
@@ -65,6 +65,7 @@ export const generateGasCommentLogic = (formData: FormData): string => {
     const formattedGasPreContact = formatPhoneNumberWithHyphens(gasPreContact);
 
     const formattedPostalCode = formatPostalCode(postalCode, gasProvider);
+    const formattedCurrentPostalCode = formatPostalCode(currentPostalCode, gasProvider);
 
     switch (gasProvider) {
         case 'すまいのでんき（ストエネ）': // This is "すまいのガス"
@@ -161,6 +162,7 @@ export const generateGasCommentLogic = (formData: FormData): string => {
 
         case '東急ガス':
             {
+                const tokyuCurrentAddress = currentPostalCode ? `〒${formattedCurrentPostalCode} ${currentAddress || ''}` : currentAddress || '';
                 let tokyuCommentLines = [
                     `【えねこねガス_開栓】${tag}`,
                     `契確時間：${elecConfirmationTime || ''}`,
@@ -179,7 +181,7 @@ export const generateGasCommentLogic = (formData: FormData): string => {
                     `利用開始日：${moveInDate || ''} ${gasOpeningTimeSlot || ''}`,
                     `メアド：${email || ''}`,
                     `支払い方法：${paymentMethod || ''}`,
-                    `現住所：${currentAddress || ''}`
+                    `現住所：${tokyuCurrentAddress}`
                 ];
                  comment = tokyuCommentLines.join('\n');
                  if (remarks) {
