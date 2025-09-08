@@ -15,7 +15,7 @@ export const INITIAL_FORM_DATA: FormData = {
   address: '',
   buildingInfo: '',
   moveInDate: '',
-  mailingOption: '現住所',
+  mailingOption: '',
   currentPostalCode: '',
   currentAddress: '',
   mailingBuildingInfo: '',
@@ -88,6 +88,7 @@ export const INITIAL_FORM_DATA: FormData = {
   elecPostConfirmationDateTime: '',
   elecImportCompanyName: '',
   isNewConstruction: 'いいえ',
+  qenesIsCorporate: false,
 
   // --- Gas Specific ---
   gasProvider: '',
@@ -403,50 +404,53 @@ export const ELEC_ID_PREFIX_OPTIONS = [
     { value: 'No.', label: 'No.'},
 ];
 
+// FIX: Initialize GAS_ID_PREFIX_OPTIONS and add missing time slot and WTS constants.
 export const GAS_ID_PREFIX_OPTIONS = [
     { value: 'SR', label: 'SR' },
     { value: 'S', label: 'S' },
     { value: 'STJP:', label: 'STJP:' },
     { value: 'サカイ', label: 'サカイ' },
     { value: 'それ以外', label: 'それ以外' },
-    { value: '全販路', label: '全販路' },
-];
-
-export const TIME_SLOTS_TOHO = [
-    { value: '10-12', label: '10-12' },
-    { value: '12-15', label: '12-15' },
-    { value: '15-18', label: '15-18' },
-    { value: '18-21', label: '18-21' },
-];
-
-export const TIME_SLOTS_TOHO_GAS_SETUP = [
-    { value: '9-12', label: '①9-12時' },
-    { value: '13-15', label: '②13-15時' },
-    { value: '15-17', label: '③15-17時' },
 ];
 
 export const GAS_OPENING_TIME_SLOTS = [
-    { value: '9-12', label: '9-12' },
-    { value: '13-15', label: '13-15' },
-    { value: '15-17', label: '15-17' },
-];
-
-export const TIME_SLOTS_NICHI = [
-    ...GAS_OPENING_TIME_SLOTS,
-    { value: '17-19 (日祝以外)', label: '17-19 (日祝以外)' },
+    { value: '9-12', label: '9-12時' },
+    { value: '13-15', label: '13-15時' },
+    { value: '15-17', label: '15-17時' },
+    { value: '17-19', label: '17-19時' },
+    { value: '終日', label: '終日' },
 ];
 
 export const TIME_SLOTS_SUTENE_SR = [
-    { value: '9-12', label: '9-12' },
-    { value: '13-15', label: '13-15' },
-    { value: '15-17', label: '15-17' },
-    { value: '13-17', label: '午後枠 (13-17)' },
+    { value: '9-12', label: '9-12時' },
+    { value: '13-15', label: '13-15時' },
+    { value: '15-17', label: '15-17時' },
+];
+
+export const TIME_SLOTS_NICHI = [
+    { value: '9-12', label: '9-12時' },
+    { value: '13-17', label: '13-17時' },
 ];
 
 export const TIME_SLOTS_TOKYO_GAS = [
-    ...GAS_OPENING_TIME_SLOTS,
-    { value: '17-19 (日祝除く)', label: '17-19 (日祝除く)' },
+    { value: '9-12', label: '9-12時' },
+    { value: '13-15', label: '13-15時' },
+    { value: '15-17', label: '15-17時' },
+    { value: '17-19', label: '17-19時' },
 ];
+
+export const TIME_SLOTS_TOHO = [
+    { value: '9-12', label: '9-12' },
+    { value: '13-17', label: '13-17' },
+    { value: '順次', label: '順次'},
+];
+
+export const TIME_SLOTS_TOHO_GAS_SETUP = [
+    { value: '9-12', label: '9-12時' },
+    { value: '13-15', label: '13-15時' },
+    { value: '15-17', label: '15-17時' },
+];
+
 
 // --- WTS Constants ---
 export const WTS_CUSTOMER_TYPES = [
@@ -456,7 +460,8 @@ export const WTS_CUSTOMER_TYPES = [
 ];
 
 export const WTS_SHIPPING_DESTINATIONS = [
-    { value: '新住所', label: '新住所 (設置先と同じ)' },
+    { value: '新住所', label: '新住所' },
+    { value: '現住所', label: '現住所' },
     { value: 'その他', label: 'その他' },
 ];
 
@@ -465,93 +470,54 @@ export const WTS_FIVE_YEAR_PLAN_OPTIONS = [
     { value: '3年', label: '3年' },
 ];
 
-export const WTS_FREE_WATER_OPTIONS = [
-    { value: 'あり', label: 'あり' },
-    { value: 'なし', label: 'なし' },
-    { value: 'クレカの場合無料水あり', label: 'クレカの場合無料水あり' },
-];
-
 export const WTS_WATER_PURIFIER_OPTIONS = [
     { value: 'あり', label: 'あり' },
     { value: 'なし', label: 'なし' },
 ];
 
 export const WTS_MULTIPLE_UNITS_OPTIONS = [
-    { value: 'した', label: 'した' },
-    { value: 'してない', label: 'してない' },
+    { value: 'あり', label: 'あり' },
+    { value: 'なし', label: 'なし' },
 ];
 
 export const WTS_U20_HIGHSCHOOL_OPTIONS = [
-    { value: '高校生じゃない', label: '高校生じゃない' },
-    { value: '高校生', label: '高校生' },
+    { value: 'はい', label: 'はい' },
+    { value: 'いいえ', label: 'いいえ' },
 ];
 
 export const WTS_U20_PARENTAL_CONSENT_OPTIONS = [
     { value: 'OK', label: 'OK' },
     { value: 'NG', label: 'NG' },
-    { value: 'きいてない', label: 'きいてない' },
 ];
 
 export const WTS_SERVERS = [
-    { value: 'fam2', label: 'fam2' },
     { value: 'スリム4ロング', label: 'スリム4ロング' },
     { value: 'スリム4ショート', label: 'スリム4ショート' },
-    { value: 'ロッカスマート', label: 'ロッカスマート' },
-    { value: 'リッタ', label: 'リッタ' },
-    { value: 'スリムR2', label: 'スリムR2' },
-    { value: 'AURA', label: 'AURA' },
-    { value: 'amadana', label: 'amadana' },
+    { value: 'アイコン', label: 'アイコン' },
 ];
 
 export const WTS_COLORS = {
-    fam2: [
+    'スリム4ロング': [
+        { value: 'ホワイト', label: 'ホワイト' },
+        { value: 'ブラック', label: 'ブラック' },
+        { value: 'ピンク', label: 'ピンク' },
+    ],
+    'スリム4ショート': [
         { value: 'ホワイト', label: 'ホワイト' },
         { value: 'ブラック', label: 'ブラック' },
     ],
-    スリム4ロング: [
+    'アイコン': [
         { value: 'ホワイト', label: 'ホワイト' },
         { value: 'ブラック', label: 'ブラック' },
-        { value: 'トープ', label: 'トープ' },
-        { value: 'グレー', label: 'グレー' },
-    ],
-    スリム4ショート: [
-        { value: 'ホワイト', label: 'ホワイト' },
-        { value: 'ブラック', label: 'ブラック' },
-        { value: 'トープ', label: 'トープ' },
-        { value: 'グレー', label: 'グレー' },
-    ],
-    ロッカスマート: [
-        { value: 'ホワイト', label: 'ホワイト' },
-        { value: 'ブラック', label: 'ブラック' },
-    ],
-    リッタ: [
-        { value: 'ホワイト', label: 'ホワイト' },
-        { value: 'ブラック', label: 'ブラック' },
-    ],
-    スリムR2: [
-        { value: 'ホワイト', label: 'ホワイト' },
-        { value: 'ブラック', label: 'ブラック' },
-    ],
-    AURA: [
-        { value: 'ホワイト', label: 'ホワイト' },
-        { value: 'ブラック', label: 'ブラック' },
-        { value: 'ブルーブラック', label: 'ブルーブラック' },
-        { value: 'メタリック', label: 'メタリック' },
-    ],
-    amadana: [
-        { value: 'ホワイト', label: 'ホワイト' },
-        { value: 'ブラック', label: 'ブラック' },
-        { value: 'ブラウン', label: 'ブラウン' },
     ],
 };
 
+export const WTS_FREE_WATER_OPTIONS = [
+    { value: 'あり', label: 'あり' },
+    { value: 'なし', label: 'なし' },
+];
+
 export const WTS_CARRIER_OPTIONS = [
-    { value: 'AU', label: 'AU' },
-    { value: 'SB', label: 'SB' },
-    { value: 'ドコモ', label: 'ドコモ' },
-    { value: 'アハモ', label: 'アハモ' },
-    { value: 'UQモバイル', label: 'UQモバイル' },
-    { value: 'Yモバイル', label: 'Yモバイル' },
-    { value: '聞いてない', label: '聞いてない' },
-    { value: 'その他', label: 'その他' },
+    { value: '佐川', label: '佐川' },
+    { value: 'ヤマト', label: 'ヤマト' },
 ];

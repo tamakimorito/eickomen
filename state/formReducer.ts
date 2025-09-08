@@ -1,3 +1,4 @@
+// FIX: Add WTS_COLORS to import to resolve missing member error.
 import { INITIAL_FORM_DATA, WTS_COLORS } from '../constants.ts';
 import type { FormData, FormAction } from '../types.ts';
 import { ELEC_ID_PREFIX_OPTIONS, GAS_ID_PREFIX_OPTIONS, RACK_OPTIONS_CHINTAI_FREE_10G, RACK_OPTIONS_CHINTAI_FREE_MANSION, RACK_OPTIONS_1G, RACK_OPTIONS_10G } from '../constants.ts';
@@ -178,45 +179,6 @@ export const formReducer = (state: FormData, action: FormAction): FormData => {
           if (value === '東急ガス') {
               newState.gasHasContractConfirmation = 'あり';
           }
-      }
-      
-      // --- Mailing Option Logic ---
-      if (name === 'elecProvider') {
-        const newProvider = value;
-        const elecMailingConfig = {
-            'すまいのでんき（ストエネ）': '新居',
-            'プラチナでんき（ジャパン）': '新居',
-            'ニチガス電気セット': '新居',
-            '大阪ガス電気セット': '新居',
-            'キューエネスでんき': '新居',
-            '東京ガス電気セット': '現住所', 
-            '東邦ガスセット': '現住所', 
-            'ループでんき': '新居', 
-            'HTBエナジー': '新居', 
-            'ユーパワー UPOWER': '新居', 
-            'はぴe': '新居'
-        };
-        if (elecMailingConfig.hasOwnProperty(newProvider)) {
-            newState.mailingOption = elecMailingConfig[newProvider];
-        } else if (value === '') { 
-            newState.mailingOption = INITIAL_FORM_DATA.mailingOption;
-        }
-      }
-      
-      if (name === 'gasProvider') {
-        const newProvider = value;
-        const gasMailingConfig = {
-            'すまいのでんき（ストエネ）': '新居',
-            'ニチガス単品': '新居',
-            '大阪ガス単品': '新居',
-            '東邦ガス単品': '現住所', 
-            '東急ガス': '現住所'
-        };
-        if (gasMailingConfig.hasOwnProperty(newProvider)) {
-            newState.mailingOption = gasMailingConfig[newProvider];
-        } else if (value === '') {
-            newState.mailingOption = INITIAL_FORM_DATA.mailingOption;
-        }
       }
       
       // --- Internet Form Dynamic Logic ---

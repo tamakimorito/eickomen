@@ -143,7 +143,7 @@ const DefaultInternetForm = () => {
                 <h3 className="text-lg font-bold text-blue-700">その他詳細</h3>
                  <FormRadioGroup
                     label="書面発送先" name="mailingOption" value={formData.mailingOption} onChange={handleInputChange}
-                    options={MAILING_OPTIONS} isInvalid={invalidFields.includes('mailingOption')}
+                    options={MAILING_OPTIONS} isInvalid={invalidFields.includes('mailingOption')} required
                 />
                 {formData.mailingOption === '現住所' && (
                     <div className="p-4 bg-blue-50/50 rounded-lg border border-blue-200 grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -378,6 +378,14 @@ const AuHikariForm = () => {
   return (
     <div className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormInput
+                label="レコードID"
+                name="recordId"
+                value={formData.recordId}
+                onChange={handleInputChange}
+                isInvalid={invalidFields.includes('recordId')}
+                required
+            />
             <FormInput
                 label="名乗り"
                 name="greeting"

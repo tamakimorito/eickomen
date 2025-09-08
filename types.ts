@@ -86,6 +86,7 @@ export type FormData = {
   elecPostConfirmationDateTime: string;
   elecImportCompanyName: string;
   isNewConstruction: string;
+  qenesIsCorporate: boolean;
   
   // --- Gas Specific ---
   gasProvider: string;

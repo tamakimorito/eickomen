@@ -82,12 +82,17 @@ const ManualModal = ({ isOpen, onClose }) => {
                 <SubTitle>・入力内容のチェック機能</SubTitle>
                 <p className="text-gray-700 ml-4">必須項目が未入力のままコピーしようとすると、どの項目が足りないかを教えてくれます。</p>
             </li>
+            <li>
+                <SubTitle>・コメント欄の編集アラート</SubTitle>
+                <p className="text-gray-700 ml-4">生成コメント欄を直接編集しようとすると、不備防止のための確認画面が表示されます。</p>
+            </li>
           </ul>
 
           <SectionTitle icon={ArrowPathIcon}>コピーとリセット</SectionTitle>
           <ul className="list-disc list-inside space-y-1">
-            <ListItem>右下の「コピー」ボタンをクリックすると、生成されたコメント全文がクリップボードにコピーされます。</ListItem>
-            <ListItem>コピーが完了すると、**20分後**にフォームを自動リセットするタイマーが起動します。</ListItem>
+            <ListItem>右下の「コピー」ボタンを押すと、コメントがクリップボードにコピーされた後、フォームをすぐにリセットするか確認画面が表示されます。</ListItem>
+            <ListItem>「はい」を選ぶとフォームは即時リセットされ、「いいえ」を選ぶと入力内容は保持されます。</ListItem>
+            <ListItem>「いいえ」を選択した場合、**20分後**にフォームを自動リセットするタイマーが作動します。</ListItem>
             <ListItem>作業中に**他のタブに切り替える**と、このタイマーは自動で解除され、入力内容が保持されます。</ListItem>
             <ListItem>右下の「リセット(終話)」ボタンで、いつでもフォームを初期状態に戻せます。(安全のため、確認画面が表示されます)</ListItem>
           </ul>

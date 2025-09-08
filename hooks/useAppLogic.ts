@@ -27,6 +27,7 @@ const FIELD_LABELS = {
     attachedOption: '付帯OP', isNewConstruction: '新築', gasOpeningDate: 'ガス開栓日',
     gasOpeningTimeSlot: 'ガス立会時間枠', gasArea: 'ガスエリア', gasWitness: '立会者',
     gasPreContact: 'ガス事前連絡先', gasIsCorporate: '法人契約', elecConfirmationTime: '契確時間',
+    qenesIsCorporate: '法人契約', contactPersonName: '対応者（漢字）', contactPersonNameKana: '対応者（フリガナ）',
     // WTS
     wtsCustomerType: '顧客タイプ', wtsShippingDestination: '発送先', wtsShippingPostalCode: '発送先郵便番号',
     wtsShippingAddress: '発送先住所', wtsServerType: 'サーバー', wtsServerColor: 'サーバー色',
@@ -72,7 +73,7 @@ const getRequiredFields = (formData, activeTab) => {
                     if (!formData.gmoIsDocomoOwnerSame) required.push('gmoDocomoOwnerName', 'gmoDocomoOwnerPhone');
                 }
             } else if (product === 'AUひかり') {
-                required.push('greeting', 'contractorName', 'existingLineCompany', 'postalCode', 'address', 'phone', 'auContactType', 'auPlanProvider');
+                required.push('recordId', 'greeting', 'contractorName', 'existingLineCompany', 'postalCode', 'address', 'phone', 'auContactType', 'auPlanProvider');
             }
             break;
 
@@ -122,6 +123,9 @@ const getRequiredFields = (formData, activeTab) => {
                     required.push('attachedOption');
                 } else {
                     required.push('primaryProductStatus', 'elecConfirmationTime');
+                }
+                if (formData.qenesIsCorporate) {
+                    required.push('contactPersonName', 'contactPersonNameKana');
                 }
             }
 
@@ -391,12 +395,34 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
                 return;
             }
             navigator.clipboard.writeText(generatedComment).then(() => {
-                setToast({ message: 'コメントをコピーしました！20分後にフォームはリセットされます。', type: 'success' });
-                if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
-                resetTimerRef.current = setTimeout(() => {
-                    resetForm(true);
-                    setToast({ message: 'フォームが自動リセットされました。', type: 'info' });
-                }, 20 * 60 * 1000);
+                setToast({ message: 'コメントをコピーしました！', type: 'success' });
+
+                // After copy, show reset confirmation modal
+                setModalState({
+                    isOpen: true,
+                    title: 'フォームのリセット',
+                    message: '終話した場合、フォームをリセットできます。リセットしますか？',
+                    confirmText: 'はい、リセットする',
+                    cancelText: 'いいえ、まだ続ける',
+                    type: 'warning', // Makes 'cancel' (No) blue and 'confirm' (Yes) gray
+                    onConfirm: () => { // "Yes" clicked
+                        if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
+                        resetForm(true);
+                        setToast({ message: 'フォームをリセットしました', type: 'info' });
+                        closeModal();
+                    },
+                    onCancel: () => { // "No" clicked
+                        // Start 20-minute timer ONLY if user says no to immediate reset.
+                        if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
+                        resetTimerRef.current = setTimeout(() => {
+                            resetForm(true);
+                            setToast({ message: 'フォームが自動リセットされました。', type: 'info' });
+                        }, 20 * 60 * 1000);
+                        setToast({ message: '入力を継続します。20分後にフォームは自動リセットされます。', type: 'info' });
+                        closeModal();
+                    }
+                });
+
             }).catch(err => {
                 setToast({ message: 'コピーに失敗しました', type: 'error' });
                 console.error('Copy failed', err);

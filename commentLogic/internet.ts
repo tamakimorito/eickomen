@@ -100,7 +100,7 @@ const generateDefaultInternetComment = (formData: FormData): string => {
     switch (product) {
         case 'SoftBank光1G':
             commentLines = [
-                `〓SoftBank光1G〓${tag}`,
+                `〓SoftBank光1G〓 ${tag}`,
                 `タイプ：${housingType || ''}`,
                 `AP名：${apName || ''}`,
                 idField,
@@ -136,7 +136,7 @@ const generateDefaultInternetComment = (formData: FormData): string => {
 
         case 'SoftBank光10G':
             commentLines = [
-                `〓SoftBank光10ギガ〓${tag}`,
+                `〓SoftBank光10ギガ〓 ${tag}`,
                 `タイプ：${housingType || ''}`,
                 `AP名：${apName || ''}`,
                 idField,
@@ -171,7 +171,7 @@ const generateDefaultInternetComment = (formData: FormData): string => {
 
         case 'SB Air':
             commentLines = [
-                `〓SB Air〓${tag}`,
+                `〓SB Air〓 ${tag}`,
                 `タイプ：${housingType || ''}`,
                 `AP名：${apName || ''}`,
                 idField,
@@ -206,8 +206,8 @@ const generateDefaultInternetComment = (formData: FormData): string => {
                 if (isChintaiProduct) {
                     const isChintaiFree = product === '賃貸ねっと【無料施策】';
                     const header = isChintaiFree
-                        ? `【ちんむりょ賃貸ねっと無料施策】${tag}`
-                        : `【賃貸ねっと】${tag}`;
+                        ? `【ちんむりょ賃貸ねっと無料施策】 ${tag}`
+                        : `【賃貸ねっと】 ${tag}`;
 
                     commentLines.push(header);
                     commentLines.push(`タイプ：${housingType || ''}`);
@@ -378,6 +378,7 @@ const generateGmoDocomoComment = (formData: FormData): string => {
 const generateAuHikariComment = (formData: FormData): string => {
     const {
         apName,
+        recordId,
         greeting,
         contractorName,
         existingLineCompany,
@@ -410,8 +411,9 @@ const generateAuHikariComment = (formData: FormData): string => {
     const formattedPostalCode = formatPostalCodeWithHyphen(postalCode);
 
     let comment = [
-        `【AUひかり】※AUでんき案内禁止${tag}`,
+        `【AUひかり】※AUでんき案内禁止 ${tag}`,
         `獲得者：${apName || ''}`,
+        `レコードID：${recordId || ''}`,
         `名乗り：${greeting || ''}`,
         `お客様氏名：${contractorName || ''}`,
         `現状回線/プロバイダ：${existingLineCompany || ''}`,

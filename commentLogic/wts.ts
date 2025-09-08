@@ -54,11 +54,11 @@ export const generateWtsCommentLogic = (formData: FormData): string => {
     const formattedPhone = formatPhoneNumberWithHyphens(phone);
     const formattedShippingPostalCode = formatPostalCode(wtsShippingPostalCode);
     
-    let header = `【プレミアムウォーター】${tag}`;
+    let header = `【プレミアムウォーター】 ${tag}`;
     if (wtsCustomerType === 'U-20') {
-        header = `【プレミアムウォーターU20】${tag}`;
+        header = `【プレミアムウォーターU20】 ${tag}`;
     } else if (wtsCustomerType === '法人') {
-        header = `【プレミアムウォーター法人】${tag}`;
+        header = `【プレミアムウォーター法人】 ${tag}`;
     }
     
     const commentLines = [header];

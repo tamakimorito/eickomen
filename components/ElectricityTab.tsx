@@ -6,7 +6,7 @@ import {
     TIME_SLOTS_NICHI, TIME_SLOTS_SUTENE_SR, GAS_OPENING_TIME_SLOTS, TIME_SLOTS_TOKYO_GAS, TIME_SLOTS_TOHO_GAS_SETUP
 } from '../constants.ts';
 import { AppContext } from '../context/AppContext.tsx';
-import { FormInput, FormSelect, FormRadioGroup, FormTextArea, FormDateInput } from './FormControls.tsx';
+import { FormInput, FormSelect, FormRadioGroup, FormTextArea, FormDateInput, FormCheckbox } from './FormControls.tsx';
 
 // A component to render the mailing address section based on provider rules
 const MailingAddressSection = () => {
@@ -20,10 +20,8 @@ const MailingAddressSection = () => {
             case 'プラチナでんき（ジャパン）':
             case 'ニチガス電気セット':
             case '大阪ガス電気セット':
-                return { ...defaultConfig, showOptions: true, showFields: mailingOption === '現住所', isRequired: mailingOption === '現住所', description: '新住所郵送（指定も可能）' };
-            
             case 'キューエネスでんき':
-                return { ...defaultConfig, showOptions: true, showFields: mailingOption === '現住所', isRequired: false, description: '新住所郵送（指定も可能）' };
+                return { ...defaultConfig, showOptions: false, showFields: false, isRequired: false, description: '新住所郵送（指定も可能、その場合備考欄に特記事項としてわかりやすく書くこと）' };
 
             case 'リミックスでんき':
                 return { ...defaultConfig, showFields: true, isRequired: false, description: '決済登録が難しい場合などの書面送付先を入力します。' };
@@ -350,15 +348,6 @@ const ElectricityTab = () => {
                             <FormInput label="後確希望日/時間" name="elecPostConfirmationDateTime" value={formData.elecPostConfirmationDateTime} onChange={handleInputChange} isInvalid={invalidFields.includes('elecPostConfirmationDateTime')} />
                         </>
                     )}
-                    {isQenes && (
-                         <div className="md:col-span-2 p-4 bg-yellow-50 border border-yellow-300 rounded-lg space-y-4">
-                            <p className="text-sm font-bold text-yellow-800">※法人の場合は電話対応者名を記載</p>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <FormInput label="対応者（漢字）" name="contactPersonName" value={formData.contactPersonName} onChange={handleInputChange} isInvalid={invalidFields.includes('contactPersonName')} />
-                                <FormInput label="対応者（フリガナ）" name="contactPersonNameKana" value={formData.contactPersonNameKana} onChange={handleInputChange} isInvalid={invalidFields.includes('contactPersonNameKana')} />
-                            </div>
-                        </div>
-                    )}
                     {isHtb && (
                          <FormInput label="架電希望日時" name="postConfirmationTime" value={formData.postConfirmationTime} onChange={handleInputChange} isInvalid={invalidFields.includes('postConfirmationTime')} />
                     )}
@@ -370,6 +359,39 @@ const ElectricityTab = () => {
                     )}
                 </div>
                 <FormTextArea label="備考" name="remarks" value={formData.remarks} onChange={handleInputChange} rows={3} isInvalid={invalidFields.includes('remarks')} />
+                {isQenes && (
+                    <div className="pt-4 space-y-4">
+                         {/* FIX: Added missing description prop to FormCheckbox */}
+                         <FormCheckbox
+                            label="法人契約"
+                            name="qenesIsCorporate"
+                            checked={formData.qenesIsCorporate}
+                            onChange={handleInputChange}
+                            isInvalid={invalidFields.includes('qenesIsCorporate')}
+                            description=""
+                        />
+                        {formData.qenesIsCorporate && (
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-blue-50/50 rounded-lg border border-blue-200">
+                                <FormInput 
+                                    label="対応者（漢字）" 
+                                    name="contactPersonName" 
+                                    value={formData.contactPersonName} 
+                                    onChange={handleInputChange} 
+                                    isInvalid={invalidFields.includes('contactPersonName')}
+                                    required 
+                                />
+                                <FormInput 
+                                    label="対応者（フリガナ）" 
+                                    name="contactPersonNameKana" 
+                                    value={formData.contactPersonNameKana} 
+                                    onChange={handleInputChange} 
+                                    isInvalid={invalidFields.includes('contactPersonNameKana')}
+                                    required
+                                />
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
         </div>
     );

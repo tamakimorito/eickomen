@@ -75,12 +75,12 @@ export const generateGasCommentLogic = (formData: FormData): string => {
             switch (gasRecordIdPrefix) {
                 case 'SR':
                      if (gasIsVacancy === 'あり') {
-                        comment = `【ストエネ/★インポートのみ/すまいの/※空室プランHAHZZT223】${tag}\n${baseSuteneComment('※空室プラン　すまいのガスのみ')}`;
+                        comment = `【ストエネ/★インポートのみ/すまいの/※空室プランHAHZZT223】 ${tag}\n${baseSuteneComment('※空室プラン　すまいのガスのみ')}`;
                     } else { // なし
                         if (gasHasContractConfirmation === 'あり') {
-                            comment = `【ストエネ/賃貸】${tag}\n主商材受注状況：${primaryProductStatus || ''}\n契確時間：${elecConfirmationTime || ''}\nレコードID：${recordId || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：賃貸ガスのみ\nガス：あり/なし\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n性別：${gender || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${formattedPhone || ''}\n郵便番号：${formattedPostalCode || ''}\n引越し先住所：${address || ''}\n物件名：${buildingInfo || ''}\n利用開始日：電気→　　ガス→${moveInDate || ''}\n${gasTimeSlotLine}\n支払い方法：${paymentMethod || ''}\n${suteneMailingAddress}\n備考：${remarks || ''}`;
+                            comment = `【ストエネ/賃貸】 ${tag}\n主商材受注状況：${primaryProductStatus || ''}\n契確時間：${elecConfirmationTime || ''}\nレコードID：${recordId || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：賃貸ガスのみ\nガス：あり/なし\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n性別：${gender || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${formattedPhone || ''}\n郵便番号：${formattedPostalCode || ''}\n引越し先住所：${address || ''}\n物件名：${buildingInfo || ''}\n利用開始日：電気→　　ガス→${moveInDate || ''}\n${gasTimeSlotLine}\n支払い方法：${paymentMethod || ''}\n${suteneMailingAddress}\n備考：${remarks || ''}`;
                         } else {
-                            comment = `【ストエネ/★インポートのみ/すまいの】${tag}\n${baseSuteneComment('すまいのガスのみ')}`;
+                            comment = `【ストエネ/★インポートのみ/すまいの】 ${tag}\n${baseSuteneComment('すまいのガスのみ')}`;
                         }
                     }
                     break;
@@ -94,9 +94,9 @@ export const generateGasCommentLogic = (formData: FormData): string => {
                     break;
                 case 'それ以外':
                     if (gasIsVacancy === 'あり') {
-                        comment = `【ストエネ/※空室プラン/HZEZZT011】${tag}\n契確時間：${elecConfirmationTime || ''}\nレコードID：${recordId || ''}\n主商材受注状況：${primaryProductStatus || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：Fプラン\nすまいのガスのみ\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${formattedPhone || ''}\n郵便番号：${formattedPostalCode || ''}\n引越し先住所：${address || ''}\n物件名：${buildingInfo || ''}\n利用開始日：${moveInDate || ''}\n${gasTimeSlotLine}\n支払い方法：${paymentMethod || ''}`;
+                        comment = `【ストエネ/※空室プラン/HZEZZT011】 ${tag}\n契確時間：${elecConfirmationTime || ''}\nレコードID：${recordId || ''}\n主商材受注状況：${primaryProductStatus || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：Fプラン\nすまいのガスのみ\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${formattedPhone || ''}\n郵便番号：${formattedPostalCode || ''}\n引越し先住所：${address || ''}\n物件名：${buildingInfo || ''}\n利用開始日：${moveInDate || ''}\n${gasTimeSlotLine}\n支払い方法：${paymentMethod || ''}`;
                     } else { // なし
-                        comment = `【ストエネ】${tag}\n契確時間：${elecConfirmationTime || ''}\nレコードID：${recordId || ''}\n主商材受注状況：${primaryProductStatus || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：すまいのガスのみ\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${formattedPhone || ''}\n郵便番号：${formattedPostalCode || ''}\n引越し先住所：${address || ''}\n物件名：${buildingInfo || ''}\n利用開始日：電気→　　　　　ガス→${moveInDate || ''}\n${gasTimeSlotLine}\n支払い方法：${paymentMethod || ''}\n備考：${remarks || ''}`;
+                        comment = `【ストエネ】 ${tag}\n契確時間：${elecConfirmationTime || ''}\nレコードID：${recordId || ''}\n主商材受注状況：${primaryProductStatus || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：すまいのガスのみ\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${formattedPhone || ''}\n郵便番号：${formattedPostalCode || ''}\n引越し先住所：${address || ''}\n物件名：${buildingInfo || ''}\n利用開始日：電気→　　　　　ガス→${moveInDate || ''}\n${gasTimeSlotLine}\n支払い方法：${paymentMethod || ''}\n備考：${remarks || ''}`;
                     }
                     break;
             }
@@ -105,7 +105,7 @@ export const generateGasCommentLogic = (formData: FormData): string => {
         case '東京ガス単品':
             {
                 let tokyoGasCommentLines = [
-                    `【東京ガス ガス単品】${tag}`,
+                    `【東京ガス ガス単品】 ${tag}`,
                     `レコードID：${recordId || ''}`,
                     `担当者：${apName || ''}`,
                     `契約者名義（漢字）：${contractorName || ''}`,
@@ -136,7 +136,7 @@ export const generateGasCommentLogic = (formData: FormData): string => {
         case '東邦ガス単品':
             {
                 let tohoCommentLines = [
-                    `【東邦ガス_ガス単品】${tag}`,
+                    `【東邦ガス_ガス単品】 ${tag}`,
                     `レコードID：${recordId || ''}`,
                     `名乗り：${greeting || ''}`,
                     `担当者：${apName || ''}`,
@@ -164,7 +164,7 @@ export const generateGasCommentLogic = (formData: FormData): string => {
             {
                 const tokyuCurrentAddress = currentPostalCode ? `〒${formattedCurrentPostalCode} ${currentAddress || ''}` : currentAddress || '';
                 let tokyuCommentLines = [
-                    `【えねこねガス_開栓】${tag}`,
+                    `【えねこねガス_開栓】 ${tag}`,
                     `契確時間：${elecConfirmationTime || ''}`,
                     `レコードID：${recordId || ''}`,
                     `主商材受注状況：${primaryProductStatus || ''}`,
@@ -193,7 +193,7 @@ export const generateGasCommentLogic = (formData: FormData): string => {
         case '大阪ガス単品':
             {
                 let osakaCommentLines = [
-                    `【大阪ガス単品】${tag}`,
+                    `【大阪ガス単品】 ${tag}`,
                     `名乗り：${greeting || ''}`,
                     `レコードID：${recordId || ''}`,
                     `担当者：${apName || ''}`,
@@ -214,7 +214,7 @@ export const generateGasCommentLogic = (formData: FormData): string => {
             {
                 const nichiMailingAddress = `書面送付先：${mailingOption === '現住所' ? `現住所（${currentAddress || ''}）` : '設置先'}`;
                 let nichigasCommentLines = [
-                    `【ニチガス_単品】${tag}`,
+                    `【ニチガス_単品】 ${tag}`,
                     `レコードID：${recordId || ''}`,
                     `名乗り：${greeting || ''}`,
                     `担当者：${apName || ''}`,

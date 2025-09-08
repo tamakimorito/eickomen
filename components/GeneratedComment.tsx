@@ -1,9 +1,33 @@
-import React, { useContext } from 'https://esm.sh/react@^19.1.0';
+import React, { useContext, useState, useRef } from 'https://esm.sh/react@^19.1.0';
 import { AppContext } from '../context/AppContext.tsx';
 import { ClipboardDocumentIcon, PencilSquareIcon, ArrowPathIcon } from 'https://esm.sh/@heroicons/react@^2.2.0/24/outline';
 
 const GeneratedComment = () => {
-  const { generatedComment, setGeneratedComment, handleCopy, handleResetRequest } = useContext(AppContext);
+  const { generatedComment, setGeneratedComment, handleCopy, handleResetRequest, setModalState, closeModal } = useContext(AppContext);
+  const [hasConfirmedEdit, setHasConfirmedEdit] = useState(false);
+  const textareaRef = useRef(null);
+
+  const handleFocus = () => {
+    if (hasConfirmedEdit) return;
+
+    setModalState({
+      isOpen: true,
+      title: '編集の確認',
+      message: 'このコメント欄を直接編集すると不備が発生しやすくなります。\nコピーボタンの使用を推奨しますが、このまま編集を続けますか？',
+      confirmText: '編集を続ける',
+      cancelText: 'キャンセル',
+      type: 'warning',
+      onConfirm: () => {
+        setHasConfirmedEdit(true);
+        closeModal();
+        textareaRef.current?.focus();
+      },
+      onCancel: () => {
+        textareaRef.current?.blur();
+        closeModal();
+      },
+    });
+  };
 
   return (
     <div className="bg-white p-6 rounded-2xl shadow-xl border border-gray-200">
@@ -31,7 +55,9 @@ const GeneratedComment = () => {
         </div>
       </div>
       <textarea
+        ref={textareaRef}
         value={generatedComment}
+        onFocus={handleFocus}
         onChange={(e) => setGeneratedComment(e.target.value)}
         rows={20}
         className="w-full p-3 bg-blue-50/50 border border-blue-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out text-sm font-mono leading-relaxed"
