@@ -401,7 +401,7 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
                 setModalState({
                     isOpen: true,
                     title: 'フォームのリセット',
-                    message: '終話した場合、フォームをリセットできます。リセットしますか？',
+                    message: '無事にコピーは完了しました。リセットしますか？',
                     confirmText: 'はい、リセットする',
                     cancelText: 'いいえ、まだ続ける',
                     type: 'warning', // Makes 'cancel' (No) blue and 'confirm' (Yes) gray

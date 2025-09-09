@@ -14,11 +14,6 @@ const WtsTab = () => {
     const { wtsCustomerType, isSakaiRoute, wtsServerType } = formData;
     
     const colorOptions = useMemo(() => {
-        if (!wtsServerType) return [];
-        
-        if (wtsServerType.startsWith('スリム4')) {
-            return WTS_COLORS['スリム4ロング'] || [];
-        }
         return WTS_COLORS[wtsServerType] || [];
     }, [wtsServerType]);
     

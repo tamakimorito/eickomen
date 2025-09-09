@@ -491,24 +491,55 @@ export const WTS_U20_PARENTAL_CONSENT_OPTIONS = [
 ];
 
 export const WTS_SERVERS = [
+    { value: 'fam2', label: 'fam2' },
+    { value: 'リッタ', label: 'リッタ' },
+    { value: 'ロッカスマート', label: 'ロッカスマート' },
     { value: 'スリム4ロング', label: 'スリム4ロング' },
     { value: 'スリム4ショート', label: 'スリム4ショート' },
-    { value: 'アイコン', label: 'アイコン' },
+    { value: 'amadana', label: 'amadana' },
+    { value: 'スリムR2', label: 'スリムR2' },
+    { value: 'AURA', label: 'AURA' },
 ];
 
 export const WTS_COLORS = {
+    'fam2': [
+        { value: 'ホワイト', label: 'ホワイト' },
+        { value: 'ブラック', label: 'ブラック' },
+    ],
+    'リッタ': [
+        { value: 'ホワイト', label: 'ホワイト' },
+        { value: 'ブラック', label: 'ブラック' },
+    ],
+    'ロッカスマート': [
+        { value: 'ホワイト', label: 'ホワイト' },
+        { value: 'ブラック', label: 'ブラック' },
+    ],
     'スリム4ロング': [
         { value: 'ホワイト', label: 'ホワイト' },
         { value: 'ブラック', label: 'ブラック' },
-        { value: 'ピンク', label: 'ピンク' },
+        { value: 'トープ', label: 'トープ' },
+        { value: 'グレー', label: 'グレー' },
     ],
     'スリム4ショート': [
         { value: 'ホワイト', label: 'ホワイト' },
         { value: 'ブラック', label: 'ブラック' },
+        { value: 'トープ', label: 'トープ' },
+        { value: 'グレー', label: 'グレー' },
     ],
-    'アイコン': [
+    'amadana': [
         { value: 'ホワイト', label: 'ホワイト' },
         { value: 'ブラック', label: 'ブラック' },
+        { value: 'ブラウン', label: 'ブラウン' },
+    ],
+    'スリムR2': [
+        { value: 'ホワイト', label: 'ホワイト' },
+        { value: 'ブラック', label: 'ブラック' },
+    ],
+    'AURA': [
+        { value: 'ホワイト', label: 'ホワイト' },
+        { value: 'ブラック', label: 'ブラック' },
+        { value: 'ブルーブラック', label: 'ブルーブラック' },
+        { value: 'メタリック', label: 'メタリック' },
     ],
 };
 
