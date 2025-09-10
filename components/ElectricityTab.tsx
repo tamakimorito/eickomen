@@ -276,8 +276,6 @@ const ElectricityTab = () => {
                     
                     { !isQenesItanji && !isRemix && <FormRadioGroup label="主商材受注状況" name="primaryProductStatus" value={formData.primaryProductStatus} onChange={handleInputChange} options={PRIMARY_PRODUCT_STATUS_OPTIONS} isInvalid={invalidFields.includes('primaryProductStatus')} required={isQenesOther} /> }
 
-                    { showAttachedOption && <FormRadioGroup label={isRemix ? "付帯" : "付帯OP"} name="attachedOption" value={formData.attachedOption} onChange={handleInputChange} options={ATTACHED_OPTION_OPTIONS} isInvalid={invalidFields.includes('attachedOption')} required={isQenesItanji || isRemix} /> }
-                    
                     {showNewConstructionOption && <FormRadioGroup label="新築" name="isNewConstruction" value={formData.isNewConstruction} onChange={handleInputChange} options={NEW_CONSTRUCTION_OPTIONS} isInvalid={invalidFields.includes('isNewConstruction')} />}
                 </div>
             </div>
@@ -338,6 +336,8 @@ const ElectricityTab = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     { !isQenesItanji && !isRemix && <FormInput label="契確時間" name="elecConfirmationTime" value={formData.elecConfirmationTime} onChange={handleInputChange} isInvalid={invalidFields.includes('elecConfirmationTime')} required={isQenesOther} /> }
                     
+                    { showAttachedOption && <FormRadioGroup label={isRemix ? "付帯" : "付帯OP"} name="attachedOption" value={formData.attachedOption} onChange={handleInputChange} options={ATTACHED_OPTION_OPTIONS} isInvalid={invalidFields.includes('attachedOption')} required /> }
+
                     {(elecProvider !== '東京ガス電気セット' || isOsakaGasSet) && (
                         <FormSelect label="支払い方法" name="paymentMethod" value={formData.paymentMethod} onChange={handleInputChange} options={PAYMENT_METHOD_OPTIONS_EXTENDED} isInvalid={invalidFields.includes('paymentMethod')} />
                     )}

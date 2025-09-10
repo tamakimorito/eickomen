@@ -429,7 +429,9 @@ export const TIME_SLOTS_SUTENE_SR = [
 
 export const TIME_SLOTS_NICHI = [
     { value: '9-12', label: '9-12時' },
-    { value: '13-17', label: '13-17時' },
+    { value: '13-15', label: '13-15時' },
+    { value: '15-17', label: '15-17時' },
+    { value: '17-19', label: '17-19時※日祝のみ選択可' },
 ];
 
 export const TIME_SLOTS_TOKYO_GAS = [
@@ -549,6 +551,13 @@ export const WTS_FREE_WATER_OPTIONS = [
 ];
 
 export const WTS_CARRIER_OPTIONS = [
-    { value: '佐川', label: '佐川' },
-    { value: 'ヤマト', label: 'ヤマト' },
+    { value: 'AU', label: 'AU' },
+    { value: 'ドコモ', label: 'ドコモ' },
+    { value: 'SB', label: 'SB' },
+    { value: 'UQ', label: 'UQ' },
+    { value: 'Yモバイル', label: 'Yモバイル' },
+    { value: 'POVO', label: 'POVO' },
+    { value: 'LINEMO', label: 'LINEMO' },
+    { value: 'AHAMO', label: 'AHAMO' },
+    { value: 'その他', label: 'その他' },
 ];

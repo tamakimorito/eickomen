@@ -118,10 +118,41 @@ const getRequiredFields = (formData, activeTab) => {
                 required.push('hasContractConfirmation');
             }
 
+            // --- Logic for attachedOption ---
+            const isSumai = elecProvider === 'すまいのでんき（ストエネ）';
+            const isPlatinum = elecProvider === 'プラチナでんき（ジャパン）';
+            const isRemix = elecProvider === 'リミックスでんき';
+            const isQenes = elecProvider === 'キューエネスでんき';
+            const isQenesItanji = isQenes && recordId?.startsWith('ID:');
+
+            const isPlatinumOtherConfirmed = isPlatinum &&
+                   ['それ以外', 'ID:', 'No.'].includes(elecRecordIdPrefix) &&
+                   hasContractConfirmation === 'あり';
+    
+            const isImportOnlyCase = (
+                hasContractConfirmation === 'なし' ||
+                (isSumai && elecRecordIdPrefix === 'code:') ||
+                (isPlatinum && (
+                    ['S', 'STJP:'].includes(elecRecordIdPrefix) ||
+                    (elecRecordIdPrefix === 'SR' && hasContractConfirmation !== 'あり') ||
+                    (elecRecordIdPrefix === 'サカイ' && isAllElectric !== 'あり') ||
+                    (['それ以外', 'No.'].includes(elecRecordIdPrefix) && hasContractConfirmation !== 'あり')
+                ))
+            );
+    
+            const showAttachedOption = (
+                !isPlatinumOtherConfirmed &&
+                (isRemix || isQenesItanji || (
+                    !['ニチガス電気セット', '東邦ガスセット', '大阪ガス電気セット'].includes(elecProvider) && isImportOnlyCase
+                ))
+            );
+    
+            if (showAttachedOption) {
+                required.push('attachedOption');
+            }
+
             if (elecProvider === 'キューエネスでんき') {
-                if (recordId?.startsWith('ID:')) {
-                    required.push('attachedOption');
-                } else {
+                if (!recordId?.startsWith('ID:')) {
                     required.push('primaryProductStatus', 'elecConfirmationTime');
                 }
                 if (formData.qenesIsCorporate) {
