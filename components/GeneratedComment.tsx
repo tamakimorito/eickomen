@@ -1,11 +1,15 @@
-import React, { useContext, useState, useRef } from 'https://esm.sh/react@^19.1.0';
+import React, { useContext, useState, useRef, useEffect } from 'https://esm.sh/react@^19.1.0';
 import { AppContext } from '../context/AppContext.tsx';
 import { ClipboardDocumentIcon, PencilSquareIcon, ArrowPathIcon } from 'https://esm.sh/@heroicons/react@^2.2.0/24/outline';
 
 const GeneratedComment = () => {
-  const { generatedComment, setGeneratedComment, handleCopy, handleResetRequest, setModalState, closeModal } = useContext(AppContext);
+  const { generatedComment, setGeneratedComment, handleCopy, handleResetRequest, setModalState, closeModal, formData, activeTab } = useContext(AppContext);
   const [hasConfirmedEdit, setHasConfirmedEdit] = useState(false);
   const textareaRef = useRef(null);
+
+  useEffect(() => {
+    setHasConfirmedEdit(false);
+  }, [formData?.recordId, activeTab]);
 
   const handleFocus = () => {
     if (hasConfirmedEdit) return;

@@ -274,7 +274,7 @@ const ElectricityTab = () => {
                     {showContractConfirmationOption && <FormRadioGroup label="契確は必要ですか？" name="hasContractConfirmation" value={formData.hasContractConfirmation} onChange={handleInputChange} options={YES_NO_OPTIONS} isInvalid={invalidFields.includes('hasContractConfirmation')} required disabled={isContractConfirmationDisabled} />}
                     {showGasSetOption && <FormRadioGroup label="ガスセット" name="isGasSet" value={isGasSet} onChange={handleInputChange} options={SET_NONE_OPTIONS} isInvalid={invalidFields.includes('isGasSet')} />}
                     
-                    { !isQenesItanji && !isRemix && <FormRadioGroup label="主商材受注状況" name="primaryProductStatus" value={formData.primaryProductStatus} onChange={handleInputChange} options={PRIMARY_PRODUCT_STATUS_OPTIONS} isInvalid={invalidFields.includes('primaryProductStatus')} required={isQenesOther} /> }
+                    { !isQenesItanji && !isRemix && hasContractConfirmation !== 'なし' && <FormRadioGroup label="主商材受注状況" name="primaryProductStatus" value={formData.primaryProductStatus} onChange={handleInputChange} options={PRIMARY_PRODUCT_STATUS_OPTIONS} isInvalid={invalidFields.includes('primaryProductStatus')} required={isQenesOther} /> }
 
                     {showNewConstructionOption && <FormRadioGroup label="新築" name="isNewConstruction" value={formData.isNewConstruction} onChange={handleInputChange} options={NEW_CONSTRUCTION_OPTIONS} isInvalid={invalidFields.includes('isNewConstruction')} />}
                 </div>

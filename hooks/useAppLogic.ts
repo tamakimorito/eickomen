@@ -150,14 +150,13 @@ const getRequiredFields = (formData, activeTab) => {
             if (showAttachedOption) {
                 required.push('attachedOption');
             }
-
-            if (elecProvider === 'キューエネスでんき') {
-                if (!recordId?.startsWith('ID:')) {
-                    required.push('primaryProductStatus', 'elecConfirmationTime');
+            
+            const isQenesOther = isQenes && !recordId?.startsWith('ID:');
+            if (isQenesOther) {
+                if (hasContractConfirmation !== 'なし') {
+                    required.push('primaryProductStatus');
                 }
-                if (formData.qenesIsCorporate) {
-                    required.push('contactPersonName', 'contactPersonNameKana');
-                }
+                required.push('elecConfirmationTime');
             }
 
             if (['キューエネスでんき', 'ユーパワー UPOWER', 'HTBエナジー', 'リミックスでんき', 'ループでんき'].includes(elecProvider)) {
@@ -174,6 +173,9 @@ const getRequiredFields = (formData, activeTab) => {
             }
             if (['東邦ガスセット', '東京ガス電気セット'].includes(elecProvider)) {
                 required.push('currentAddress');
+            }
+            if (formData.qenesIsCorporate) {
+                required.push('contactPersonName', 'contactPersonNameKana');
             }
             break;
         }

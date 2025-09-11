@@ -171,7 +171,7 @@ const GasTab = () => {
                     {isTokyu && (
                         <FormRadioGroup label="契確は必要ですか？" name="gasHasContractConfirmation" value={formData.gasHasContractConfirmation} onChange={handleInputChange} options={[{value: 'あり', label: 'あり'}]} disabled isInvalid={invalidFields.includes('gasHasContractConfirmation')} />
                     )}
-                    {(isSumainoGas || isTokyu) && (
+                    {(isSumainoGas || isTokyu) && formData.gasHasContractConfirmation !== 'なし' && (
                          <FormRadioGroup label="主商材受注状況" name="primaryProductStatus" value={formData.primaryProductStatus} onChange={handleInputChange} options={PRIMARY_PRODUCT_STATUS_OPTIONS} isInvalid={invalidFields.includes('primaryProductStatus')} />
                     )}
                      {!isSumainoGas && !isTokyu && <p className="text-gray-600 md:col-span-2">この商材に特有の契約条件はありません。</p>}
