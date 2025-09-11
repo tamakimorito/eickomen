@@ -1,6 +1,4 @@
-
-
-import React, { useContext } from 'https://esm.sh/react@^19.1.0';
+import React, { useContext } from 'react';
 import { AppContext } from './context/AppContext.tsx';
 import InternetTab from './components/InternetTab.tsx';
 import ElectricityTab from './components/ElectricityTab.tsx';
@@ -13,7 +11,7 @@ import { Modal } from './components/Modal.tsx';
 import ManualModal from './components/ManualModal.tsx';
 import BugReportModal from './components/BugReportModal.tsx';
 import { FormInput, FormCheckbox } from './components/FormControls.tsx';
-import { BoltIcon, FireIcon, WifiIcon, CloudIcon, ChatBubbleBottomCenterTextIcon, XCircleIcon, XMarkIcon } from 'https://esm.sh/@heroicons/react@^2.2.0/24/solid';
+import { BoltIcon, FireIcon, WifiIcon, CloudIcon, ChatBubbleBottomCenterTextIcon, XCircleIcon, XMarkIcon } from '@heroicons/react/24/solid';
 
 const TABS = [
   { id: 'electricity', label: '電気', icon: BoltIcon },

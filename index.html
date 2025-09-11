@@ -8,18 +8,27 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700&display=swap" rel="stylesheet">
     <link rel="icon" href="data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3e%3ccircle cx='50' cy='50' r='50' fill='%23facc15'/%3e%3cpath d='M50,22 C 30,22 30,42 30,42 L 30,65 C 30,70 35,70 35,70 L 65,70 C 70,70 70,65 70,65 L 70,42 C 70,42 70,22 50,22 Z' fill='%231e40af'/%3e%3ccircle cx='50' cy='75' r='8' fill='%231e40af'/%3e%3c/svg%3e">
-    <script src="https://cdn.tailwindcss.com"></script>
-<!-- JSX/TSXをブラウザで変換するためにBabelを追加 -->
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <style>
   body {
     font-family: 'M PLUS Rounded 1c', sans-serif;
   }
 </style>
+<!-- Tailwind (CDN, version pinned) -->
+<script src="https://cdn.tailwindcss.com/3.4.10"></script>
+<script>
+  // 必要最小の設定。class名は既存どおりで解決する。
+  tailwind.config = {
+    theme: { extend: {} },
+    corePlugins: { preflight: true } // 以前と同等の初期化
+  };
+</script>
 <script type="importmap">
 {
   "imports": {
-    "react/": "https://esm.sh/react@^19.1.1/"
+    "react/": "https://aistudiocdn.com/react@^19.1.1/",
+    "react": "https://aistudiocdn.com/react@^19.1.1",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.1.1/",
+    "@heroicons/react/": "https://aistudiocdn.com/@heroicons/react@^2.2.0/"
   }
 }
 </script>
@@ -27,8 +36,6 @@
 </head>
   <body class="bg-blue-50">
     <div id="root"></div>
-    <!-- BabelにTSXをモジュールとして処理するように指示 -->
-    <script type="text/babel" data-presets="react,typescript" data-type="module" src="./index.tsx"></script>
-  <script type="module" src="/index.tsx"></script>
-</body>
+    <script type="module" src="/index.tsx"></script>
+  </body>
 </html>

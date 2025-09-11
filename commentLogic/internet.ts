@@ -68,7 +68,7 @@ const generateDefaultInternetComment = (formData: FormData): string => {
         mobileCarrier,
         homeDiscount,
         wifiRouter,
-        remarks,
+        internetRemarks,
         managementCompany,
         managementNumber,
         contactPerson,
@@ -130,7 +130,7 @@ const generateDefaultInternetComment = (formData: FormData): string => {
                 `携帯キャリア：${mobileCarrier || ''}`,
                 `おうち割：${homeDiscount || ''}`,
                 `無線ルーター購入：${wifiRouter || ''}`,
-                `備考：${remarks || ''}`
+                `備考：${internetRemarks || ''}`
             );
             break;
 
@@ -165,7 +165,7 @@ const generateDefaultInternetComment = (formData: FormData): string => {
                 `既存回線：${existingLineStatus === 'あり' ? `あり（回線会社：${existingLineCompany || ''}）` : '無し'}`,
                 `携帯キャリア：${mobileCarrier || ''}`,
                 `おうち割：${homeDiscount || ''}`,
-                `備考：${remarks || ''}`
+                `備考：${internetRemarks || ''}`
             );
             break;
 
@@ -197,7 +197,7 @@ const generateDefaultInternetComment = (formData: FormData): string => {
                 `ＣＰ：${campaign || ''}`,
                 `既存回線：${existingLineStatus === 'あり' ? `あり（回線会社：${existingLineCompany || ''}）` : '無し'}`,
                 `携帯キャリア：${mobileCarrier || ''}`,
-                `備考：${remarks || ''}`
+                `備考：${internetRemarks || ''}`
             );
             break;
 
@@ -242,7 +242,7 @@ const generateDefaultInternetComment = (formData: FormData): string => {
                     const paymentText = paymentMethod === '口座' ? `口座（銀行名：${bankName || ''}）※外国人は口座NG` : (paymentMethod || '');
                     commentLines.push(`支払方法：${paymentText}`);
                     commentLines.push(`クロスパス無線ルーター：${crossPathRouter || ''}`);
-                    commentLines.push(`備考：${remarks || ''}`);
+                    commentLines.push(`備考：${internetRemarks || ''}`);
                     
                     const showChintaiOwnerInfo = housingType === 'ファミリー' || (housingType === '10G' && rackType === '無し');
 
@@ -291,7 +291,7 @@ const generateGmoDocomoComment = (formData: FormData): string => {
         existingLineCompany, gmoCallback1, gmoCallback2, gmoCallback3,
         gmoCallbackDate1, gmoCallbackDate2, gmoCallbackDate3,
         gmoNoPairIdType, mobileCarrier, paymentMethod,
-        managementCompany, managementNumber, contactPerson, noDrilling, remarks
+        managementCompany, managementNumber, contactPerson, noDrilling, internetRemarks
     } = formData;
     
     const tag = "250811";
@@ -368,8 +368,8 @@ const generateGmoDocomoComment = (formData: FormData): string => {
         }
     }
     
-    if (remarks) {
-        commentLines.push(`備考：${remarks}`);
+    if (internetRemarks) {
+        commentLines.push(`備考：${internetRemarks}`);
     }
 
     return commentLines.join('\n');
@@ -385,7 +385,7 @@ const generateAuHikariComment = (formData: FormData): string => {
         postalCode,
         address,
         auPlanProvider,
-        remarks, // This is used for '案内内容'
+        internetRemarks, // This is used for '案内内容'
         auWifiRouter,
         auOptions,
         auSupport,
@@ -420,7 +420,7 @@ const generateAuHikariComment = (formData: FormData): string => {
         `郵便番号：${formattedPostalCode || ''}`,
         `住所：${address || ''}`,
         `案内プラン/プロバイダ：${auPlanProvider ? `${auPlanProvider}/ソネット` : ''}`,
-        `案内内容：${remarks || ''}`, // remarks field is used here
+        `案内内容：${internetRemarks || ''}`, // internetRemarks field is used here
         `Wi-Fiルーター：${auWifiRouter || ''}`,
         `オプション付帯：${auOptions || ''}`,
         `乗り換えサポート：${auSupport || ''}`,
@@ -449,7 +449,7 @@ const generateGmoTokutokuComment = (formData: FormData): string => {
         existingLineCompany,
         email,
         paymentMethod,
-        remarks,
+        internetRemarks,
         // Owner Info
         managementCompany,
         managementNumber,
@@ -490,7 +490,7 @@ const generateGmoTokutokuComment = (formData: FormData): string => {
         }
     }
 
-    commentLines.push(`備考：${remarks || ''}`);
+    commentLines.push(`備考：${internetRemarks || ''}`);
     
     return commentLines.join('\n');
 };

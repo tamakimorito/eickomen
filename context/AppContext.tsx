@@ -1,4 +1,4 @@
-import React, { createContext, useMemo, type PropsWithChildren } from 'https://esm.sh/react@^19.1.0';
+import React, { createContext, useMemo, type PropsWithChildren } from 'react';
 import { useFormLogic } from '../hooks/useFormLogic.ts';
 import { useAppLogic } from '../hooks/useAppLogic.ts';
 

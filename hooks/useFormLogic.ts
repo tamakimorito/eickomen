@@ -1,4 +1,4 @@
-import { useReducer, useCallback, useState } from 'https://esm.sh/react@^19.1.0';
+import { useReducer, useCallback, useState } from 'react';
 import { formReducer } from '../state/formReducer.ts';
 import { INITIAL_FORM_DATA } from '../constants.ts';
 

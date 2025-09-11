@@ -1,6 +1,6 @@
-import React from 'https://esm.sh/react@^19.1.0';
+import React from 'react';
 import { FormTextArea } from './FormControls.tsx';
-import { ChatBubbleBottomCenterTextIcon, XMarkIcon } from 'https://esm.sh/@heroicons/react@^2.2.0/24/solid';
+import { ChatBubbleBottomCenterTextIcon, XMarkIcon } from '@heroicons/react/24/solid';
 
 const BugReportModal = ({ isOpen, onClose, reportText, onReportTextChange, onSubmit, isSubmitting, isInvalid }) => {
   if (!isOpen) return null;

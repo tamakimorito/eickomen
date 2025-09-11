@@ -1,6 +1,6 @@
-import React, { useContext, useState, useRef, useEffect } from 'https://esm.sh/react@^19.1.0';
+import React, { useContext, useState, useRef, useEffect } from 'react';
 import { AppContext } from '../context/AppContext.tsx';
-import { ClipboardDocumentIcon, PencilSquareIcon, ArrowPathIcon } from 'https://esm.sh/@heroicons/react@^2.2.0/24/outline';
+import { ClipboardDocumentIcon, PencilSquareIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 
 const GeneratedComment = () => {
   const { generatedComment, setGeneratedComment, handleCopy, handleResetRequest, setModalState, closeModal, formData, activeTab } = useContext(AppContext);

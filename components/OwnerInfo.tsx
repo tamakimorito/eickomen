@@ -1,7 +1,7 @@
-import React, { useContext } from 'https://esm.sh/react@^19.1.0';
+import React, { useContext } from 'react';
 import { AppContext } from '../context/AppContext.tsx';
 import { FormInput, FormCheckbox } from './FormControls.tsx';
-import { HomeModernIcon } from 'https://esm.sh/@heroicons/react@^2.2.0/24/outline';
+import { HomeModernIcon } from '@heroicons/react/24/outline';
 
 const OwnerInfo = ({ isChintai }) => {
   const { formData, handleInputChange, invalidFields } = useContext(AppContext);

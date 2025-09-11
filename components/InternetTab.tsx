@@ -1,4 +1,4 @@
-import React, { useMemo, useContext } from 'https://esm.sh/react@^19.1.0';
+import React, { useMemo, useContext } from 'react';
 import { 
     PRODUCTS, HOUSING_TYPES_1G, HOUSING_TYPES_10G, HOUSING_TYPES_AIR, HOUSING_TYPES_CHINTAI, HOUSING_TYPES_CHINTAI_FREE,
     RACK_OPTIONS_1G, RACK_OPTIONS_10G, RACK_OPTIONS_CHINTAI_FREE_MANSION, RACK_OPTIONS_CHINTAI_FREE_10G,
@@ -257,8 +257,8 @@ const DefaultInternetForm = () => {
                     )}
                 </div>
                 <FormTextArea
-                    label="備考" name="remarks" value={formData.remarks} onChange={handleInputChange}
-                    rows={3} isInvalid={invalidFields.includes('remarks')}
+                    label="備考" name="internetRemarks" value={formData.internetRemarks} onChange={handleInputChange}
+                    rows={3} isInvalid={invalidFields.includes('internetRemarks')}
                 />
             </div>
             
@@ -339,7 +339,7 @@ const GmoDocomoForm = () => {
                 </div>
             </div>
              {isFamily && <OwnerInfo isChintai={false} />}
-             <FormTextArea label="備考" name="remarks" value={formData.remarks} onChange={handleInputChange} rows={3} isInvalid={invalidFields.includes('remarks')} />
+             <FormTextArea label="備考" name="internetRemarks" value={formData.internetRemarks} onChange={handleInputChange} rows={3} isInvalid={invalidFields.includes('internetRemarks')} />
         </div>
     );
 };
@@ -368,7 +368,7 @@ const GmoTokutokuForm = () => {
                 </div>
             </div>
             {formData.gmoTokutokuPlan === 'ファミリー' && <OwnerInfo isChintai={false} />}
-            <FormTextArea label="備考" name="remarks" value={formData.remarks} onChange={handleInputChange} rows={3} isInvalid={invalidFields.includes('remarks')} />
+            <FormTextArea label="備考" name="internetRemarks" value={formData.internetRemarks} onChange={handleInputChange} rows={3} isInvalid={invalidFields.includes('internetRemarks')} />
         </div>
     );
 };
@@ -514,11 +514,11 @@ const AuHikariForm = () => {
          <div className="border-t-2 border-dashed border-blue-300 pt-6 space-y-4">
             <FormTextArea
                 label="案内内容（備考）"
-                name="remarks"
-                value={formData.remarks}
+                name="internetRemarks"
+                value={formData.internetRemarks}
                 onChange={handleInputChange}
                 rows={3}
-                isInvalid={invalidFields.includes('remarks')}
+                isInvalid={invalidFields.includes('internetRemarks')}
             />
         </div>
     </div>

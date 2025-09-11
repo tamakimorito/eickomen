@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from 'https://esm.sh/react@^19.1.0';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { BUG_REPORT_SCRIPT_URL } from '../constants.ts';
 import { generateElectricityCommentLogic } from '../commentLogic/electricity.ts';
 import { generateGasCommentLogic } from '../commentLogic/gas.ts';
@@ -12,7 +12,9 @@ const FIELD_LABELS = {
     buildingInfo: '物件名＋部屋番号', moveInDate: '利用開始日/入居予定日', mailingOption: '書面発送先',
     currentPostalCode: '現住所の郵便番号', currentAddress: '現住所・物件名・部屋番号',
     existingLineStatus: '既存回線', existingLineCompany: '回線会社', mobileCarrier: '携帯キャリア',
-    homeDiscount: 'おうち割', remarks: '備考', paymentMethod: '支払方法',
+    homeDiscount: 'おうち割', remarks: '備考',
+    elecRemarks: '備考', gasRemarks: '備考', internetRemarks: '備考', wtsRemarks: '備考',
+    paymentMethod: '支払方法',
     // Internet
     product: '商材', housingType: 'タイプ', rackType: 'ラック', serviceFee: '案内料金', campaign: 'CP',
     preActivationRental: '開通前レンタル', wifiRouter: '無線ルーター購入', bankName: '銀行名',
@@ -431,6 +433,7 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
                 setToast({ message: 'コメントをコピーしました！', type: 'success' });
 
                 // After copy, show reset confirmation modal
+                // FIX: Add missing isErrorBanner and bannerMessage properties to setModalState call
                 setModalState({
                     isOpen: true,
                     title: 'フォームのリセット',
@@ -453,7 +456,9 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
                         }, 20 * 60 * 1000);
                         setToast({ message: '入力を継続します。20分後にフォームは自動リセットされます。', type: 'info' });
                         closeModal();
-                    }
+                    },
+                    isErrorBanner: false,
+                    bannerMessage: '',
                 });
 
             }).catch(err => {
@@ -566,6 +571,7 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
         }
     
         if (dateErrors.length > 0) {
+            // FIX: Add missing bannerMessage property
             setModalState({
                 isOpen: true,
                 title: '入力内容の確認',
@@ -576,6 +582,7 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
                 cancelText: '修正する',
                 type: 'warning',
                 isErrorBanner: false,
+                bannerMessage: '',
             });
         } else {
             performCopy();
@@ -583,6 +590,7 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
     }, [generatedComment, formData, activeTab, resetForm, closeModal, setInvalidFields, setToast]);
 
     const handleResetRequest = useCallback(() => {
+        // FIX: Add missing bannerMessage property
         setModalState({
             isOpen: true,
             title: 'フォームのリセット確認',
@@ -599,6 +607,7 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
             cancelText: 'キャンセル',
             type: 'danger',
             isErrorBanner: false,
+            bannerMessage: '',
         });
     }, [resetForm, closeModal, setInvalidFields]);
     
@@ -705,6 +714,7 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
         if (name === 'dob') {
             const fifteenYearsAgo = new Date(today.getFullYear() - 15, today.getMonth(), today.getDate());
             if (dateToValidate > fifteenYearsAgo) {
+                // FIX: Add missing isErrorBanner and bannerMessage properties
                 setModalState({
                     isOpen: true,
                     title: '入力内容の確認',
@@ -713,7 +723,9 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
                     onCancel: closeModal,
                     confirmText: 'このまま進む',
                     cancelText: '修正する',
-                    type: 'warning'
+                    type: 'warning',
+                    isErrorBanner: false,
+                    bannerMessage: '',
                 });
             }
         }
@@ -723,6 +735,7 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
         if (moveInDateFields.includes(name)) {
             const fiveYearsAgo = new Date(today.getFullYear() - 5, today.getMonth(), today.getDate());
             if (dateToValidate <= fiveYearsAgo) {
+                // FIX: Add missing isErrorBanner and bannerMessage properties
                 setModalState({
                     isOpen: true,
                     title: '入力内容の確認',
@@ -731,7 +744,9 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
                     onCancel: closeModal,
                     confirmText: 'このまま進む',
                     cancelText: '修正する',
-                    type: 'warning'
+                    type: 'warning',
+                    isErrorBanner: false,
+                    bannerMessage: '',
                 });
             }
         }

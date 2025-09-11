@@ -1,5 +1,5 @@
-import React, { type PropsWithChildren } from 'https://esm.sh/react@^19.1.0';
-import { BookOpenIcon, XMarkIcon, ShareIcon, BoltIcon, BellAlertIcon, ArrowPathIcon } from 'https://esm.sh/@heroicons/react@^2.2.0/24/solid';
+import React, { type PropsWithChildren } from 'react';
+import { BookOpenIcon, XMarkIcon, ShareIcon, BoltIcon, BellAlertIcon, ArrowPathIcon } from '@heroicons/react/24/solid';
 
 const ManualModal = ({ isOpen, onClose }) => {
   if (!isOpen) return null;

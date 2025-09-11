@@ -1,4 +1,4 @@
-import React, { useContext, useMemo } from 'https://esm.sh/react@^19.1.0';
+import React, { useContext, useMemo } from 'react';
 import {
     WTS_CUSTOMER_TYPES, WTS_SHIPPING_DESTINATIONS, WTS_FIVE_YEAR_PLAN_OPTIONS,
     WTS_WATER_PURIFIER_OPTIONS, WTS_MULTIPLE_UNITS_OPTIONS,
@@ -302,11 +302,11 @@ const WtsTab = () => {
             <div className="border-t-2 border-dashed border-blue-300 pt-6 space-y-4">
                 <FormTextArea
                     label="備考"
-                    name="remarks"
-                    value={formData.remarks}
+                    name="wtsRemarks"
+                    value={formData.wtsRemarks}
                     onChange={handleInputChange}
                     rows={4}
-                    isInvalid={invalidFields.includes('remarks')}
+                    isInvalid={invalidFields.includes('wtsRemarks')}
                 />
             </div>
         </div>

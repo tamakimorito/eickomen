@@ -1,4 +1,4 @@
-import React, { useMemo, useContext } from 'https://esm.sh/react@^19.1.0';
+import React, { useMemo, useContext, useEffect } from 'react';
 import { 
     ELEC_PROVIDERS, YES_NO_OPTIONS, ATTACHED_OPTION_OPTIONS,
     SET_NONE_OPTIONS, PRIMARY_PRODUCT_STATUS_OPTIONS, 
@@ -102,6 +102,16 @@ const MailingAddressSection = () => {
 const ElectricityTab = () => {
     const { formData, handleInputChange, handleDateBlurWithValidation, handleNameBlur, handleIdBlur, invalidFields } = useContext(AppContext);
     const { elecProvider, elecRecordIdPrefix, isGasSet, isSakaiRoute, recordId, hasContractConfirmation, isAllElectric } = formData;
+
+    useEffect(() => {
+      const isElecTarget =
+        formData.elecProvider === 'すまいのでんき（ストエネ）' ||
+        formData.elecProvider === 'プラチナでんき（ジャパン）';
+
+      if (isElecTarget && formData.isAllElectric === 'あり' && formData.isGasSet) {
+        handleInputChange({ target: { name: 'isGasSet', value: '' } } as any);
+      }
+    }, [formData.elecProvider, formData.isAllElectric]);
     
     const isSumai = elecProvider === 'すまいのでんき（ストエネ）';
     const isPlatinum = elecProvider === 'プラチナでんき（ジャパン）';
@@ -112,7 +122,7 @@ const ElectricityTab = () => {
     const isRemix = elecProvider === 'リミックスでんき';
 
 
-    const showGasSetOption = elecProvider === 'すまいのでんき（ストエネ）';
+    const showGasSetOption = elecProvider === 'すまいのでんき（ストエネ）' && formData.isAllElectric !== 'あり';
     
     const showContractConfirmationOption = useMemo(() => {
         if (isSumai) {
@@ -358,7 +368,7 @@ const ElectricityTab = () => {
                          <FormSelect label="後確希望時間" name="postConfirmationTime" value={formData.postConfirmationTime} onChange={handleInputChange} options={TIME_SLOTS_TOHO} isInvalid={invalidFields.includes('postConfirmationTime')} />
                     )}
                 </div>
-                <FormTextArea label="備考" name="remarks" value={formData.remarks} onChange={handleInputChange} rows={3} isInvalid={invalidFields.includes('remarks')} />
+                <FormTextArea label="備考" name="elecRemarks" value={formData.elecRemarks} onChange={handleInputChange} rows={3} isInvalid={invalidFields.includes('elecRemarks')} />
                 {isQenes && (
                     <div className="pt-4 space-y-4">
                          {/* FIX: Added missing description prop to FormCheckbox */}

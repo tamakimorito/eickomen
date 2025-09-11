@@ -24,6 +24,10 @@ export const INITIAL_FORM_DATA: FormData = {
   mobileCarrier: '',
   homeDiscount: '',
   remarks: '',
+  elecRemarks: '',
+  gasRemarks: '',
+  internetRemarks: '',
+  wtsRemarks: '',
   paymentMethod: '',
   recordId: '',
 
@@ -417,8 +421,6 @@ export const GAS_OPENING_TIME_SLOTS = [
     { value: '9-12', label: '9-12時' },
     { value: '13-15', label: '13-15時' },
     { value: '15-17', label: '15-17時' },
-    { value: '17-19', label: '17-19時' },
-    { value: '終日', label: '終日' },
 ];
 
 export const TIME_SLOTS_SUTENE_SR = [
@@ -431,14 +433,14 @@ export const TIME_SLOTS_NICHI = [
     { value: '9-12', label: '9-12時' },
     { value: '13-15', label: '13-15時' },
     { value: '15-17', label: '15-17時' },
-    { value: '17-19', label: '17-19時※日祝のみ選択可' },
+    { value: '17-19', label: '17-19時（※日祝は選択不可）' },
 ];
 
 export const TIME_SLOTS_TOKYO_GAS = [
     { value: '9-12', label: '9-12時' },
     { value: '13-15', label: '13-15時' },
     { value: '15-17', label: '15-17時' },
-    { value: '17-19', label: '17-19時' },
+    { value: '17-19', label: '17-19時（※日祝は選択不可）' },
 ];
 
 export const TIME_SLOTS_TOHO = [

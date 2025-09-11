@@ -21,7 +21,11 @@ export type FormData = {
   existingLineCompany: string;
   mobileCarrier: string;
   homeDiscount: string;
-  remarks: string;
+  remarks: string; // 既存（後方互換のため残置／UIでは不使用）
+  elecRemarks: string;      // 電気タブ専用 備考
+  gasRemarks: string;       // ガスタブ専用 備考
+  internetRemarks: string;  // インターネットタブ専用 備考
+  wtsRemarks: string;       // ウォーターサーバータブ専用 備考
   paymentMethod: string;
   recordId: string;
 

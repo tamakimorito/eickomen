@@ -1,5 +1,5 @@
-import React from 'https://esm.sh/react@^19.1.0';
-import { BellIcon, QuestionMarkCircleIcon, ArrowPathIcon } from 'https://esm.sh/@heroicons/react@^2.2.0/24/solid';
+import React from 'react';
+import { BellIcon, QuestionMarkCircleIcon, ArrowPathIcon } from '@heroicons/react/24/solid';
 
 const Header = ({ onManualOpen, onResetRequest }) => {
   return (
@@ -11,7 +11,7 @@ const Header = ({ onManualOpen, onResetRequest }) => {
             </div>
             <div>
             <h1 className="text-2xl sm:text-3xl font-bold tracking-wider">営業コメント作成ツール～エイコメン～</h1>
-            <p className="text-xs text-blue-200 mt-1">Version: v1.18.1</p>
+            <p className="text-xs text-blue-200 mt-1">Version: v1.18.5</p>
             </div>
         </div>
         <div className="flex items-center gap-x-3">

@@ -43,7 +43,7 @@ export const generateWtsCommentLogic = (formData: FormData): string => {
         wtsShippingPostalCode, wtsShippingAddress,
         wtsServerColor, wtsFiveYearPlan, wtsFreeWater, wtsCreditCard, wtsCarrier,
         moveInDate, wtsWaterPurifier, wtsMultipleUnits, wtsCustomerType,
-        wtsU20HighSchool, wtsU20ParentalConsent, wtsCorporateInvoice, remarks, wtsMailingAddress,
+        wtsU20HighSchool, wtsU20ParentalConsent, wtsCorporateInvoice, wtsRemarks, wtsMailingAddress,
         recordId, isSakaiRoute, wtsServerType, wtsEmail, currentAddress, currentPostalCode
     } = { ...formData, dob: formatDate(formData.dob), moveInDate: formatDate(formData.moveInDate) };
     
@@ -117,8 +117,8 @@ export const generateWtsCommentLogic = (formData: FormData): string => {
 
     let comment = commentLines.join('\n');
     
-    if (remarks) {
-      comment += `\n備考：${remarks}`;
+    if (wtsRemarks) {
+      comment += `\n備考：${wtsRemarks}`;
     }
 
     return comment;

@@ -1,4 +1,4 @@
-import React, { useMemo, useContext } from 'https://esm.sh/react@^19.1.0';
+import React, { useMemo, useContext } from 'react';
 import { 
     GAS_PROVIDERS, YES_NO_OPTIONS,
     PRIMARY_PRODUCT_STATUS_OPTIONS, ATTACHED_OPTION_OPTIONS, GENDERS, 
@@ -284,7 +284,7 @@ const GasTab = () => {
                         <FormInput label="後確希望日/時間" name="postConfirmationTime" value={formData.postConfirmationTime} onChange={handleInputChange} isInvalid={invalidFields.includes('postConfirmationTime')} />
                     )}
                  </div>
-                <FormTextArea label="備考" name="remarks" value={formData.remarks} onChange={handleInputChange} rows={3} isInvalid={invalidFields.includes('remarks')} />
+                <FormTextArea label="備考" name="gasRemarks" value={formData.gasRemarks} onChange={handleInputChange} rows={3} isInvalid={invalidFields.includes('gasRemarks')} />
             </div>
         </div>
     );

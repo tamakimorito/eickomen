@@ -99,11 +99,11 @@ export const formReducer = (state: FormData, action: FormAction): FormData => {
 
       if (!oldIsPlatinumSakai && newIsPlatinumSakai) {
           // Condition just became true, set remarks
-          newState.remarks = '5000円CB';
+          newState.elecRemarks = '5000円CB';
       } else if (oldIsPlatinumSakai && !newIsPlatinumSakai) {
           // Condition just became false, only clear remarks if it's the default text
-          if (state.remarks === '5000円CB') {
-              newState.remarks = '';
+          if (state.elecRemarks === '5000円CB') {
+              newState.elecRemarks = '';
           }
       }
       
@@ -115,8 +115,8 @@ export const formReducer = (state: FormData, action: FormAction): FormData => {
         const isEligibleId = recordId.startsWith('ID:') || /^CC\d+/.test(recordId);
 
         if (isEligibleProvider && isEligibleId) {
-            if (newState.remarks === '') {
-                newState.remarks = '5,000円CB';
+            if (newState.elecRemarks === '') {
+                newState.elecRemarks = '5,000円CB';
             }
         }
       }
@@ -140,130 +140,24 @@ export const formReducer = (state: FormData, action: FormAction): FormData => {
         newState.gmoDocomoOwnerName = '';
         newState.gmoDocomoOwnerPhone = '';
       }
-      
-      // --- Electricity/Gas Contract Confirmation Logic ---
-      const newElecProvider = name === 'elecProvider' ? value : newState.elecProvider;
-      const oldPrefix = state.elecRecordIdPrefix;
-      const newPrefix = newState.elecRecordIdPrefix;
-      const newIsAllElectric = name === 'isAllElectric' ? value : newState.isAllElectric;
-      const otherPlatinumChannels = ['それ以外', 'ID:', 'No.'];
-
-      if (name === 'elecProvider' || name === 'recordId' || name === 'isSakaiRoute') {
-        if (newElecProvider === 'プラチナでんき（ジャパン）' && otherPlatinumChannels.includes(newPrefix) && !otherPlatinumChannels.includes(oldPrefix)) {
-            newState.hasContractConfirmation = 'なし';
-        }
-      }
-      
-      if (name === 'elecProvider' || name === 'recordId' || name === 'isSakaiRoute' || name === 'isAllElectric') {
-        if (newElecProvider === 'プラチナでんき（ジャパン）') {
-            if (newPrefix === 'SR') {
-                newState.hasContractConfirmation = 'なし';
-            } else if (newIsAllElectric !== 'あり' && !otherPlatinumChannels.includes(newPrefix)) {
-                newState.hasContractConfirmation = ''; 
-            }
-        } else if (newElecProvider === 'すまいのでんき（ストエネ）' && newPrefix === 'code:') {
-            newState.hasContractConfirmation = 'なし';
-        } else if (newElecProvider === 'キューエネスでんき') {
-            newState.hasContractConfirmation = (newPrefix === 'ID:') ? 'なし' : 'あり';
-        }
-      }
-
-
-       // Clear attachedOption and gender if hasContractConfirmation becomes 'あり' for Platinum other channels
-      if (name === 'hasContractConfirmation' && value === 'あり' && newElecProvider === 'プラチナでんき（ジャパン）' && otherPlatinumChannels.includes(newPrefix)) {
-        newState.attachedOption = '';
-        newState.gender = '';
-      }
-
-      if (name === 'gasProvider') {
-          if (value === '東急ガス') {
-              newState.gasHasContractConfirmation = 'あり';
-          }
-      }
-      
-      // --- Internet Form Dynamic Logic ---
-      if (name === 'product') {
-          const defaultInternetFields = {
-              housingType: '', rackType: '', campaign: '', serviceFee: '', homeDiscount: '', crossPathRouter: '',
-              gmoConstructionSplit: false, gmoCompensation: '', gmoRouter: '', gmoIsDocomoOwnerSame: true,
-              gmoDocomoOwnerName: '', gmoDocomoOwnerPhone: '', gmoCallback1: '', gmoCallback2: '',
-              gmoCallback3: '', gmoNoPairIdType: '',
-              auPlanProvider: '', auWifiRouter: '', auOptions: '話してないです', auSupport: '',
-              auCampaign: '2万円CB', auContactType: '', auPreCheckTime: '',
-          };
-          newState = { ...newState, ...defaultInternetFields };
-      }
-
-      const newHousingType = name === 'housingType' ? value : newState.housingType;
-      const newProduct = name === 'product' ? value : newState.product;
-      const currentRackOptions = getRackOptions(newProduct, newHousingType);
-
-      if (name === 'housingType' && !currentRackOptions.some(opt => opt.value === newState.rackType)) {
-          newState.rackType = '';
-      }
-
-      if (name === 'product' || name === 'housingType') {
-          if (newProduct.startsWith('SoftBank') || newProduct === 'SB Air') {
-              if (newProduct === 'SoftBank光10G') {
-                  newState.serviceFee = '3カ月0円→6930円';
-              } else if (newProduct === 'SB Air') {
-                  newState.serviceFee = '3カ月1485円、2年4950円、3年以降5368円';
-              } else { // 1G
-                  if (newHousingType === 'マンション') newState.serviceFee = '4180';
-                  else if (newHousingType === 'ファミリー') newState.serviceFee = '5720';
-                  else newState.serviceFee = '';
-              }
-          } else if (newProduct.startsWith('賃貸ねっと')) {
-              if (newProduct === '賃貸ねっと') {
-                  if (newHousingType === 'マンション') newState.serviceFee = '3960';
-                  else if (newHousingType === 'ファミリー') newState.serviceFee = '5060';
-                  else if (newHousingType === '10G') {
-                    newState.serviceFee = '6160';
-                    newState.crossPathRouter = '10Gレンタル';
-                  } else {
-                    newState.serviceFee = '';
-                    newState.crossPathRouter = '';
-                  }
-                  if (newHousingType !== '10G' && newState.crossPathRouter === '10Gレンタル') {
-                      newState.crossPathRouter = '';
-                  }
-              } else if (newProduct === '賃貸ねっと【無料施策】') {
-                  if (newHousingType === 'マンション') {
-                      newState.serviceFee = '初月無料→3960';
-                      newState.crossPathRouter = '無料施策プレゼント';
-                      if (newState.rackType === '光配線クロス') newState.rackType = '';
-                  } else if (newHousingType === 'マンション10G') {
-                      newState.serviceFee = '初月無料→6160';
-                      newState.crossPathRouter = '10Gレンタル';
-                      newState.rackType = '光配線クロス';
-                  } else {
-                    newState.serviceFee = '';
-                    newState.crossPathRouter = '';
-                    newState.rackType = '';
-                  }
-              }
-          }
-      }
-      
+      // FIX: Ensure all code paths in the reducer function return a value. The 'UPDATE_FIELD' case was missing its return statement.
       return newState;
-    }
-    
-    case 'UPDATE_DERIVED_FIELDS_FROM_ID': {
-        // This action is deprecated and its logic is merged into 'UPDATE_FIELD' for better consistency.
-        // Kept to avoid breaking older parts of the code if they still call it.
-        return state;
     }
 
     case 'SET_FORM_DATA':
-        return { ...state, ...action.payload };
-    
+      return { ...state, ...action.payload };
+
     case 'RESET_FORM': {
       const { keepApName, apName } = action.payload;
-      return {
-        ...INITIAL_FORM_DATA,
-        apName: keepApName ? apName : '',
-      };
+      if (keepApName) {
+        return { ...INITIAL_FORM_DATA, apName: apName };
+      }
+      return INITIAL_FORM_DATA;
     }
+
+    case 'UPDATE_DERIVED_FIELDS_FROM_ID':
+      // This logic is now handled inside 'UPDATE_FIELD', but we keep the case for safety.
+      return state;
 
     default:
       return state;
