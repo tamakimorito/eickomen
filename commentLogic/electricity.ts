@@ -249,7 +249,7 @@ export const generateElectricityCommentLogic = (formData: FormData): string => {
             break;
         }
         case 'リミックスでんき':
-            comment = `【リミックスでんき/★インポートのみ】 ${tag}\nレコードID：${recordId || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：ベーシックプラン\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${formattedPhone || ''}\n郵便番号：${formattedPostalCode || ''}\n住所：${address || ''}\n物件名：${buildingInfo || ''}\n利用開始日：${moveInDate || ''}\n---\n郵送先郵便番号：${formattedCurrentPostalCode || ''}\n郵送先住所：${currentAddress || ''}\n郵送先物件名：${mailingBuildingInfo || ''}\n---\nメアド：${email || ''}\n支払い方法：${paymentMethod || ''}\n付帯：${attachedOption || ''}\n備考：${elecRemarks || ''}`;
+            comment = `【リミックスでんき/★インポートのみ】 ${tag}\nレコードID：${recordId || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：${attachedOption === 'あり' ? 'ベーシックプランセット' : 'ベーシックプラン'}\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${formattedPhone || ''}\n郵便番号：${formattedPostalCode || ''}\n住所：${address || ''}\n物件名：${buildingInfo || ''}\n利用開始日：${moveInDate || ''}\n---\n郵送先郵便番号：${formattedCurrentPostalCode || ''}\n郵送先住所：${currentAddress || ''}\n郵送先物件名：${mailingBuildingInfo || ''}\n---\nメアド：${email || ''}\n支払い方法：${paymentMethod || ''}\n付帯：${attachedOption || ''}\n備考：${elecRemarks || ''}`;
             break;
         case 'HTBエナジー':
             comment = `【エネ商流_HTBエナジー】 ${tag}

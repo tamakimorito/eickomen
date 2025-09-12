@@ -288,6 +288,7 @@ export const PAYMENT_METHOD_OPTIONS_EXTENDED = [
 export const CROSS_PATH_ROUTER_OPTIONS = [
     { value: '4950円購入', label: '4950円購入' },
     { value: 'お客様で手配', label: 'お客様で手配' },
+    { value: '10Gレンタル', label: '10Gレンタル' },
 ];
 
 // --- GMO Docomo Constants ---

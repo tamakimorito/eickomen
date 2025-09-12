@@ -184,7 +184,7 @@ const getRequiredFields = (formData, activeTab) => {
 
         case 'gas': {
             const { gasProvider, gasHasContractConfirmation } = formData;
-            required.push('gasProvider', 'contractorName', 'contractorNameKana', 'dob', 'phone', 'postalCode', 'address', 'buildingInfo', 'moveInDate');
+            required.push('gasProvider', 'contractorName', 'contractorNameKana', 'dob', 'phone', 'postalCode', 'address', 'buildingInfo', 'gasOpeningDate');
             
             if (!isSakaiRoute) required.push('recordId');
 

@@ -29,6 +29,27 @@ const getRackOptions = (product, housingType) => {
     return baseOptions;
 }
 
+const computeServiceFee = (product: string, housingType: string): string => {
+  switch (product) {
+    case 'SoftBank光1G':
+      if (housingType === 'マンション') return '4180';
+      if (housingType === 'ファミリー') return '5720';
+      return '';
+    case 'SoftBank光10G':
+      return '3カ月0円→6930円';
+    case 'SB Air':
+      return '3カ月1485円、2年4950円、3年以降5368円';
+    case '賃貸ねっと':
+    case '賃貸ねっと【無料施策】':
+      if (housingType === 'マンション' || housingType === 'マンション10G') return '3960';
+      if (housingType === 'ファミリー') return '5060';
+      if (housingType === '10G') return '6160';
+      return '';
+    default:
+      return '';
+  }
+};
+
 export const formReducer = (state: FormData, action: FormAction): FormData => {
   switch (action.type) {
     case 'UPDATE_FIELD': {
@@ -110,15 +131,42 @@ export const formReducer = (state: FormData, action: FormAction): FormData => {
       // --- CB Remarks Logic for ID:/CC: records ---
       if (name === 'elecProvider' || name === 'recordId') {
         const cbEligibleProviders = ['すまいのでんき（ストエネ）', 'プラチナでんき（ジャパン）', 'キューエネスでんき'];
+        
+        // Check old state eligibility
+        const wasEligibleProvider = cbEligibleProviders.includes(state.elecProvider);
+        const oldRecordId = state.recordId || '';
+        const wasEligibleId = oldRecordId.startsWith('ID:') || /^CC\d+/.test(oldRecordId);
+
+        // Check new state eligibility
         const isEligibleProvider = cbEligibleProviders.includes(newState.elecProvider);
         const recordId = newState.recordId || '';
         const isEligibleId = recordId.startsWith('ID:') || /^CC\d+/.test(recordId);
 
         if (isEligibleProvider && isEligibleId) {
+            // If eligible, add CB text if remarks are empty
             if (newState.elecRemarks === '') {
                 newState.elecRemarks = '5,000円CB';
             }
+        } else if (wasEligibleProvider && wasEligibleId && !(isEligibleProvider && isEligibleId)) {
+            // If it was eligible before but isn't now, clear the remark if it's the exact auto-inserted text
+            if (newState.elecRemarks === '5,000円CB') {
+                newState.elecRemarks = '';
+            }
         }
+      }
+      
+       // --- Logic for serviceFee auto-update ---
+      if (name === 'product' || name === 'housingType') {
+          const oldAutoFee = computeServiceFee(state.product, state.housingType);
+          const newAutoFee = computeServiceFee(newState.product, newState.housingType);
+
+          // Update only if the field is empty or still contains the old auto-generated value
+          if (state.serviceFee === '' || state.serviceFee === oldAutoFee) {
+              newState.serviceFee = newAutoFee;
+          }
+           if (newState.product === '賃貸ねっと【無料施策】') {
+               newState.crossPathRouter = 'プレゼント';
+           }
       }
 
 

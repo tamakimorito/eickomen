@@ -183,11 +183,11 @@ const GasTab = () => {
                 <div className="p-4 bg-blue-50/50 rounded-lg border border-blue-200 space-y-4">
                      <FormDateInput
                         label="ガス利用開始日"
-                        name="moveInDate"
-                        value={formData.moveInDate}
+                        name="gasOpeningDate"
+                        value={formData.gasOpeningDate}
                         onChange={handleInputChange}
                         onBlur={handleDateBlurWithValidation}
-                        isInvalid={invalidFields.includes('moveInDate')}
+                        isInvalid={invalidFields.includes('gasOpeningDate')}
                         placeholder="例: 2024/08/01"
                         required
                     />

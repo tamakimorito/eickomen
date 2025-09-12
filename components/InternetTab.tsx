@@ -162,13 +162,13 @@ const DefaultInternetForm = () => {
                    {(!isChintai && !isChintaiFree) &&
                     <FormInput
                         label="案内料金" name="serviceFee" value={formData.serviceFee} onChange={handleInputChange}
-                        isInvalid={invalidFields.includes('serviceFee')} disabled={is10G} required
+                        isInvalid={invalidFields.includes('serviceFee')} required
                     />
                    }
                    {(isChintai || isChintaiFree) &&
                      <FormInput
                         label="案内料金" name="serviceFee" value={formData.serviceFee} onChange={handleInputChange}
-                        isInvalid={invalidFields.includes('serviceFee')} disabled={true} required
+                        isInvalid={invalidFields.includes('serviceFee')} required
                     />
                    }
                     {(!isChintai && !isChintaiFree) &&
@@ -189,19 +189,11 @@ const DefaultInternetForm = () => {
                                     isInvalid={invalidFields.includes('bankName')} required
                                 />
                             )}
-                            {formData.housingType === '10G' ? (
-                                <FormInput
-                                    label="クロスパス無線ルーター" name="crossPathRouter" value={formData.crossPathRouter}
-                                    onChange={handleInputChange} isInvalid={invalidFields.includes('crossPathRouter')}
-                                    className="md:col-span-2" disabled required
-                                />
-                            ) : (
-                                <FormSelect
-                                    label="クロスパス無線ルーター" name="crossPathRouter" value={formData.crossPathRouter}
-                                    onChange={handleInputChange} options={CROSS_PATH_ROUTER_OPTIONS}
-                                    isInvalid={invalidFields.includes('crossPathRouter')} className="md:col-span-2" required
-                                />
-                            )}
+                            <FormSelect
+                                label="クロスパス無線ルーター" name="crossPathRouter" value={formData.crossPathRouter}
+                                onChange={handleInputChange} options={CROSS_PATH_ROUTER_OPTIONS}
+                                isInvalid={invalidFields.includes('crossPathRouter')} className="md:col-span-2" required
+                            />
                         </>
                     )}
                     {isChintaiFree && (
@@ -216,10 +208,10 @@ const DefaultInternetForm = () => {
                                     isInvalid={invalidFields.includes('bankName')} required
                                 />
                             )}
-                            <FormInput
+                            <FormSelect
                                 label="クロスパス無線ルーター" name="crossPathRouter" value={formData.crossPathRouter}
-                                onChange={handleInputChange} isInvalid={invalidFields.includes('crossPathRouter')}
-                                className="md:col-span-2" disabled required
+                                onChange={handleInputChange} options={[{ value: 'プレゼント', label: 'プレゼント' }]}
+                                isInvalid={invalidFields.includes('crossPathRouter')} className="md:col-span-2" required
                             />
                         </>
                     )}
