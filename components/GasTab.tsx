@@ -70,7 +70,7 @@ const MailingAddressSection = () => {
                         name="currentAddress"
                         value={currentAddress}
                         onChange={handleInputChange}
-                        className="md:col-span-2"
+                        className="md-col-span-2"
                         isInvalid={invalidFields.includes('currentAddress')}
                         required={config.isRequired}
                     />

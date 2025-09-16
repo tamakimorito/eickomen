@@ -18,13 +18,15 @@ const MailingAddressSection = () => {
         switch(elecProvider) {
             case 'すまいのでんき（ストエネ）':
             case 'プラチナでんき（ジャパン）':
-            case 'ニチガス電気セット':
             case '大阪ガス電気セット':
             case 'キューエネスでんき':
                 return { ...defaultConfig, showOptions: false, showFields: false, isRequired: false, description: '新住所郵送（指定も可能、その場合備考欄に特記事項としてわかりやすく書くこと）' };
 
             case 'リミックスでんき':
-                return { ...defaultConfig, showFields: true, isRequired: false, description: '決済登録が難しい場合などの書面送付先を入力します。' };
+                return { ...defaultConfig, showOptions: true, showFields: mailingOption === '現住所', isRequired: true, description: '書面送付先を選択してください。' };
+            
+            case 'ニチガス電気セット':
+                return { ...defaultConfig, showOptions: true, showFields: mailingOption === '現住所', isRequired: true, description: '書面送付先を選択してください。' };
 
             case '東京ガス電気セット':
                  return { ...defaultConfig, fixedValue: '現住所', showFields: true, isRequired: true, description: '書面は現住所へ送付されます。' };
@@ -60,6 +62,7 @@ const MailingAddressSection = () => {
                     onChange={handleInputChange}
                     options={MAILING_OPTIONS}
                     isInvalid={invalidFields.includes('mailingOption')}
+                    required={config.isRequired}
                 />
             )}
             
@@ -78,7 +81,7 @@ const MailingAddressSection = () => {
                         name="currentAddress"
                         value={currentAddress}
                         onChange={handleInputChange}
-                        className="md:col-span-2"
+                        className="md-col-span-2"
                         isInvalid={invalidFields.includes('currentAddress')}
                         required={config.isRequired}
                     />
@@ -88,7 +91,7 @@ const MailingAddressSection = () => {
                             name="mailingBuildingInfo"
                             value={mailingBuildingInfo}
                             onChange={handleInputChange}
-                            className="md:col-span-2"
+                            className="md-col-span-2"
                             isInvalid={invalidFields.includes('mailingBuildingInfo')}
                         />
                     )}

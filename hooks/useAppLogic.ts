@@ -80,7 +80,7 @@ const getRequiredFields = (formData, activeTab) => {
             break;
 
         case 'electricity': {
-            const { elecProvider, elecRecordIdPrefix, isAllElectric, hasContractConfirmation, recordId, isVacancy } = formData;
+            const { elecProvider, elecRecordIdPrefix, isAllElectric, hasContractConfirmation, recordId, isVacancy, mailingOption } = formData;
             required.push('elecProvider', 'greeting', 'contractorName', 'contractorNameKana', 'dob', 'phone', 'postalCode', 'address', 'buildingInfo', 'moveInDate');
             
             if (elecProvider !== '東京ガス電気セット' && !['すまいのでんき（ストエネ）', 'プラチナでんき（ジャパン）'].includes(elecProvider)) {
@@ -167,8 +167,11 @@ const getRequiredFields = (formData, activeTab) => {
              if (elecProvider === 'すまいのでんき（ストエネ）' && formData.isGasSet === 'セット' || ['ニチガス電気セット', '東邦ガスセット', '東京ガス電気セット', '大阪ガス電気セット'].includes(elecProvider)) {
                 required.push('gasOpeningDate', 'gasOpeningTimeSlot');
             }
-             if (formData.mailingOption === '現住所' && ['すまいのでんき（ストエネ）', 'プラチナでんき（ジャパン）', 'ニチガス電気セット', '東京ガス電気セット', '東邦ガスセット', '大阪ガス電気セット'].includes(elecProvider)) {
+             if (mailingOption === '現住所' && ['リミックスでんき', 'ニチガス電気セット', '東京ガス電気セット', '東邦ガスセット'].includes(elecProvider)) {
                 required.push('currentPostalCode', 'currentAddress');
+            }
+            if (elecProvider === 'リミックスでんき' || elecProvider === 'ニチガス電気セット') {
+                required.push('mailingOption');
             }
             if (['ニチガス電気セット'].includes(elecProvider)) {
                 required.push('gasArea', 'gasWitness', 'gasPreContact');
@@ -678,32 +681,49 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
         const { name, value } = e.target;
         if (!value) return;
 
-        // 1. Formatting Logic
-        let processedValue = value;
-        const match = value.match(/^(?<month>\d{1,2})\/(?<day>\d{1,2})$/);
-        if (match?.groups) {
-            const { month, day } = match.groups;
-            const m = parseInt(month, 10);
-            const d = parseInt(day, 10);
-            if (m >= 1 && m <= 12 && d >= 1 && d <= 31) {
-                const today = new Date();
-                const currentYear = today.getFullYear();
-                const targetDate = new Date(currentYear, m - 1, d);
-                if (targetDate.getMonth() === m - 1) {
-                    processedValue = `${targetDate.getFullYear()}/${String(targetDate.getMonth() + 1).padStart(2, '0')}/${String(targetDate.getDate()).padStart(2, '0')}`;
-                }
-            }
-        } else {
-            const targetDate = new Date(value);
-            if (!isNaN(targetDate.getTime())) {
-                processedValue = `${targetDate.getFullYear()}/${String(targetDate.getMonth() + 1).padStart(2, '0')}/${String(targetDate.getDate()).padStart(2, '0')}`;
+        let processedValue = value.trim();
+        let isValidDate = false;
+
+        // Try to parse different formats
+        // YYYYMMDD
+        if (/^\d{8}$/.test(processedValue)) {
+            processedValue = `${processedValue.substring(0, 4)}/${processedValue.substring(4, 6)}/${processedValue.substring(6, 8)}`;
+        }
+        // YYYY-MM-DD or YYYY.MM.DD or YYYY/MM/DD
+        else if (/^\d{4}[-./]\d{1,2}[-./]\d{1,2}$/.test(processedValue)) {
+            const parts = processedValue.replace(/[.-]/g, '/').split('/');
+            processedValue = `${parts[0]}/${String(parts[1]).padStart(2, '0')}/${String(parts[2]).padStart(2, '0')}`;
+        }
+        // M/D
+        else if (/^\d{1,2}\/\d{1,2}$/.test(processedValue)) {
+            const today = new Date();
+            const currentYear = today.getFullYear();
+            const parts = processedValue.split('/');
+            processedValue = `${currentYear}/${String(parts[0]).padStart(2, '0')}/${String(parts[1]).padStart(2, '0')}`;
+        }
+
+        // Final validation
+        if (/^\d{4}\/\d{2}\/\d{2}$/.test(processedValue)) {
+            const date = new Date(processedValue);
+            // Check if the date is valid (e.g., not 2025/02/30) by checking if the components match after construction
+            if (!isNaN(date.getTime()) && date.toISOString().startsWith(processedValue.replace(/\//g, '-'))) {
+                isValidDate = true;
             }
         }
+
+        if (!isValidDate) {
+            setToast({ message: '日付はYYYY/MM/DD形式で入力してください（例：2025/09/16）', type: 'error' });
+            setInvalidFields(prev => [...new Set([...prev, name])]);
+            return;
+        }
+
         if (processedValue !== value) {
             dispatch({ type: 'UPDATE_FIELD', payload: { name, value: processedValue } });
         }
+        
+        setInvalidFields(prev => prev.filter(f => f !== name));
 
-        // 2. Validation Logic
+        // 2. Validation Logic (Age, etc.)
         const dateToValidate = new Date(processedValue);
         if (isNaN(dateToValidate.getTime())) return;
 
@@ -714,7 +734,6 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
         if (name === 'dob') {
             const fifteenYearsAgo = new Date(today.getFullYear() - 15, today.getMonth(), today.getDate());
             if (dateToValidate > fifteenYearsAgo) {
-                // FIX: Add missing isErrorBanner and bannerMessage properties
                 setModalState({
                     isOpen: true,
                     title: '入力内容の確認',
@@ -735,7 +754,6 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
         if (moveInDateFields.includes(name)) {
             const fiveYearsAgo = new Date(today.getFullYear() - 5, today.getMonth(), today.getDate());
             if (dateToValidate <= fiveYearsAgo) {
-                // FIX: Add missing isErrorBanner and bannerMessage properties
                 setModalState({
                     isOpen: true,
                     title: '入力内容の確認',
@@ -750,7 +768,7 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
                 });
             }
         }
-    }, [dispatch, setModalState, closeModal]);
+    }, [dispatch, setModalState, closeModal, setToast, setInvalidFields]);
     
     
     return {
