@@ -694,6 +694,16 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
             const parts = processedValue.replace(/[.-]/g, '/').split('/');
             processedValue = `${parts[0]}/${String(parts[1]).padStart(2, '0')}/${String(parts[2]).padStart(2, '0')}`;
         }
+        // YYYY年M月D日
+        else if (/^\d{4}年\d{1,2}月\d{1,2}日$/.test(processedValue)) {
+            const match = processedValue.match(/^(\d{4})年(\d{1,2})月(\d{1,2})日$/);
+            if (match) {
+              const year = match[1];
+              const month = match[2].padStart(2, '0');
+              const day = match[3].padStart(2, '0');
+              processedValue = `${year}/${month}/${day}`;
+            }
+        }
         // M/D
         else if (/^\d{1,2}\/\d{1,2}$/.test(processedValue)) {
             const today = new Date();
@@ -702,11 +712,16 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
             processedValue = `${currentYear}/${String(parts[0]).padStart(2, '0')}/${String(parts[1]).padStart(2, '0')}`;
         }
 
-        // Final validation
+        // Final validation using component check to be timezone-safe
         if (/^\d{4}\/\d{2}\/\d{2}$/.test(processedValue)) {
-            const date = new Date(processedValue);
+            const [y, m, d] = processedValue.split('/').map(n => parseInt(n, 10));
+            const date = new Date(y, m - 1, d);
             // Check if the date is valid (e.g., not 2025/02/30) by checking if the components match after construction
-            if (!isNaN(date.getTime()) && date.toISOString().startsWith(processedValue.replace(/\//g, '-'))) {
+            if (!isNaN(date.getTime()) &&
+                date.getFullYear() === y &&
+                date.getMonth() + 1 === m &&
+                date.getDate() === d
+            ) {
                 isValidDate = true;
             }
         }
