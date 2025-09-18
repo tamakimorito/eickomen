@@ -151,16 +151,30 @@ export const generateElectricityCommentLogic = (formData: FormData): string => {
                 case 'それ以外':
                 case 'ID:':
                 case 'No.':
-                    if (isVacancy === 'あり') {
-                        const planF = isAllElectric === 'あり'
+                    if (hasContractConfirmation === 'なし') {
+                        const header = isVacancy === 'あり'
+                            ? `【ストエネ/★インポートのみ/※空室プラン/HZEZZT011】`
+                            : `【ストエネ/★インポートのみ】`;
+                        
+                        const plan = isAllElectric === 'あり'
                             ? 'すまいのでんきオール電化プラン'
-                            : (isGasSet === 'セット' ? 'すまいのセット' : 'すまいの電気のみ');
-                        comment = `【ストエネ/※空室プラン/HZEZZT011】 ${tag}\n契確時間：${elecConfirmationTime || ''}\n${primaryProductStatus ? `主商材受注状況：${primaryProductStatus}\n` : ''}${baseInfo}\nプラン：${planF}\n${contractInfo}\n${addressInfo}\n利用開始日：${moveInDate || ''}\n支払い方法：${paymentMethod || ''}\n備考：${elecRemarks || ''}`;
+                            : (isGasSet === 'セット' ? 'すまいのセット' : 'すまいのでんきのみ');
+                        
+                        const attachedOptionLineDirect = `付帯OP：${attachedOption || ''}\n`;
+                        
+                        comment = `${header} ${tag}\n${baseInfo}\nプラン：${plan}\n${contractInfo}\n性別：${gender || ''}\n${importAddressInfo}\n${elecDateLine}\n${attachedOptionLineDirect}支払い方法：${paymentMethod || ''}\n備考：${elecRemarks || ''}`;
                     } else {
-                        const planElse = isAllElectric === 'あり'
-                            ? 'すまいのでんきオール電化プラン'
-                            : (isGasSet === 'セット' ? 'すまいのでんきセット' : 'すまいのでんきのみ');
-                        comment = `【ストエネ】 ${tag}\n契確時間：${elecConfirmationTime || ''}\n${primaryProductStatus ? `主商材受注状況：${primaryProductStatus}\n` : ''}${baseInfo}\nプラン：${planElse}\n${contractInfo}\n${addressInfo}\n${elecDateLine}\n支払い方法：${paymentMethod || ''}\n備考：${elecRemarks || ''}`;
+                        if (isVacancy === 'あり') {
+                            const planF = isAllElectric === 'あり'
+                                ? 'すまいのでんきオール電化プラン'
+                                : (isGasSet === 'セット' ? 'すまいのセット' : 'すまいの電気のみ');
+                            comment = `【ストエネ/※空室プラン/HZEZZT011】 ${tag}\n契確時間：${elecConfirmationTime || ''}\n${primaryProductStatus ? `主商材受注状況：${primaryProductStatus}\n` : ''}${baseInfo}\nプラン：${planF}\n${contractInfo}\n${addressInfo}\n利用開始日：${moveInDate || ''}\n支払い方法：${paymentMethod || ''}\n備考：${elecRemarks || ''}`;
+                        } else {
+                            const planElse = isAllElectric === 'あり'
+                                ? 'すまいのでんきオール電化プラン'
+                                : (isGasSet === 'セット' ? 'すまいのでんきセット' : 'すまいのでんきのみ');
+                            comment = `【ストエネ】 ${tag}\n契確時間：${elecConfirmationTime || ''}\n${primaryProductStatus ? `主商材受注状況：${primaryProductStatus}\n` : ''}${baseInfo}\nプラン：${planElse}\n${contractInfo}\n${addressInfo}\n${elecDateLine}\n支払い方法：${paymentMethod || ''}\n備考：${elecRemarks || ''}`;
+                        }
                     }
                     break;
             }

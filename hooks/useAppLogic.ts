@@ -101,7 +101,7 @@ const getRequiredFields = (formData, activeTab) => {
             if (elecProvider === 'すまいのでんき（ストエネ）') {
                 if (elecRecordIdPrefix === 'code:') {
                     isContractConfirmationVisible = false;
-                } else if (['S', 'STJP:', 'サカイ', 'ID:', 'それ以外', 'No.'].includes(elecRecordIdPrefix) && isAllElectric !== 'あり' && isVacancy !== 'あり') {
+                } else if (['S', 'STJP:', 'サカイ'].includes(elecRecordIdPrefix) && isAllElectric !== 'あり' && isVacancy !== 'あり') {
                     isContractConfirmationVisible = false;
                 } else {
                     isContractConfirmationVisible = true;

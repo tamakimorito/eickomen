@@ -130,7 +130,7 @@ const ElectricityTab = () => {
     const showContractConfirmationOption = useMemo(() => {
         if (isSumai) {
             if (elecRecordIdPrefix === 'code:') return false;
-            if (['S', 'STJP:', 'サカイ', 'ID:', 'それ以外', 'No.'].includes(elecRecordIdPrefix) && isAllElectric !== 'あり' && formData.isVacancy !== 'あり') return false;
+            if (['S', 'STJP:', 'サカイ'].includes(elecRecordIdPrefix) && isAllElectric !== 'あり' && formData.isVacancy !== 'あり') return false;
             return true;
         }
         if (isPlatinum) {
