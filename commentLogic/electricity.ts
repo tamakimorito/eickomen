@@ -87,17 +87,9 @@ export const generateElectricityCommentLogic = (formData: FormData): string => {
         elecDateLine = dateLine; // Use combined line for sets
     }
     
-    const isImportOnlyCase = (
-        hasContractConfirmation === 'なし' ||
-        (elecProvider === 'すまいのでんき（ストエネ）' && elecRecordIdPrefix === 'code:') ||
-        (elecProvider === 'プラチナでんき（ジャパン）' && ['STJP:', 'S'].includes(elecRecordIdPrefix)) ||
-        (elecProvider === 'プラチナでんき（ジャパン）' && elecRecordIdPrefix === 'サカイ' && isAllElectric !== 'あり') ||
-        (elecProvider === 'プラチナでんき（ジャパン）' && ['それ以外', 'No.'].includes(elecRecordIdPrefix) && hasContractConfirmation !== 'あり')
-    );
-
     const showPrimaryProductStatus = hasContractConfirmation === 'あり';
     
-    const attachedOptionLine = isImportOnlyCase ? `付帯OP：${attachedOption || ''}\n` : '';
+    const attachedOptionLine = `付帯OP：${attachedOption || ''}\n`;
 
     switch (elecProvider) {
         case 'すまいのでんき（ストエネ）':
@@ -105,6 +97,7 @@ export const generateElectricityCommentLogic = (formData: FormData): string => {
             const contractInfo = `契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${formattedPhone || ''}`;
             const addressInfo = `郵便番号：${formattedPostalCode || ''}\n引越し先住所：${address || ''}\n物件名：${buildingInfo || ''}`;
             const importAddressInfo = `郵便番号：${formattedPostalCode || ''}\n住所：${address || ''}\n物件名：${buildingInfo || ''}`;
+            const vacancyNote = isVacancy === 'あり' ? '※空室\n' : '';
 
             switch (elecRecordIdPrefix) {
                 case 'SR':
@@ -136,11 +129,27 @@ export const generateElectricityCommentLogic = (formData: FormData): string => {
                     break;
                 case 'S':
                 case 'STJP:':
-                    const code = elecRecordIdPrefix === 'S' ? 'HAHZZT276' : 'HAHZZT293';
-                    const planS = isAllElectric === 'あり'
-                        ? 'すまいのでんきオール電化プラン'
-                        : (isGasSet === 'セット' ? 'すまいのでんきセット' : 'すまいのでんきのみ');
-                    comment = `【ストエネ】\n${code}※ ${tag}\n契確時間：${elecConfirmationTime || ''}\n${primaryProductStatus ? `主商材受注状況：${primaryProductStatus}\n` : ''}${baseInfo}\nプラン：${planS}\n${contractInfo}\n${addressInfo}\n${elecDateLine}\n支払い方法：${paymentMethod || ''}\n備考：${elecRemarks || ''}`;
+                    if (hasContractConfirmation === 'なし') {
+                        const code = elecRecordIdPrefix === 'S' ? 'HAHZZT276' : 'HAHZZT293';
+                        const planSImp = isAllElectric === 'あり' ? 'すまいのでんきオール電化プラン' : 'すまいのでんきのみ';
+                        comment = `【ストエネ/★インポートのみ/すまいの】
+${code}※ ${tag}
+${baseInfo}
+プラン：${planSImp}
+${contractInfo}
+性別：${gender || ''}
+${importAddressInfo}
+${vacancyNote}${elecDateLine}
+${attachedOptionLine}支払い方法：${paymentMethod || ''}
+備考：${elecRemarks || ''}`;
+                        comment = comment.replace(/^\s*\n/gm, '');
+                    } else {
+                        const code = elecRecordIdPrefix === 'S' ? 'HAHZZT276' : 'HAHZZT293';
+                        const planS = isAllElectric === 'あり'
+                            ? 'すまいのでんきオール電化'
+                            : (isGasSet === 'セット' ? 'すまいのでんきセット' : 'すまいのでんきのみ');
+                        comment = `【ストエネ】\n${code}※ ${tag}\n契確時間：${elecConfirmationTime || ''}\n${primaryProductStatus ? `主商材受注状況：${primaryProductStatus}\n` : ''}${baseInfo}\nプラン：${planS}\n${contractInfo}\n${addressInfo}\n${elecDateLine}\n支払い方法：${paymentMethod || ''}\n備考：${elecRemarks || ''}`;
+                    }
                     break;
                 case 'サカイ':
                     const planSakai = isAllElectric === 'あり'
@@ -160,9 +169,7 @@ export const generateElectricityCommentLogic = (formData: FormData): string => {
                             ? 'すまいのでんきオール電化プラン'
                             : (isGasSet === 'セット' ? 'すまいのセット' : 'すまいのでんきのみ');
                         
-                        const attachedOptionLineDirect = `付帯OP：${attachedOption || ''}\n`;
-                        
-                        comment = `${header} ${tag}\n${baseInfo}\nプラン：${plan}\n${contractInfo}\n性別：${gender || ''}\n${importAddressInfo}\n${elecDateLine}\n${attachedOptionLineDirect}支払い方法：${paymentMethod || ''}\n備考：${elecRemarks || ''}`;
+                        comment = `${header} ${tag}\n${baseInfo}\nプラン：${plan}\n${contractInfo}\n性別：${gender || ''}\n${importAddressInfo}\n${elecDateLine}\n${attachedOptionLine}支払い方法：${paymentMethod || ''}\n備考：${elecRemarks || ''}`;
                     } else {
                         if (isVacancy === 'あり') {
                             const planF = isAllElectric === 'あり'
@@ -195,18 +202,23 @@ export const generateElectricityCommentLogic = (formData: FormData): string => {
                         const headerSR = isVacancy === 'あり' ? `【JAPAN電力※空室プランHAHZZT281】` : `【JAPAN電力】HAHZZT182`;
                         comment = `${headerSR} ${tag}\n契確時間：${elecConfirmationTime || ''}\n${baseInfoPlat}\n名乗り：${greeting || ''}\nプラン：${planSR}\n${contractInfoPlat}\n${contactInfoPlat}\n${addressInfoPlat}\n${elecDateLine}\n支払い方法：${paymentMethod || ''}\n備考：${elecRemarks || ''}`;
                     } else { // インポートのみ
-                        const headerSRImp = isVacancy === 'あり' ? `【JAPAN電力/★インポートのみ※空室プランHAHZZT281】` : `【JAPAN電力/★インポートのみ】HAHZZT182`;
-                        comment = `${headerSRImp} ${tag}\n${baseInfoPlat}\n名乗り：${greeting || ''}\nプラン：${planSR}\n${contractInfoPlat}\n性別：${gender || ''}\n${contactInfoPlat}\n${importAddressInfoPlat}\n利用開始日：${moveInDate || ''}\n${attachedOptionLine}支払い方法：${paymentMethod || ''}\n備考：${elecRemarks || ''}`;
+                        const headerSRImp = `【JAPAN電力/★インポートのみ${isVacancy === 'あり' ? '※空室プランHAHZZT281' : ''}】`;
+                        const codePart = isVacancy === 'あり' ? '' : 'HAHZZT182 ';
+                        comment = `${headerSRImp} ${codePart}${tag}\n${baseInfoPlat}\n名乗り：${greeting || ''}\nプラン：${planSR}\n${contractInfoPlat}\n性別：${gender || ''}\n${contactInfoPlat}\n${importAddressInfoPlat}\n利用開始日：${moveInDate || ''}\n${attachedOptionLine}支払い方法：${paymentMethod || ''}\n備考：${elecRemarks || ''}`;
                     }
                     break;
                 case 'STJP:':
                 case 'S':
-                    const codePlat = elecRecordIdPrefix === 'S' ? 'HAHZZT276' : 'HAHZZT293';
+                     const codePlat = elecRecordIdPrefix === 'S' ? 'HAHZZT276' : 'HAHZZT293';
                     const planPlat = isAllElectric === 'あり' ? 'プラチナでんきオール電化' : 'プラチナでんき';
-                    comment = `【JAPAN電力/★インポートのみ】\n${codePlat}※ ${tag}\n${baseInfoPlat}\n名乗り：${greeting || ''}\nプラン：${planPlat}\n${contractInfoPlat}\n性別：${gender || ''}\n${contactInfoPlat}\n${importAddressInfoPlat}\n利用開始日：${moveInDate || ''}\n${attachedOptionLine}支払い方法：${paymentMethod || ''}\n備考：${elecRemarks || ''}`;
+                    if (hasContractConfirmation === 'あり') {
+                        comment = `【JAPAN電力】\n${codePlat}※ ${tag}\n契確時間：${elecConfirmationTime || ''}\n${baseInfoPlat}\n名乗り：${greeting || ''}\nプラン：${planPlat}\n${contractInfoPlat}\n${contactInfoPlat}\n${addressInfoPlat}\n${elecDateLine}\n支払い方法：${paymentMethod || ''}\n備考：${elecRemarks || ''}`;
+                    } else {
+                        comment = `【JAPAN電力/★インポートのみ】\n${codePlat}※ ${tag}\n${baseInfoPlat}\n名乗り：${greeting || ''}\nプラン：${planPlat}\n${contractInfoPlat}\n性別：${gender || ''}\n${contactInfoPlat}\n${importAddressInfoPlat}\n利用開始日：${moveInDate || ''}\n${attachedOptionLine}支払い方法：${paymentMethod || ''}\n備考：${elecRemarks || ''}`;
+                    }
                     break;
                 case 'サカイ':
-                    if (isAllElectric === 'あり') {
+                    if (isAllElectric === 'あり' && hasContractConfirmation === 'あり') {
                         comment = `【JAPAN電力】HAHZZT259 ${tag}\nFM取込社名：サカイ販路\n名乗り：ライフイン24\n${baseInfoPlat}\nプラン： プラチナでんきオール電化プラン\n${contractInfoPlat}\n性別：${gender || ''}\n${contactInfoPlat}\n郵便番号：${formattedPostalCode || ''}\n住所：${address || ''}\n物件名：${buildingInfo || ''}\n利用開始日：${moveInDate || ''}\n支払い方法：${paymentMethod || ''}\n備考：5000CB`;
                     } else {
                         comment = `【JAPAN電力/★インポートのみ】HAHZZT259 ${tag}\nFM取込社名：サカイ販路\n名乗り：ライフイン24\n${baseInfoPlat}\nプラン： プラチナでんき\n${contractInfoPlat}\n性別：${gender || ''}\n${contactInfoPlat}\n郵便番号：${formattedPostalCode || ''}\n住所：${address || ''}\n物件名：${buildingInfo || ''}\n利用開始日：${moveInDate || ''}\n${attachedOptionLine}支払い方法：${paymentMethod || ''}\n備考：5000CB`;
@@ -218,7 +230,7 @@ export const generateElectricityCommentLogic = (formData: FormData): string => {
                      if (hasContractConfirmation === 'あり') {
                         const planElse = isAllElectric === 'あり' ? 'プラチナでんきオール電化' : 'プラチナでんき';
                         comment = `【JAPAN電力】 ${tag}
-契確時間：順次
+契確時間：${elecConfirmationTime || ''}
 レコードID：${recordId || ''}
 主商材受注状況：${primaryProductStatus || ''}
 担当者：${apName || ''}
@@ -236,7 +248,7 @@ export const generateElectricityCommentLogic = (formData: FormData): string => {
 備考：${elecRemarks || ''}`;
                         comment = comment.replace(/^\s*\n/gm, '');
                     } else { // インポートのみ (契確なし)
-                        const headerElseImp = isVacancy === 'あり' ? `【JAPAN電力/★インポートのみ※空室プランHZEZZT011】` : `【JAPAN電力/★インポートのみ】`;
+                        const headerElseImp = `【JAPAN電力/★インポートのみ${isVacancy === 'あり' ? '※空室プランHZEZZT011' : ''}】`;
                         const planElseImp = isAllElectric === 'あり' ? 'プラチナでんきオール電化' : 'プラチナでんき';
                         comment = `${headerElseImp} ${tag}\n${baseInfoPlat}\n名乗り：${greeting || ''}\nプラン：${planElseImp}\n${contractInfoPlat}\n性別：${gender || ''}\n${contactInfoPlat}\n${importAddressInfoPlat}\n利用開始日：${moveInDate || ''}\n${attachedOptionLine}支払い方法：${paymentMethod || ''}\n備考：${elecRemarks || ''}`;
                     }
@@ -249,12 +261,12 @@ export const generateElectricityCommentLogic = (formData: FormData): string => {
                 qenesCorporateLines = `\n対応者（漢字）：${contactPersonName || ''}\n対応者（フリガナ）：${contactPersonNameKana || ''}`;
             }
 
-            if (recordId?.startsWith('ID:')) {
+            if (recordId?.toLowerCase().startsWith('id:')) {
                 // Itanji route
                 comment = `【キューエネスでんき/★インポートのみ】 ${tag}\nレコードID：${recordId || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：エコhome\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${formattedPhone || ''}\n郵便番号：${formattedPostalCode || ''}\n住所：${address || ''}\n物件名：${buildingInfo || ''}\n利用開始日：${moveInDate || ''}\nメアド：${email || ''}\n付帯OP：${attachedOption || ''}\n支払い方法：${paymentMethod || ''}\n備考：${elecRemarks || ''}${qenesCorporateLines}`;
             } else {
                 // Other routes (No., etc.)
-                const header = (recordId?.startsWith('No.') && isVacancy === 'あり') 
+                const header = (recordId?.toLowerCase().startsWith('no.') && isVacancy === 'あり') 
                     ? `【キューエネスでんき】※ケイアイ空室通電 ${tag}`
                     : `【キューエネスでんき】 ${tag}`;
                 

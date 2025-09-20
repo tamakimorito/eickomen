@@ -65,7 +65,7 @@ export const formReducer = (state: FormData, action: FormAction): FormData => {
       
       // Sync recordId/customerId and update prefix
       if (name === 'recordId' || name === 'customerId') {
-          const idValue = value;
+          const idValue = value || '';
           // Sync both fields
           newState.recordId = idValue;
           newState.customerId = idValue;
@@ -73,11 +73,11 @@ export const formReducer = (state: FormData, action: FormAction): FormData => {
           if (!newState.isSakaiRoute) {
               // Auto-determine prefix from ID for Elec/Gas tabs
               let prefix = 'それ以外';
-              if (idValue.startsWith('STJP:')) prefix = 'STJP:';
-              else if (idValue.startsWith('SR')) prefix = 'SR';
-              else if (idValue.startsWith('code:')) prefix = 'code:';
-              else if (idValue.startsWith('ID:')) prefix = 'ID:';
-              else if (idValue.startsWith('No.')) prefix = 'No.';
+              if (idValue.toLowerCase().startsWith('stjp:')) prefix = 'STJP:';
+              else if (idValue.toLowerCase().startsWith('sr')) prefix = 'SR';
+              else if (idValue.toLowerCase().startsWith('code:')) prefix = 'code:';
+              else if (idValue.toLowerCase().startsWith('id:')) prefix = 'ID:';
+              else if (idValue.toLowerCase().startsWith('no.')) prefix = 'No.';
               else if (/^S\d/.test(idValue)) prefix = 'S'; // Use regex to check for 'S' followed by a digit.
               
               if (ELEC_ID_PREFIX_OPTIONS.some(opt => opt.value === prefix)) {
@@ -87,7 +87,7 @@ export const formReducer = (state: FormData, action: FormAction): FormData => {
                   newState.gasRecordIdPrefix = prefix;
               }
           }
-          if (idValue.startsWith('code:')) {
+          if (idValue.toLowerCase().startsWith('code:')) {
             newState.isVacancy = 'あり';
           }
       }
@@ -135,12 +135,12 @@ export const formReducer = (state: FormData, action: FormAction): FormData => {
         // Check old state eligibility
         const wasEligibleProvider = cbEligibleProviders.includes(state.elecProvider);
         const oldRecordId = state.recordId || '';
-        const wasEligibleId = oldRecordId.startsWith('ID:') || /^CC\d+/.test(oldRecordId);
+        const wasEligibleId = oldRecordId.toLowerCase().startsWith('id:') || /^CC\d+/.test(oldRecordId);
 
         // Check new state eligibility
         const isEligibleProvider = cbEligibleProviders.includes(newState.elecProvider);
         const recordId = newState.recordId || '';
-        const isEligibleId = recordId.startsWith('ID:') || /^CC\d+/.test(recordId);
+        const isEligibleId = recordId.toLowerCase().startsWith('id:') || /^CC\d+/.test(recordId);
 
         if (isEligibleProvider && isEligibleId) {
             // If eligible, add CB text if remarks are empty

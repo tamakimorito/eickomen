@@ -25,7 +25,7 @@ const FIELD_LABELS = {
     auPlanProvider: '案内プラン/プロバイダ',
     // Elec/Gas
     elecProvider: '電気商材', gasProvider: 'ガス商材', isAllElectric: 'オール電化', isVacancy: '空室',
-    hasContractConfirmation: '契確要否', isGasSet: 'ガスセット', primaryProductStatus: '主商材受注状況',
+    hasContractConfirmation: '契約確認は必要ですか？', isGasSet: 'ガスセット', primaryProductStatus: '主商材受注状況',
     attachedOption: '付帯OP', isNewConstruction: '新築', gasOpeningDate: 'ガス開栓日',
     gasOpeningTimeSlot: 'ガス立会時間枠', gasArea: 'ガスエリア', gasWitness: '立会者',
     gasPreContact: 'ガス事前連絡先', gasIsCorporate: '法人契約', elecConfirmationTime: '契確時間',
@@ -80,87 +80,34 @@ const getRequiredFields = (formData, activeTab) => {
             break;
 
         case 'electricity': {
-            const { elecProvider, elecRecordIdPrefix, isAllElectric, hasContractConfirmation, recordId, isVacancy, mailingOption } = formData;
+            const { elecProvider, recordId, hasContractConfirmation, mailingOption, isSakaiRoute } = formData;
             required.push('elecProvider', 'greeting', 'contractorName', 'contractorNameKana', 'dob', 'phone', 'postalCode', 'address', 'buildingInfo', 'moveInDate');
             
             if (elecProvider !== '東京ガス電気セット' && !['すまいのでんき（ストエネ）', 'プラチナでんき（ジャパン）'].includes(elecProvider)) {
                 required.push('paymentMethod');
             }
             if (!isSakaiRoute) required.push('recordId');
-
-            if (elecProvider === 'すまいのでんき（ストエネ）' && hasContractConfirmation === 'なし') {
-                required.push('gender');
-            }
-            if (elecProvider === 'プラチナでんき（ジャパン）' && hasContractConfirmation === 'なし') {
-                required.push('gender');
-            }
-
-
-            // Replicate the showContractConfirmationOption logic to determine if the field is required.
-            let isContractConfirmationVisible = false;
-            if (elecProvider === 'すまいのでんき（ストエネ）') {
-                if (elecRecordIdPrefix === 'code:') {
-                    isContractConfirmationVisible = false;
-                } else if (['S', 'STJP:', 'サカイ'].includes(elecRecordIdPrefix) && isAllElectric !== 'あり' && isVacancy !== 'あり') {
-                    isContractConfirmationVisible = false;
-                } else {
-                    isContractConfirmationVisible = true;
-                }
-            } else if (elecProvider === 'プラチナでんき（ジャパン）') {
-                if (['S', 'STJP:'].includes(elecRecordIdPrefix)) {
-                    isContractConfirmationVisible = false;
-                } else if (['サカイ'].includes(elecRecordIdPrefix)) {
-                     isContractConfirmationVisible = isAllElectric === 'あり';
-                } else if (['それ以外', 'ID:', 'No.', 'SR'].includes(elecRecordIdPrefix)) {
-                    isContractConfirmationVisible = true;
-                }
-            }
-
-            if (isContractConfirmationVisible) {
-                required.push('hasContractConfirmation');
-            }
-
-            // --- Logic for attachedOption ---
-            const isSumai = elecProvider === 'すまいのでんき（ストエネ）';
-            const isPlatinum = elecProvider === 'プラチナでんき（ジャパン）';
-            const isRemix = elecProvider === 'リミックスでんき';
+            
+            const isSuteneOrPlatinum = ['すまいのでんき（ストエネ）', 'プラチナでんき（ジャパン）'].includes(elecProvider);
             const isQenes = elecProvider === 'キューエネスでんき';
-            const isQenesItanji = isQenes && recordId?.startsWith('ID:');
+            const isRemix = elecProvider === 'リミックスでんき';
+            const isQenesItanji = isQenes && recordId?.toLowerCase().startsWith('id:');
 
-            const isPlatinumOtherConfirmed = isPlatinum &&
-                   ['それ以外', 'ID:', 'No.'].includes(elecRecordIdPrefix) &&
-                   hasContractConfirmation === 'あり';
-    
-            const isImportOnlyCase = (
-                hasContractConfirmation === 'なし' ||
-                (isSumai && elecRecordIdPrefix === 'code:') ||
-                (isPlatinum && (
-                    ['S', 'STJP:'].includes(elecRecordIdPrefix) ||
-                    (elecRecordIdPrefix === 'SR' && hasContractConfirmation !== 'あり') ||
-                    (elecRecordIdPrefix === 'サカイ' && isAllElectric !== 'あり') ||
-                    (['それ以外', 'No.'].includes(elecRecordIdPrefix) && hasContractConfirmation !== 'あり')
-                ))
-            );
-    
-            const showAttachedOption = (
-                !isPlatinumOtherConfirmed &&
-                (isRemix || isQenesItanji || (
-                    !['ニチガス電気セット', '東邦ガスセット', '大阪ガス電気セット'].includes(elecProvider) && isImportOnlyCase
-                ))
-            );
-    
-            if (showAttachedOption) {
+            if (isSuteneOrPlatinum) {
+                required.push('hasContractConfirmation');
+                if (hasContractConfirmation === 'なし') {
+                    required.push('gender', 'attachedOption');
+                }
+            }
+            
+            if (hasContractConfirmation === 'あり') {
+                required.push('elecConfirmationTime', 'primaryProductStatus');
+            }
+
+            if (isRemix || isQenesItanji) {
                 required.push('attachedOption');
             }
             
-            const isQenesOther = isQenes && !recordId?.startsWith('ID:');
-            if (isQenesOther) {
-                if (hasContractConfirmation !== 'なし') {
-                    required.push('primaryProductStatus');
-                }
-                required.push('elecConfirmationTime');
-            }
-
             if (['キューエネスでんき', 'ユーパワー UPOWER', 'HTBエナジー', 'リミックスでんき', 'ループでんき'].includes(elecProvider)) {
                 required.push('email');
             }
@@ -363,7 +310,7 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
         const autoGreetings = ['すまえる', 'ばっちり賃貸入居サポートセンター', 'レプリス株式会社'];
         
         // Logic for setting greeting based on new recordId
-        if (recordId.startsWith('ID:')) {
+        if (recordId.toLowerCase().startsWith('id:')) {
             if (activeTab === 'electricity' || activeTab === 'gas') newGreeting = 'すまえる';
         } else if (recordId.startsWith('L')) {
             newGreeting = 'ばっちり賃貸入居サポートセンター';
@@ -374,7 +321,7 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
         }
 
         // Logic for clearing greeting when changing away from a pattern
-        if (previousRecordId && previousRecordId.startsWith('ID:') && !recordId.startsWith('ID:')) {
+        if (previousRecordId && previousRecordId.toLowerCase().startsWith('id:') && !recordId.toLowerCase().startsWith('id:')) {
             if (greeting === 'すまえる') newGreeting = '';
         }
         
@@ -623,7 +570,7 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
         
         // If switching to the internet tab and the record ID indicates an "Itanji" case,
         // clear the greeting field as it should not be carried over.
-        if (newTab === 'internet' && formData.recordId.startsWith('ID:')) {
+        if (newTab === 'internet' && formData.recordId.toLowerCase().startsWith('id:')) {
             dispatch({ type: 'UPDATE_FIELD', payload: { name: 'greeting', value: '' } });
         }
         
@@ -785,6 +732,53 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
         }
     }, [dispatch, setModalState, closeModal, setToast, setInvalidFields]);
     
+    const handlePhoneBlur = useCallback((e) => {
+        const { name, value } = e.target;
+        const currentTarget = e.currentTarget;
+        if (!value) return;
+        if (/[^\d\-]/.test(value)) {
+            setModalState({
+                isOpen: true,
+                title: '入力内容の確認',
+                message: '電話番号じゃないものが入ってるようですが、修正しますか？',
+                confirmText: '修正する',
+                cancelText: 'しない',
+                type: 'default',
+                onConfirm: () => {
+                    dispatch({ type: 'UPDATE_FIELD', payload: { name, value: '' } });
+                    closeModal();
+                    currentTarget.focus();
+                },
+                onCancel: closeModal,
+                isErrorBanner: false,
+                bannerMessage: '',
+            });
+        }
+    }, [dispatch, setModalState, closeModal]);
+
+    const handleKanaBlur = useCallback((e) => {
+        const { name, value } = e.target;
+        const currentTarget = e.currentTarget;
+        if (!value) return;
+        if (!/^[ァ-ヶー・\s　]+$/.test(value)) {
+             setModalState({
+                isOpen: true,
+                title: '入力内容の確認',
+                message: 'フリガナはカタカナで入力してください。修正しますか？',
+                confirmText: '修正する',
+                cancelText: 'しない',
+                type: 'default',
+                onConfirm: () => {
+                    dispatch({ type: 'UPDATE_FIELD', payload: { name, value: '' } });
+                    closeModal();
+                    currentTarget.focus();
+                },
+                onCancel: closeModal,
+                isErrorBanner: false,
+                bannerMessage: '',
+            });
+        }
+    }, [dispatch, setModalState, closeModal]);
     
     return {
         activeTab,
@@ -807,5 +801,7 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
         handleCopy,
         handleResetRequest,
         handleDateBlurWithValidation,
+        handlePhoneBlur,
+        handleKanaBlur,
     };
 };

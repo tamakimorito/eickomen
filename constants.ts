@@ -399,7 +399,7 @@ export const GAS_PROVIDERS = [
 
 export const ELEC_ID_PREFIX_OPTIONS = [
     { value: 'SR', label: 'SR' },
-    { value: 'code:', label: 'code:' },
+    { value: 'code:', label: 'Code:' },
     { value: 'S', label: 'S' },
     { value: 'STJP:', label: 'STJP:' },
     { value: 'サカイ', label: 'サカイ' },

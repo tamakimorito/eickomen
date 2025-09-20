@@ -103,7 +103,7 @@ const MailingAddressSection = () => {
 
 
 const ElectricityTab = () => {
-    const { formData, handleInputChange, handleDateBlurWithValidation, handleNameBlur, handleIdBlur, invalidFields } = useContext(AppContext);
+    const { formData, handleInputChange, handleDateBlurWithValidation, handleNameBlur, handleIdBlur, invalidFields, handlePhoneBlur, handleKanaBlur } = useContext(AppContext);
     const { elecProvider, elecRecordIdPrefix, isGasSet, isSakaiRoute, recordId, hasContractConfirmation, isAllElectric } = formData;
 
     useEffect(() => {
@@ -118,34 +118,18 @@ const ElectricityTab = () => {
     
     const isSumai = elecProvider === 'すまいのでんき（ストエネ）';
     const isPlatinum = elecProvider === 'プラチナでんき（ジャパン）';
-    const isGenderRequired = (isSumai && hasContractConfirmation === 'なし') || (isPlatinum && hasContractConfirmation === 'なし');
+    const isGenderRequired = (isSumai || isPlatinum) && hasContractConfirmation === 'なし';
     const isQenes = elecProvider === 'キューエネスでんき';
-    const isQenesItanji = isQenes && recordId?.startsWith('ID:');
-    const isQenesOther = isQenes && !recordId?.startsWith('ID:');
+    const isQenesItanji = isQenes && recordId?.toLowerCase().startsWith('id:');
+    const isQenesOther = isQenes && !recordId?.toLowerCase().startsWith('id:');
     const isRemix = elecProvider === 'リミックスでんき';
 
 
     const showGasSetOption = elecProvider === 'すまいのでんき（ストエネ）' && formData.isAllElectric !== 'あり';
     
     const showContractConfirmationOption = useMemo(() => {
-        if (isSumai) {
-            if (elecRecordIdPrefix === 'code:') return false;
-            if (['S', 'STJP:', 'サカイ'].includes(elecRecordIdPrefix) && isAllElectric !== 'あり' && formData.isVacancy !== 'あり') return false;
-            return true;
-        }
-        if (isPlatinum) {
-            if (elecRecordIdPrefix === 'SR') return true;
-            if (['S', 'STJP:'].includes(elecRecordIdPrefix)) return false;
-             if (['それ以外', 'ID:', 'No.'].includes(elecRecordIdPrefix)) {
-                return true;
-            }
-            if (elecRecordIdPrefix === 'サカイ') {
-                return isAllElectric === 'あり';
-            }
-            return false;
-        }
-        return false;
-    }, [elecProvider, elecRecordIdPrefix, isAllElectric, formData.isVacancy]);
+        return ['すまいのでんき（ストエネ）', 'プラチナでんき（ジャパン）'].includes(elecProvider);
+    }, [elecProvider]);
 
     const isPlatinumOtherConfirmed = useMemo(() => {
         return isPlatinum &&
@@ -164,7 +148,7 @@ const ElectricityTab = () => {
         if (['すまいのでんき（ストエネ）', 'プラチナでんき（ジャパン）'].includes(elecProvider)) {
             return true;
         }
-        if (elecProvider === 'キューエネスでんき' && recordId?.startsWith('No.')) {
+        if (elecProvider === 'キューエネスでんき' && recordId?.toLowerCase().startsWith('no.')) {
             return true;
         }
         return false;
@@ -174,7 +158,7 @@ const ElectricityTab = () => {
     
     const isImportOnlyCase = useMemo(() => {
         if (hasContractConfirmation === 'なし') return true;
-        if (isSumai && elecRecordIdPrefix === 'code:') return true;
+        if (isSumai && elecRecordIdPrefix?.toLowerCase() === 'code:') return true;
         if (isPlatinum) {
             if (['S', 'STJP:'].includes(elecRecordIdPrefix)) return true;
             if (elecRecordIdPrefix === 'SR' && hasContractConfirmation !== 'あり') return true;
@@ -190,9 +174,15 @@ const ElectricityTab = () => {
         if (['ニチガス電気セット', '東邦ガスセット', '大阪ガス電気セット'].includes(elecProvider)) {
             return false;
         }
-         if (isQenesItanji) return true;
+        if (isQenesItanji) return true;
+        
+        // For Sutene/Platinum "no confirmation" cases
+        if (hasContractConfirmation === 'なし' && (isSumai || isPlatinum)) {
+            return true;
+        }
+
         return isImportOnlyCase;
-    }, [isImportOnlyCase, elecProvider, isQenesItanji, isRemix, isPlatinumOtherConfirmed]);
+    }, [isImportOnlyCase, elecProvider, isQenesItanji, isRemix, isPlatinumOtherConfirmed, hasContractConfirmation, isSumai, isPlatinum]);
     
     // Gender field is shown for almost all "import only" templates.
     const showGender = useMemo(() => {
@@ -202,6 +192,10 @@ const ElectricityTab = () => {
 
         // Exception case for Platinum Sakai
         if (isPlatinum && elecRecordIdPrefix === 'サカイ' && isAllElectric === 'あり' && hasContractConfirmation === 'あり') {
+            return true;
+        }
+
+        if (hasContractConfirmation === 'なし' && (isSumai || isPlatinum)) {
             return true;
         }
 
@@ -232,16 +226,17 @@ const ElectricityTab = () => {
     }, [elecProvider, elecRecordIdPrefix, isElecGasSetSelected]);
 
      const idPrefixDescription = useMemo(() => {
+        const lowerCasePrefix = elecRecordIdPrefix?.toLowerCase();
         const map = {
-            'SR': 'ストエネ販路',
-            'STJP:': 'ベンダー（トーマス販路）',
+            'sr': 'ストエネ販路',
+            'stjp:': 'ベンダー（トーマス販路）',
             'code:': 'ベンダー（YMCS）販路',
-            'S': 'すま直販路',
-            'ID:': 'スマサポ、イタンジ、ベンダー、その他販路',
+            's': 'すま直販路',
+            'id:': 'スマサポ、イタンジ、ベンダー、その他販路',
             'それ以外': 'スマサポ、イタンジ、ベンダー、その他販路',
-            'No.': 'スマサポ、イタンジ、ベンダー、その他販路',
+            'no.': 'スマサポ、イタンジ、ベンダー、その他販路',
         };
-        return map[elecRecordIdPrefix] || '';
+        return map[lowerCasePrefix] || '';
     }, [elecRecordIdPrefix]);
 
     const isHtb = elecProvider === 'HTBエナジー';
@@ -252,7 +247,7 @@ const ElectricityTab = () => {
     const isNichigasSet = elecProvider === 'ニチガス電気セット';
     const emailIsRequired = isQenes || isUpower || isHtb || isRemix || elecProvider === 'ループでんき';
 
-    const isContractConfirmationDisabled = isPlatinum && elecRecordIdPrefix === 'SR';
+    const isContractConfirmationDisabled = isPlatinum && elecRecordIdPrefix === 'SR' && hasContractConfirmation === 'なし';
 
     return (
         <div className="space-y-6">
@@ -284,10 +279,10 @@ const ElectricityTab = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 p-4 bg-blue-50/50 rounded-lg border border-blue-200">
                     {showAllElectricOption && <FormRadioGroup label="オール電化" name="isAllElectric" value={formData.isAllElectric} onChange={handleInputChange} options={YES_NO_OPTIONS} isInvalid={invalidFields.includes('isAllElectric')} />}
                     {showVacancyOption && <FormRadioGroup label="空室" name="isVacancy" value={formData.isVacancy} onChange={handleInputChange} options={YES_NO_OPTIONS} isInvalid={invalidFields.includes('isVacancy')} />}
-                    {showContractConfirmationOption && <FormRadioGroup label="契確は必要ですか？" name="hasContractConfirmation" value={formData.hasContractConfirmation} onChange={handleInputChange} options={YES_NO_OPTIONS} isInvalid={invalidFields.includes('hasContractConfirmation')} required disabled={isContractConfirmationDisabled} />}
+                    {showContractConfirmationOption && <FormRadioGroup label="契約確認は必要ですか？" name="hasContractConfirmation" value={formData.hasContractConfirmation} onChange={handleInputChange} options={YES_NO_OPTIONS} isInvalid={invalidFields.includes('hasContractConfirmation')} required disabled={isContractConfirmationDisabled} />}
                     {showGasSetOption && <FormRadioGroup label="ガスセット" name="isGasSet" value={isGasSet} onChange={handleInputChange} options={SET_NONE_OPTIONS} isInvalid={invalidFields.includes('isGasSet')} />}
                     
-                    { !isQenesItanji && !isRemix && hasContractConfirmation !== 'なし' && <FormRadioGroup label="主商材受注状況" name="primaryProductStatus" value={formData.primaryProductStatus} onChange={handleInputChange} options={PRIMARY_PRODUCT_STATUS_OPTIONS} isInvalid={invalidFields.includes('primaryProductStatus')} required={isQenesOther} /> }
+                    { hasContractConfirmation !== 'なし' && !isQenesItanji && !isRemix && <FormRadioGroup label="主商材受注状況" name="primaryProductStatus" value={formData.primaryProductStatus} onChange={handleInputChange} options={PRIMARY_PRODUCT_STATUS_OPTIONS} isInvalid={invalidFields.includes('primaryProductStatus')} required={isQenesOther} /> }
 
                     {showNewConstructionOption && <FormRadioGroup label="新築" name="isNewConstruction" value={formData.isNewConstruction} onChange={handleInputChange} options={NEW_CONSTRUCTION_OPTIONS} isInvalid={invalidFields.includes('isNewConstruction')} />}
                 </div>
@@ -298,10 +293,10 @@ const ElectricityTab = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormInput label="名乗り" name="greeting" value={formData.greeting} onChange={handleInputChange} isInvalid={invalidFields.includes('greeting')} />
                     <FormInput label="契約者名義（漢字）" name="contractorName" value={formData.contractorName} onChange={handleInputChange} onBlur={handleNameBlur} isInvalid={invalidFields.includes('contractorName')} required />
-                    <FormInput label="契約者名義（フリガナ）" name="contractorNameKana" value={formData.contractorNameKana} onChange={handleInputChange} onBlur={handleNameBlur} isInvalid={invalidFields.includes('contractorNameKana')} required />
+                    <FormInput label="契約者名義（フリガナ）" name="contractorNameKana" value={formData.contractorNameKana} onChange={handleInputChange} onBlur={handleKanaBlur} isInvalid={invalidFields.includes('contractorNameKana')} required />
                     {showGender && <FormSelect label="性別" name="gender" value={formData.gender} onChange={handleInputChange} options={GENDERS} isInvalid={invalidFields.includes('gender')} required={isGenderRequired} />}
                     <FormDateInput label="生年月日（西暦）" name="dob" value={formData.dob} onChange={handleInputChange} onBlur={handleDateBlurWithValidation} isInvalid={invalidFields.includes('dob')} placeholder="例: 1990/01/01" required />
-                    <FormInput label="電話番号" name="phone" value={formData.phone} onChange={handleInputChange} isInvalid={invalidFields.includes('phone')} required />
+                    <FormInput label="電話番号" name="phone" value={formData.phone} onChange={handleInputChange} onBlur={handlePhoneBlur} isInvalid={invalidFields.includes('phone')} required />
                     { !isSumai && !isPlatinum && <FormInput label="メアド" name="email" type="email" value={formData.email} onChange={handleInputChange} isInvalid={invalidFields.includes('email')} required={emailIsRequired}/> }
                 </div>
             </div>
@@ -311,7 +306,26 @@ const ElectricityTab = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormInput label="郵便番号" name="postalCode" value={formData.postalCode} onChange={handleInputChange} isInvalid={invalidFields.includes('postalCode')} required className="md:col-span-2" />
                     <FormInput label="住所" name="address" value={formData.address} onChange={handleInputChange} className="md:col-span-2" isInvalid={invalidFields.includes('address')} required />
-                    <FormInput label="物件名＋部屋番号" name="buildingInfo" value={formData.buildingInfo} onChange={handleInputChange} className="md:col-span-2" isInvalid={invalidFields.includes('buildingInfo')} required />
+                    <div className="md:col-span-2 flex items-end gap-2">
+                         <FormInput
+                            label="物件名＋部屋番号"
+                            name="buildingInfo"
+                            value={formData.buildingInfo}
+                            onChange={handleInputChange}
+                            className="flex-grow"
+                            isInvalid={invalidFields.includes('buildingInfo')}
+                            required
+                        />
+                        <FormCheckbox
+                            label="戸建て"
+                            name="isDetachedHouse"
+                            checked={formData.buildingInfo === '戸建て'}
+                            onChange={(e) => handleInputChange({ target: { name: 'buildingInfo', value: e.target.checked ? '戸建て' : '' } })}
+                            className="pb-2"
+                            description=""
+                            isInvalid={invalidFields.includes('buildingInfo')}
+                        />
+                    </div>
                 </div>
             </div>
             
@@ -326,7 +340,7 @@ const ElectricityTab = () => {
                             <>
                                 <FormInput label="ガスエリア" name="gasArea" value={formData.gasArea} onChange={handleInputChange} placeholder="例: 東京ガス" isInvalid={invalidFields.includes('gasArea')} required />
                                 <FormInput label="立会者" name="gasWitness" value={formData.gasWitness} onChange={handleInputChange} isInvalid={invalidFields.includes('gasWitness')} required />
-                                <FormInput label="ガス事前連絡先" name="gasPreContact" value={formData.gasPreContact} onChange={handleInputChange} isInvalid={invalidFields.includes('gasPreContact')} required />
+                                <FormInput label="ガス事前連絡先" name="gasPreContact" value={formData.gasPreContact} onChange={handleInputChange} onBlur={handlePhoneBlur} isInvalid={invalidFields.includes('gasPreContact')} required />
                             </>
                         )}
                          {(isToho || elecProvider === '東京ガス電気セット') && (
@@ -347,7 +361,7 @@ const ElectricityTab = () => {
             <div className="border-t-2 border-dashed border-blue-300 pt-6 space-y-4">
                 <h3 className="text-lg font-bold text-blue-700">その他</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    { !isQenesItanji && !isRemix && <FormInput label="契確時間" name="elecConfirmationTime" value={formData.elecConfirmationTime} onChange={handleInputChange} isInvalid={invalidFields.includes('elecConfirmationTime')} required={isQenesOther} /> }
+                    { hasContractConfirmation === 'あり' && !isQenesItanji && !isRemix && <FormInput label="契確時間" name="elecConfirmationTime" value={formData.elecConfirmationTime} onChange={handleInputChange} isInvalid={invalidFields.includes('elecConfirmationTime')} required /> }
                     
                     { showAttachedOption && <FormRadioGroup label={isRemix ? "付帯" : "付帯OP"} name="attachedOption" value={formData.attachedOption} onChange={handleInputChange} options={ATTACHED_OPTION_OPTIONS} isInvalid={invalidFields.includes('attachedOption')} required /> }
 
@@ -390,6 +404,7 @@ const ElectricityTab = () => {
                                     name="contactPersonName" 
                                     value={formData.contactPersonName} 
                                     onChange={handleInputChange} 
+                                    onBlur={handleNameBlur}
                                     isInvalid={invalidFields.includes('contactPersonName')}
                                     required 
                                 />
@@ -398,6 +413,7 @@ const ElectricityTab = () => {
                                     name="contactPersonNameKana" 
                                     value={formData.contactPersonNameKana} 
                                     onChange={handleInputChange} 
+                                    onBlur={handleKanaBlur}
                                     isInvalid={invalidFields.includes('contactPersonNameKana')}
                                     required
                                 />

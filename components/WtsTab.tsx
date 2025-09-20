@@ -3,14 +3,15 @@ import {
     WTS_CUSTOMER_TYPES, WTS_SHIPPING_DESTINATIONS, WTS_FIVE_YEAR_PLAN_OPTIONS,
     WTS_WATER_PURIFIER_OPTIONS, WTS_MULTIPLE_UNITS_OPTIONS,
     WTS_U20_HIGHSCHOOL_OPTIONS, WTS_U20_PARENTAL_CONSENT_OPTIONS, MAILING_OPTIONS,
-    WTS_SERVERS, WTS_COLORS, WTS_FREE_WATER_OPTIONS, WTS_CARRIER_OPTIONS
+    WTS_SERVERS, WTS_COLORS, WTS_FREE_WATER_OPTIONS, WTS_CARRIER_OPTIONS,
+    YES_NO_OPTIONS
 } from '../constants.ts';
 import { AppContext } from '../context/AppContext.tsx';
-import { FormInput, FormSelect, FormRadioGroup, FormTextArea, FormDateInput } from './FormControls.tsx';
+import { FormInput, FormSelect, FormRadioGroup, FormTextArea, FormDateInput, FormCheckbox } from './FormControls.tsx';
 
 
 const WtsTab = () => {
-    const { formData, handleInputChange, handleDateBlurWithValidation, handleNameBlur, handleIdBlur, invalidFields } = useContext(AppContext);
+    const { formData, handleInputChange, handleDateBlurWithValidation, handleNameBlur, handleIdBlur, invalidFields, handlePhoneBlur, handleKanaBlur } = useContext(AppContext);
     const { wtsCustomerType, isSakaiRoute, wtsServerType } = formData;
     
     const colorOptions = useMemo(() => {
@@ -91,7 +92,7 @@ const WtsTab = () => {
                         name="contractorNameKana"
                         value={formData.contractorNameKana}
                         onChange={handleInputChange}
-                        onBlur={handleNameBlur}
+                        onBlur={handleKanaBlur}
                         isInvalid={invalidFields.includes('contractorNameKana')}
                     />
                      <FormDateInput
@@ -109,6 +110,7 @@ const WtsTab = () => {
                         name="phone"
                         value={formData.phone}
                         onChange={handleInputChange}
+                        onBlur={handlePhoneBlur}
                         isInvalid={invalidFields.includes('phone')}
                         required
                     />
