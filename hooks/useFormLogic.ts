@@ -19,26 +19,6 @@ export const useFormLogic = () => {
         setInvalidFields([]);
     }, [dispatch, formData.apName]);
 
-    const handleNameBlur = useCallback((e) => {
-        const { name, value } = e.target;
-        if (!value) return;
-
-        const hasNumber = /\d/.test(value);
-        const isKanaField = name.toLowerCase().includes('kana');
-
-        if (isKanaField) {
-            const isNotKana = /[^\u30A0-\u30FF\u3000\s]/.test(value); 
-            if (isNotKana) {
-                console.warn(`Validation Warning: Non-Kana characters in ${name}: "${value}"`);
-                return;
-            }
-        }
-
-        if (hasNumber && !isKanaField) {
-            console.warn(`Validation Warning: Numbers in name field ${name}: "${value}"`);
-        }
-    }, []);
-
     const handleIdBlur = useCallback(() => {
         // dispatch({ type: 'UPDATE_DERIVED_FIELDS_FROM_ID' });
         // This logic is now handled inside the main formReducer for consistency.
@@ -50,7 +30,6 @@ export const useFormLogic = () => {
         invalidFields,
         setInvalidFields,
         handleInputChange,
-        handleNameBlur,
         resetForm,
         handleIdBlur,
     };

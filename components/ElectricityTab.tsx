@@ -247,8 +247,6 @@ const ElectricityTab = () => {
     const isNichigasSet = elecProvider === 'ニチガス電気セット';
     const emailIsRequired = isQenes || isUpower || isHtb || isRemix || elecProvider === 'ループでんき';
 
-    const isContractConfirmationDisabled = isPlatinum && elecRecordIdPrefix === 'SR' && hasContractConfirmation === 'なし';
-
     return (
         <div className="space-y-6">
             <h3 className="text-xl font-bold text-gray-800 border-b-2 pb-2">電気契約情報</h3>
@@ -279,7 +277,7 @@ const ElectricityTab = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 p-4 bg-blue-50/50 rounded-lg border border-blue-200">
                     {showAllElectricOption && <FormRadioGroup label="オール電化" name="isAllElectric" value={formData.isAllElectric} onChange={handleInputChange} options={YES_NO_OPTIONS} isInvalid={invalidFields.includes('isAllElectric')} />}
                     {showVacancyOption && <FormRadioGroup label="空室" name="isVacancy" value={formData.isVacancy} onChange={handleInputChange} options={YES_NO_OPTIONS} isInvalid={invalidFields.includes('isVacancy')} />}
-                    {showContractConfirmationOption && <FormRadioGroup label="契約確認は必要ですか？" name="hasContractConfirmation" value={formData.hasContractConfirmation} onChange={handleInputChange} options={YES_NO_OPTIONS} isInvalid={invalidFields.includes('hasContractConfirmation')} required disabled={isContractConfirmationDisabled} />}
+                    {showContractConfirmationOption && <FormRadioGroup label="契約確認は必要ですか？" name="hasContractConfirmation" value={formData.hasContractConfirmation} onChange={handleInputChange} options={YES_NO_OPTIONS} isInvalid={invalidFields.includes('hasContractConfirmation')} required />}
                     {showGasSetOption && <FormRadioGroup label="ガスセット" name="isGasSet" value={isGasSet} onChange={handleInputChange} options={SET_NONE_OPTIONS} isInvalid={invalidFields.includes('isGasSet')} />}
                     
                     { hasContractConfirmation !== 'なし' && !isQenesItanji && !isRemix && <FormRadioGroup label="主商材受注状況" name="primaryProductStatus" value={formData.primaryProductStatus} onChange={handleInputChange} options={PRIMARY_PRODUCT_STATUS_OPTIONS} isInvalid={invalidFields.includes('primaryProductStatus')} required={isQenesOther} /> }

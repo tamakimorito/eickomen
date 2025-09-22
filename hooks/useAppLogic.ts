@@ -19,9 +19,14 @@ const FIELD_LABELS = {
     product: '商材', housingType: 'タイプ', rackType: 'ラック', serviceFee: '案内料金', campaign: 'CP',
     preActivationRental: '開通前レンタル', wifiRouter: '無線ルーター購入', bankName: '銀行名',
     crossPathRouter: 'クロスパス無線ルーター', managementCompany: '管理会社名', managementContact: '管理連絡先',
-    contactPerson: '担当者名', gmoCompensation: 'GMO解約違約金補填', gmoRouter: '無線LANルーター案内',
+    contactPerson: '担当者名', 
+    gmoConstructionSplit: '工事費分割案内', gmoCompensation: 'GMO解約違約金補填', gmoRouter: '無線LANルーター案内',
     gmoIsDocomoOwnerSame: 'ドコモ名義人申込者同一', gmoDocomoOwnerName: 'ドコモ名義人',
-    gmoDocomoOwnerPhone: 'ドコモ名義人電話番号', gmoNoPairIdType: '身分証', auContactType: '連絡先種別',
+    gmoDocomoOwnerPhone: 'ドコモ名義人電話番号', gmoNoPairIdType: '身分証', 
+    gmoCallback1: '第一希望 時間', gmoCallback2: '第二希望 時間', gmoCallback3: '第三希望 時間',
+    gmoCallbackDate1: '第一希望 日付', gmoCallbackDate2: '第二希望 日付', gmoCallbackDate3: '第三希望 日付',
+    gmoTokutokuPlan: 'プラン', gmoTokutokuCampaign: 'CP',
+    auContactType: '連絡先種別',
     auPlanProvider: '案内プラン/プロバイダ',
     // Elec/Gas
     elecProvider: '電気商材', gasProvider: 'ガス商材', isAllElectric: 'オール電化', isVacancy: '空室',
@@ -47,7 +52,33 @@ const getRequiredFields = (formData, activeTab) => {
     switch (activeTab) {
         case 'internet':
             required.push('product');
-            if (product.includes('SoftBank') || product.includes('賃貸ねっと')) {
+            if (product === 'GMOドコモ光') {
+                 required.push(
+                    'housingType', 'customerId', 'gmoCompensation', 'gmoRouter', 'greeting', 
+                    'contractorName', 'phone', 'existingLineCompany', 'gmoCallback1', 'gmoCallback2', 'gmoCallback3',
+                    'gmoCallbackDate1', 'gmoCallbackDate2', 'gmoCallbackDate3'
+                );
+                 if (formData.housingType.includes('ペアなし')) {
+                    required.push('gmoNoPairIdType', 'mobileCarrier', 'paymentMethod');
+                } else {
+                    if (!formData.gmoIsDocomoOwnerSame) {
+                        required.push('gmoDocomoOwnerName', 'gmoDocomoOwnerPhone');
+                    }
+                }
+            } else if (product === 'GMOとくとく光') {
+                 required.push(
+                    'customerId', 'gmoTokutokuPlan', 'contractorName', 'dob', 'moveInDate', 'mailingOption', 'buildingInfo',
+                    'serviceFee', 'gmoTokutokuCampaign', 'existingLineStatus', 'email', 'paymentMethod'
+                 );
+                 if (formData.mailingOption === '現住所') required.push('currentPostalCode', 'currentAddress');
+                 if (formData.existingLineStatus === 'あり') required.push('existingLineCompany');
+
+            } else if (product === 'AUひかり') {
+                required.push(
+                    'recordId', 'greeting', 'contractorName', 'existingLineCompany', 'postalCode', 'address',
+                    'phone', 'auContactType', 'auPlanProvider', 'serviceFee'
+                );
+            } else if (product.includes('SoftBank') || product.includes('賃貸ねっと')) {
                 required.push('greeting', 'housingType', 'rackType', 'contractorName', 'contractorNameKana', 'dob', 'phone', 'postalCode', 'address', 'buildingInfo', 'moveInDate', 'mailingOption');
                 if (formData.mailingOption === '現住所') required.push('currentPostalCode', 'currentAddress');
 
@@ -67,15 +98,6 @@ const getRequiredFields = (formData, activeTab) => {
                         required.push('managementCompany', 'managementContact', 'contactPerson');
                     }
                 }
-            } else if (product === 'GMOドコモ光') {
-                required.push('housingType', 'customerId', 'gmoCompensation', 'gmoRouter', 'greeting', 'contractorName', 'phone', 'existingLineCompany');
-                if (formData.housingType.includes('ペアなし')) {
-                    required.push('gmoNoPairIdType', 'mobileCarrier', 'paymentMethod');
-                } else {
-                    if (!formData.gmoIsDocomoOwnerSame) required.push('gmoDocomoOwnerName', 'gmoDocomoOwnerPhone');
-                }
-            } else if (product === 'AUひかり') {
-                required.push('recordId', 'greeting', 'contractorName', 'existingLineCompany', 'postalCode', 'address', 'phone', 'auContactType', 'auPlanProvider');
             }
             break;
 
@@ -755,11 +777,45 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
             });
         }
     }, [dispatch, setModalState, closeModal]);
+    
+    const handleNameBlur = useCallback((e) => {
+        const { name, value } = e.target;
+        const currentTarget = e.currentTarget;
+        if (!value) return;
+
+        // Original logic: Check for numbers
+        if (/\d/.test(value)) {
+            console.warn(`Validation Warning: Numbers in name field ${name}: "${value}"`);
+        }
+
+        // New SoftBank space check for contractorName
+        const isSoftBankProduct = ['SoftBank光1G', 'SoftBank光10G', 'SB Air'].includes(formData.product);
+        if (isSoftBankProduct && name === 'contractorName' && !/[\s　]/.test(value)) {
+            setModalState({
+                isOpen: true,
+                title: '入力内容の確認',
+                message: '姓と名の間にスペース（全角/半角）がありません。修正しますか？',
+                confirmText: '修正する',
+                cancelText: 'このまま続行',
+                type: 'default',
+                onConfirm: () => {
+                    closeModal();
+                    currentTarget.focus();
+                },
+                onCancel: closeModal,
+                isErrorBanner: false,
+                bannerMessage: '',
+            });
+        }
+    }, [formData.product, setModalState, closeModal]);
+
 
     const handleKanaBlur = useCallback((e) => {
         const { name, value } = e.target;
         const currentTarget = e.currentTarget;
         if (!value) return;
+        
+        // 1. Original Kana character validation
         if (!/^[ァ-ヶー・\s　]+$/.test(value)) {
              setModalState({
                 isOpen: true,
@@ -777,8 +833,53 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
                 isErrorBanner: false,
                 bannerMessage: '',
             });
+            return; // Stop further checks if not kana
         }
-    }, [dispatch, setModalState, closeModal]);
+
+        // 2. New Tokyo Gas length check
+        const isTokyoGasProduct = formData.elecProvider === '東京ガス電気セット' || formData.gasProvider === '東京ガス単品';
+        if (name === 'contractorNameKana' && isTokyoGasProduct) {
+            const kanaWithoutSpaces = value.replace(/[\s　]/g, '');
+            if (kanaWithoutSpaces.length >= 9) {
+                setModalState({
+                    isOpen: true,
+                    title: 'フリガナのご確認',
+                    message: 'フリガナが9文字以上です。東京ガス受付では短縮表記が必要な場合があります。短くして再入力しますか？',
+                    confirmText: '修正する',
+                    cancelText: 'このまま続行',
+                    type: 'default',
+                    onConfirm: () => {
+                        closeModal();
+                        currentTarget.focus();
+                    },
+                    onCancel: closeModal,
+                    isErrorBanner: false,
+                    bannerMessage: '',
+                });
+                return; 
+            }
+        }
+        
+        // 3. New SoftBank space check for Kana
+        const isSoftBankProduct = ['SoftBank光1G', 'SoftBank光10G', 'SB Air'].includes(formData.product);
+        if (name === 'contractorNameKana' && isSoftBankProduct && !/[\s　]/.test(value)) {
+            setModalState({
+                isOpen: true,
+                title: '入力内容の確認',
+                message: '姓と名の間にスペース（全角/半角）がありません。修正しますか？',
+                confirmText: '修正する',
+                cancelText: 'このまま続行',
+                type: 'default',
+                onConfirm: () => {
+                    closeModal();
+                    currentTarget.focus();
+                },
+                onCancel: closeModal,
+                isErrorBanner: false,
+                bannerMessage: '',
+            });
+        }
+    }, [dispatch, setModalState, closeModal, formData.product, formData.elecProvider, formData.gasProvider]);
     
     return {
         activeTab,
@@ -802,6 +903,7 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
         handleResetRequest,
         handleDateBlurWithValidation,
         handlePhoneBlur,
+        handleNameBlur,
         handleKanaBlur,
     };
 };
