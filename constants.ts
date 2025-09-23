@@ -445,9 +445,10 @@ export const TIME_SLOTS_TOKYO_GAS = [
 ];
 
 export const TIME_SLOTS_TOHO = [
-    { value: '9-12', label: '9-12' },
-    { value: '13-17', label: '13-17' },
-    { value: '順次', label: '順次'},
+  { value: '10-12', label: '10-12' },
+  { value: '12-15', label: '12-15' },
+  { value: '15-18', label: '15-18' },
+  { value: '18-21', label: '18-21' },
 ];
 
 export const TIME_SLOTS_TOHO_GAS_SETUP = [

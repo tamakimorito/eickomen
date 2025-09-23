@@ -4,6 +4,10 @@
 
 ---
 
+## v1.20.3 (2025/09/23)
+- feat(electricity/toho): 東邦ガスセットの後確希望時間を 10-12 / 12-15 / 15-18 / 18-21 の4枠に変更。
+- note: ガス立会時間枠（TIME_SLOTS_TOHO_GAS_SETUP）は変更なし。
+
 ## v1.20.2 (2025/09/23)
 - feat(internet/gmo-tokutoku): GMOとくとく光フォームをコメント仕様に整合（専用項目/必須制御）。
 - feat(internet/au): AUひかりフォームをコメント仕様に整合（専用項目/必須制御）。
