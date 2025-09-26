@@ -38,6 +38,10 @@ const DefaultInternetForm = () => {
         else if (is1G) baseOptions = RACK_OPTIONS_1G;
         else return [];
 
+        if (isChintai && formData.housingType === 'マンション') {
+            return baseOptions.filter(o => o.value !== '無し');
+        }
+
         const housingType = formData.housingType;
         const isMansionType = housingType.includes('マンション') || housingType === '10G';
         const isFamilyType = housingType.includes('ファミリー');

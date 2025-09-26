@@ -131,7 +131,7 @@ export const generateElectricityCommentLogic = (formData: FormData): string => {
                 case 'STJP:':
                     if (hasContractConfirmation === 'なし') {
                         const code = elecRecordIdPrefix === 'S' ? 'HAHZZT276' : 'HAHZZT293';
-                        const planSImp = isAllElectric === 'あり' ? 'すまいのでんきオール電化プラン' : 'すまいのでんきのみ';
+                        const planSImp = isGasSet === 'セット' ? 'すまいのセット' : 'すまいのでんきのみ';
                         comment = `【ストエネ/★インポートのみ/すまいの】
 ${code}※ ${tag}
 ${baseInfo}

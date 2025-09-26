@@ -16,6 +16,7 @@ const MailingAddressSection = () => {
         const defaultConfig = { showOptions: false, showFields: false, isRequired: false, fixedValue: null, description: null };
         switch(gasProvider) {
             case 'すまいのでんき（ストエネ）': // This is "すまいのガス"
+                 return { ...defaultConfig, description: '新住所郵送（指定も可能。その場合は備考欄に特記事項としてわかりやすく記載）' };
             case 'ニチガス単品':
             case '大阪ガス単品':
                 return { ...defaultConfig, showOptions: true, showFields: mailingOption === '現住所', isRequired: mailingOption === '現住所', description: '書面送付先を選択してください。' };
@@ -129,9 +130,9 @@ const GasTab = () => {
     }, [gasRecordIdPrefix]);
 
     // Conditional rendering based on comment templates
-    const showGreeting = !isTokyo && !isOsakaGas;
+    const showGreeting = !isTokyo;
     const showEmail = isTokyu;
-    const showPaymentMethod = !isTokyo;
+    const showPaymentMethod = !isTokyo && !isOsakaGas;
     const showGender = isSumainoGas;
 
     return (
@@ -239,7 +240,7 @@ const GasTab = () => {
             <div className="border-t-2 border-dashed border-blue-300 pt-6 space-y-4">
                 <h3 className="text-lg font-bold text-blue-700">契約者情報</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {showGreeting && <FormInput label="名乗り" name="greeting" value={formData.greeting} onChange={handleInputChange} isInvalid={invalidFields.includes('greeting')} />}
+                    {showGreeting && <FormInput label="名乗り" name="greeting" value={formData.greeting} onChange={handleInputChange} isInvalid={invalidFields.includes('greeting')} required={isOsakaGas} />}
                     <FormInput label="契約者名義（漢字）" name="contractorName" value={formData.contractorName} onChange={handleInputChange} onBlur={handleNameBlur} isInvalid={invalidFields.includes('contractorName')} required />
                     <FormInput label="契約者名義（フリガナ）" name="contractorNameKana" value={formData.contractorNameKana} onChange={handleInputChange} onBlur={handleKanaBlur} isInvalid={invalidFields.includes('contractorNameKana')} required />
                     {showGender && <FormSelect label="性別" name="gender" value={formData.gender} onChange={handleInputChange} options={GENDERS} isInvalid={invalidFields.includes('gender')} />}
@@ -277,7 +278,7 @@ const GasTab = () => {
                 </div>
             </div>
             
-            <MailingAddressSection />
+            {!isOsakaGas && <MailingAddressSection />}
 
             <div className="border-t-2 border-dashed border-blue-300 pt-6 space-y-4">
                 <h3 className="text-lg font-bold text-blue-700">その他</h3>

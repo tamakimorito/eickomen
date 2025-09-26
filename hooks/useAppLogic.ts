@@ -1,3 +1,4 @@
+
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { BUG_REPORT_SCRIPT_URL } from '../constants.ts';
 import { generateElectricityCommentLogic } from '../commentLogic/electricity.ts';
@@ -160,10 +161,12 @@ const getRequiredFields = (formData, activeTab) => {
             
             if (!isSakaiRoute) required.push('recordId');
 
-            if (![ '東京ガス単品', '大阪ガス単品' ].includes(gasProvider)) {
+            if (gasProvider === '大阪ガス単品') {
+                required.push('greeting');
+            } else if (![ '東京ガス単品' ].includes(gasProvider)) {
                 required.push('greeting');
             }
-             if (gasProvider !== '東京ガス単品') {
+             if (gasProvider !== '東京ガス単品' && gasProvider !== '大阪ガス単品') {
                 required.push('paymentMethod');
             }
             if (gasProvider === '東急ガス') {
@@ -209,6 +212,11 @@ const getRequiredFields = (formData, activeTab) => {
     const missingLabels = missingFields.map(field => FIELD_LABELS[field] || field);
     
     return { missingFields, missingLabels };
+};
+
+const effectiveLen = (str: string | undefined | null): number => {
+    if (!str) return 0;
+    return str.replace(/[\s\u3000]/g, '').length;
 };
 
 
@@ -354,18 +362,49 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
         previousRecordIdRef.current = recordId;
 
     }, [recordId, greeting, activeTab, isSakaiRoute, dispatch]);
+
+    // Tokyo Gas: check name length on provider change
+    useEffect(() => {
+        const isTokyoGasProduct = formData.elecProvider === '東京ガス電気セット' || formData.gasProvider === '東京ガス単品';
+        if (!isTokyoGasProduct) return;
+    
+        const contractorNameLength = effectiveLen(formData.contractorName);
+        const contractorNameKanaLength = effectiveLen(formData.contractorNameKana);
+    
+        if (contractorNameLength >= 9 || contractorNameKanaLength >= 9) {
+            const invalidField = contractorNameLength >= 9 ? 'contractorName' : 'contractorNameKana';
+            setInvalidFields(prev => [...new Set([...prev, invalidField])]);
+            // FIX: Add missing onCancel property
+            setModalState({
+                isOpen: true,
+                title: '契約者名義の確認',
+                message: '契約者名義が9文字以上です。\n東京ガス受付では短縮表記が必要です。',
+                confirmText: '修正する',
+                cancelText: null, // No cancel button, blocking modal
+                type: 'default',
+                onConfirm: () => {
+                    closeModal();
+                    // Don't focus here as it's a provider change event
+                },
+                onCancel: closeModal,
+                isErrorBanner: true,
+                bannerMessage: '契約者名義が長すぎます。修正してください。'
+            });
+        }
+    }, [formData.elecProvider, formData.gasProvider, formData.contractorName, formData.contractorNameKana, setModalState, setInvalidFields, closeModal]);
     
     const handleCopy = useCallback(() => {
         const { missingFields, missingLabels } = getRequiredFields(formData, activeTab);
 
         if (missingFields.length > 0) {
             setInvalidFields(missingFields);
+            // FIX: Change onCancel from null to a function to match state type
             setModalState({
                 isOpen: true,
                 title: '必須項目が未入力です',
                 message: `以下の項目を入力してください：\n\n・${missingLabels.join('\n・')}`,
                 onConfirm: closeModal,
-                onCancel: null, // Hides cancel button
+                onCancel: closeModal, // Hides cancel button
                 confirmText: 'OK',
                 cancelText: null,
                 type: 'warning',
@@ -381,12 +420,13 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
         // --- Address Number Check for AU Hikari ---
         if (activeTab === 'internet' && formData.product === 'AUひかり' && formData.address && !/\d/.test(formData.address)) {
             setInvalidFields(['address']);
+            // FIX: Change onCancel from null to a function to match state type
             setModalState({
                 isOpen: true,
                 title: '入力エラー',
                 message: '「住所※物件名部屋番号まで全部」に番地などの数字が含まれていません。修正してください。',
                 onConfirm: closeModal,
-                onCancel: null,
+                onCancel: closeModal,
                 confirmText: 'OK',
                 cancelText: null,
                 type: 'warning',
@@ -783,18 +823,39 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
         const currentTarget = e.currentTarget;
         if (!value) return;
 
-        // Original logic: Check for numbers
+        const isTokyoGasProduct = formData.elecProvider === '東京ガス電気セット' || formData.gasProvider === '東京ガス単品';
+        if (isTokyoGasProduct && effectiveLen(value) >= 9) {
+            setInvalidFields(prev => [...new Set([...prev, name])]);
+            // FIX: Add missing onCancel property
+            setModalState({
+                isOpen: true,
+                title: '契約者名義の確認',
+                message: '契約者名義が9文字以上です。\n東京ガス受付では短縮表記が必要です。',
+                confirmText: '修正する',
+                cancelText: null,
+                type: 'default',
+                onConfirm: () => {
+                    closeModal();
+                    currentTarget.focus();
+                },
+                onCancel: closeModal,
+                isErrorBanner: true,
+                bannerMessage: '契約者名義が長すぎます。修正してください。'
+            });
+            return;
+        } else {
+            setInvalidFields(prev => prev.filter(f => f !== name));
+        }
+
         if (/\d/.test(value)) {
             console.warn(`Validation Warning: Numbers in name field ${name}: "${value}"`);
         }
 
-        // New SoftBank space check for contractorName
-        const isSoftBankProduct = ['SoftBank光1G', 'SoftBank光10G', 'SB Air'].includes(formData.product);
-        if (isSoftBankProduct && name === 'contractorName' && !/[\s　]/.test(value)) {
+        if (name === 'contractorName' && !/[\s\u3000]/.test(value)) {
             setModalState({
                 isOpen: true,
                 title: '入力内容の確認',
-                message: '姓と名の間にスペース（全角/半角）がありません。修正しますか？',
+                message: '姓と名の間にスペース（全角/半角）がありません。修正をお願いします。',
                 confirmText: '修正する',
                 cancelText: 'このまま続行',
                 type: 'default',
@@ -807,7 +868,7 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
                 bannerMessage: '',
             });
         }
-    }, [formData.product, setModalState, closeModal]);
+    }, [formData.elecProvider, formData.gasProvider, setModalState, closeModal, setInvalidFields]);
 
 
     const handleKanaBlur = useCallback((e) => {
@@ -815,8 +876,31 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
         const currentTarget = e.currentTarget;
         if (!value) return;
         
-        // 1. Original Kana character validation
-        if (!/^[ァ-ヶー・\s　]+$/.test(value)) {
+        const isTokyoGasProduct = formData.elecProvider === '東京ガス電気セット' || formData.gasProvider === '東京ガス単品';
+        if (isTokyoGasProduct && effectiveLen(value) >= 9) {
+            setInvalidFields(prev => [...new Set([...prev, name])]);
+            // FIX: Add missing onCancel property
+            setModalState({
+                isOpen: true,
+                title: '契約者名義の確認',
+                message: 'フリガナが9文字以上です。\n東京ガス受付では短縮表記が必要です。',
+                confirmText: '修正する',
+                cancelText: null,
+                type: 'default',
+                onConfirm: () => {
+                    closeModal();
+                    currentTarget.focus();
+                },
+                onCancel: closeModal,
+                isErrorBanner: true,
+                bannerMessage: '契約者名義が長すぎます。修正してください。'
+            });
+            return;
+        } else {
+            setInvalidFields(prev => prev.filter(f => f !== name));
+        }
+        
+        if (!/^[ァ-ヶー・\s\u3000]+$/.test(value)) {
              setModalState({
                 isOpen: true,
                 title: '入力内容の確認',
@@ -833,40 +917,14 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
                 isErrorBanner: false,
                 bannerMessage: '',
             });
-            return; // Stop further checks if not kana
-        }
-
-        // 2. New Tokyo Gas length check
-        const isTokyoGasProduct = formData.elecProvider === '東京ガス電気セット' || formData.gasProvider === '東京ガス単品';
-        if (name === 'contractorNameKana' && isTokyoGasProduct) {
-            const kanaWithoutSpaces = value.replace(/[\s　]/g, '');
-            if (kanaWithoutSpaces.length >= 9) {
-                setModalState({
-                    isOpen: true,
-                    title: 'フリガナのご確認',
-                    message: 'フリガナが9文字以上です。東京ガス受付では短縮表記が必要な場合があります。短くして再入力しますか？',
-                    confirmText: '修正する',
-                    cancelText: 'このまま続行',
-                    type: 'default',
-                    onConfirm: () => {
-                        closeModal();
-                        currentTarget.focus();
-                    },
-                    onCancel: closeModal,
-                    isErrorBanner: false,
-                    bannerMessage: '',
-                });
-                return; 
-            }
+            return;
         }
         
-        // 3. New SoftBank space check for Kana
-        const isSoftBankProduct = ['SoftBank光1G', 'SoftBank光10G', 'SB Air'].includes(formData.product);
-        if (name === 'contractorNameKana' && isSoftBankProduct && !/[\s　]/.test(value)) {
+        if (name === 'contractorNameKana' && !/[\s\u3000]/.test(value)) {
             setModalState({
                 isOpen: true,
                 title: '入力内容の確認',
-                message: '姓と名の間にスペース（全角/半角）がありません。修正しますか？',
+                message: '姓と名の間にスペース（全角/半角）がありません。修正をお願いします。',
                 confirmText: '修正する',
                 cancelText: 'このまま続行',
                 type: 'default',
@@ -879,7 +937,7 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
                 bannerMessage: '',
             });
         }
-    }, [dispatch, setModalState, closeModal, formData.product, formData.elecProvider, formData.gasProvider]);
+    }, [dispatch, setModalState, closeModal, formData.elecProvider, formData.gasProvider, setInvalidFields]);
     
     return {
         activeTab,
