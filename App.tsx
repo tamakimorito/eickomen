@@ -1,162 +1,270 @@
-import React, { useContext } from 'react';
-import { AppContext } from './context/AppContext.tsx';
-import InternetTab from './components/InternetTab.tsx';
-import ElectricityTab from './components/ElectricityTab.tsx';
-import GasTab from './components/GasTab.tsx';
-import WtsTab from './components/WtsTab.tsx';
-import GeneratedComment from './components/GeneratedComment.tsx';
-import Header from './components/Header.tsx';
-import { Toast } from './components/Toast.tsx';
-import { Modal } from './components/Modal.tsx';
-import ManualModal from './components/ManualModal.tsx';
-import BugReportModal from './components/BugReportModal.tsx';
-import { FormInput, FormCheckbox } from './components/FormControls.tsx';
-import { BoltIcon, FireIcon, WifiIcon, CloudIcon, ChatBubbleBottomCenterTextIcon, XCircleIcon, XMarkIcon } from '@heroicons/react/24/solid';
+import React, { useState, useCallback, useRef } from 'react';
 
-const TABS = [
-  { id: 'electricity', label: '電気', icon: BoltIcon },
-  { id: 'gas', label: 'ガス', icon: FireIcon },
-  { id: 'internet', label: 'インターネット', icon: WifiIcon },
-  { id: 'wts', label: 'ウォーターサーバー', icon: CloudIcon },
-];
+import TopBar from './components/TopBar';
+import ControlsBar from './components/ControlsBar';
+import InfoPanel from './components/InfoPanel';
+import LoadingSpinner from './components/LoadingSpinner';
+import CandidateSelection from './components/CandidateSelection';
+import ConversationView from './components/ConversationView';
+import ManualRequestForm from './components/ManualRequestForm';
+import { AppState, Candidate, Message, SearchResponse, ConversationResponse } from './types';
+import * as api from './services/apiService';
+import { normalizePhoneNumber } from './utils/phoneUtils';
 
-type TabProps = {
-    id: string;
-    label: string;
-    icon: React.ElementType;
-    activeTab: string;
-    onTabChange: (id: string) => void;
-};
+interface Toast {
+  id: number;
+  message: string;
+  type: 'success' | 'error';
+}
 
-const Tab: React.FC<TabProps> = ({ id, label, icon: Icon, activeTab, onTabChange }) => (
-    <button
-        onClick={() => onTabChange(id)}
-        className={`flex items-center gap-2 px-3 sm:px-4 py-3 text-sm sm:text-base font-bold transition-colors duration-200 ease-in-out focus:outline-none -mb-px ${
-            activeTab === id
-            ? 'text-blue-700 border-b-4 border-blue-700'
-            : 'text-gray-500 hover:text-blue-600 border-b-4 border-transparent'
-        }`}
-    >
-        <Icon className="h-5 w-5"/>
-        <span className="hidden sm:inline">{label}</span>
-    </button>
-);
+const App: React.FC = () => {
+  const [appState, setAppState] = useState<AppState>(AppState.UNAUTHENTICATED);
+  const [password, setPassword] = useState<string>('');
+  const [passwordInput, setPasswordInput] = useState<string>('');
+  const [phoneInput, setPhoneInput] = useState<string>('');
+  const [error, setError] = useState<string | null>(null);
 
+  const [searchData, setSearchData] = useState<Pick<SearchResponse, 'maskedPhone' | 'candidates'> | null>(null);
+  const [conversationData, setConversationData] = useState<Omit<ConversationResponse, 'ok' | 'error'> | null>(null);
 
-const App = () => {
-    const {
-        formData,
-        handleInputChange,
-        invalidFields,
-        toast,
-        setToast,
-        modalState,
-        setModalState,
-        isManualOpen,
-        setIsManualOpen,
-        isBugReportOpen,
-        bugReportState,
-        handleBugReportTextChange,
-        handleOpenBugReport,
-        handleCloseBugReport,
-        handleBugReportSubmit,
-        activeTab,
-        onTabChange,
-        handleResetRequest,
-    } = useContext(AppContext);
+  const [toasts, setToasts] = useState<Toast[]>([]);
+  const nextToastId = useRef(0);
 
-    return (
-        <div className="bg-gray-100 min-h-screen font-sans">
-            <Header onManualOpen={() => setIsManualOpen(true)} onResetRequest={handleResetRequest} />
+  const addToast = useCallback((message: string, type: 'success' | 'error') => {
+    const id = nextToastId.current++;
+    setToasts(prev => [...prev, { id, message, type }]);
+    const timer = setTimeout(() => {
+      setToasts(prev => prev.filter(t => t.id !== id));
+    }, 5000);
+    return () => clearTimeout(timer);
+  }, []);
 
-            {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
-            
-             {modalState.isErrorBanner && (
-                <div className="bg-red-600 text-white shadow-md">
-                    <div className="max-w-7xl mx-auto py-3 px-3 sm:px-6 lg:px-8">
-                        <div className="flex items-center justify-between flex-wrap">
-                            <div className="w-0 flex-1 flex items-center">
-                                <span className="flex p-2 rounded-lg bg-red-800">
-                                    <XCircleIcon className="h-6 w-6 text-white" aria-hidden="true" />
-                                </span>
-                                <p className="ml-3 font-medium truncate">
-                                    <span>{modalState.bannerMessage}</span>
-                                </p>
-                            </div>
-                            <div className="order-2 flex-shrink-0 sm:order-3 sm:ml-3">
-                                <button type="button" onClick={() => setModalState(prev => ({...prev, isErrorBanner: false}))} className="-mr-1 flex p-2 rounded-md hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-white sm:-mr-2">
-                                    <span className="sr-only">Dismiss</span>
-                                    <XMarkIcon className="h-6 w-6 text-white" aria-hidden="true" />
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
+  const handleError = useCallback((e: any, defaultMessage: string) => {
+    const errorMessage = e instanceof Error ? e.message : defaultMessage;
+    console.error(e);
+    setError(errorMessage);
+    setAppState(AppState.ERROR);
+  }, []);
 
-            <Modal {...modalState} />
-            <ManualModal isOpen={isManualOpen} onClose={() => setIsManualOpen(false)} />
-            <BugReportModal 
-                isOpen={isBugReportOpen}
-                onClose={handleCloseBugReport}
-                reportText={bugReportState.text}
-                onReportTextChange={handleBugReportTextChange}
-                onSubmit={handleBugReportSubmit}
-                isSubmitting={bugReportState.isSubmitting}
-                isInvalid={bugReportState.isInvalid}
-            />
+  const handleAuth = useCallback(async () => {
+    if (!passwordInput) return;
+    setAppState(AppState.AUTHENTICATING);
+    setError(null);
+    try {
+      await api.authenticate(passwordInput);
+      setPassword(passwordInput);
+      setAppState(AppState.AUTHENTICATED_IDLE);
+    } catch (e) {
+      handleError(e, '認証に失敗しました。');
+    }
+  }, [passwordInput, handleError]);
 
-            <main className="max-w-7xl mx-auto py-6 sm:py-8 px-4 sm:px-6 lg:px-8">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <div className="bg-white p-6 rounded-2xl shadow-xl border border-gray-200">
-                        <div className="flex items-center justify-between mb-4">
-                            <FormInput
-                                label="担当者/AP名"
-                                name="apName"
-                                value={formData.apName}
-                                onChange={handleInputChange}
-                                isInvalid={invalidFields.includes('apName')}
-                                required
-                                className="w-1/2"
-                            />
-                             <FormCheckbox
-                                label="サカイ販路"
-                                name="isSakaiRoute"
-                                checked={formData.isSakaiRoute}
-                                onChange={handleInputChange}
-                                isInvalid={invalidFields.includes('isSakaiRoute')}
-                                description=""
-                                className="pt-6"
-                            />
-                        </div>
-                        <div className="border-b-2 border-gray-200">
-                            <nav className="flex space-x-2 sm:space-x-4">
-                                {TABS.map(tab => <Tab key={tab.id} id={tab.id} label={tab.label} icon={tab.icon} activeTab={activeTab} onTabChange={onTabChange} />)}
-                            </nav>
-                        </div>
-                        <div className="mt-6 space-y-6">
-                            {activeTab === 'electricity' && <ElectricityTab />}
-                            {activeTab === 'gas' && <GasTab />}
-                            {activeTab === 'internet' && <InternetTab />}
-                            {activeTab === 'wts' && <WtsTab />}
-                        </div>
-                    </div>
+  const handleSelectCandidate = useCallback(async (userId: string, maskedPhone?: string, candidates?: Candidate[]) => {
+    setAppState(AppState.LOADING_CONVO);
+    setError(null);
+    try {
+      const data = await api.getConversation(password, userId, null);
+      setConversationData(data);
+      if (maskedPhone && candidates) {
+        setSearchData({ maskedPhone, candidates });
+      }
+      setAppState(AppState.CONVERSATION);
+    } catch (e) {
+      handleError(e, '会話の読み込みに失敗しました。');
+    }
+  }, [password, handleError]);
 
-                    <div className="sticky top-24 self-start">
-                        <GeneratedComment />
-                    </div>
-                </div>
-            </main>
-            
-            <button
-                onClick={handleOpenBugReport}
-                className="fixed bottom-6 right-6 bg-red-600 text-white p-4 rounded-full shadow-lg hover:bg-red-700 transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-                aria-label="不具合・要望の報告"
+  const handleSearch = useCallback(async () => {
+    const normalizedPhone = normalizePhoneNumber(phoneInput);
+    if (normalizedPhone.length < 9) return;
+    setAppState(AppState.SEARCHING);
+    setError(null);
+    setSearchData(null);
+    setConversationData(null);
+    try {
+      const data = await api.searchPhone(password, normalizedPhone);
+      if (data.candidates.length === 0) {
+        setAppState(AppState.NO_MATCH);
+      } else if (data.candidates.length === 1) {
+        await handleSelectCandidate(data.candidates[0].userId, data.maskedPhone, data.candidates);
+      } else {
+        setSearchData({ maskedPhone: data.maskedPhone, candidates: data.candidates });
+        setAppState(AppState.CANDIDATES);
+      }
+    } catch (e) {
+      handleError(e, '検索に失敗しました。');
+    }
+  }, [password, phoneInput, handleSelectCandidate, handleError]);
+
+  const handleLoadMore = useCallback(async () => {
+    if (!conversationData?.nextBefore || !conversationData?.userId) return;
+    setAppState(AppState.PAGINATING);
+    try {
+      const data = await api.getConversation(password, conversationData.userId, conversationData.nextBefore);
+      setConversationData(prev => prev ? ({
+        ...prev,
+        messages: [...data.messages, ...prev.messages],
+        nextBefore: data.nextBefore,
+      }) : null);
+    } catch (e) {
+      addToast(e instanceof Error ? e.message : '追加のメッセージ読み込みに失敗しました。', 'error');
+    } finally {
+      setAppState(AppState.CONVERSATION);
+    }
+  }, [password, conversationData, addToast]);
+
+  const handleReAuth = () => {
+    setAppState(AppState.UNAUTHENTICATED);
+    setPassword('');
+    setPasswordInput('');
+    setPhoneInput('');
+    setError(null);
+    setSearchData(null);
+    setConversationData(null);
+  };
+
+  const handleManualRequest = useCallback(async (payload: { apName: string; recordId: string; requestType: 'email' | 'address' }) => {
+    if (!password) {
+        addToast('認証情報がありません。再認証してください。', 'error');
+        throw new Error('Not authenticated');
+    }
+    const normalizedPhone = normalizePhoneNumber(phoneInput);
+    try {
+      const response = await api.notify({
+          pass: password,
+          phone: normalizedPhone,
+          ...payload
+      });
+      if (response.deduped) {
+          addToast('このリクエストは既に送信されています。', 'success');
+      } else {
+          addToast('リクエストを送信しました。', 'success');
+      }
+    } catch (e: any) {
+        addToast(`リクエストの送信に失敗しました: ${e.message}`, 'error');
+        throw e;
+    }
+  }, [password, phoneInput, addToast]);
+
+  const isAuthenticated = appState !== AppState.UNAUTHENTICATED && appState !== AppState.AUTHENTICATING;
+
+  const renderContent = () => {
+    // FIX: Grouped AppState.UNAUTHENTICATED and AppState.AUTHENTICATING to resolve a type-narrowing error.
+    // This change makes the login form's loading state functional, as was likely intended.
+    switch (appState) {
+      case AppState.UNAUTHENTICATED:
+      case AppState.AUTHENTICATING:
+        return (
+          <div className="h-full flex flex-col justify-center items-center text-center bg-[#EDEEF2] p-4">
+            <div className="max-w-sm w-full">
+              <h2 className="text-2xl font-bold text-gray-800 mb-2">
+                あとパスワードを入力して認証してください。
+              </h2>
+              <p className="text-sm text-gray-600 mb-8">
+                （パスワードはコールセンターすまえるチャットの概要記載）
+              </p>
+              <form onSubmit={(e) => { e.preventDefault(); handleAuth(); }} className="flex flex-col items-center gap-4">
+                <label htmlFor="password-input" className="sr-only">パスワード</label>
+                <input
+                  id="password-input"
+                  type="password"
+                  value={passwordInput}
+                  onChange={(e) => setPasswordInput(e.target.value)}
+                  placeholder="パスワード"
+                  className="rounded-lg border border-[#D6D9DE] px-4 py-3 text-lg focus:outline-none focus:ring-2 focus:ring-[#06C755] w-full"
+                  disabled={appState === AppState.AUTHENTICATING}
+                  autoFocus
+                />
+                <button
+                  type="submit"
+                  className="bg-[#06C755] text-white rounded-lg px-8 py-3 text-lg font-bold hover:bg-[#0dbf58] disabled:opacity-50 w-full transition-colors"
+                  disabled={appState === AppState.AUTHENTICATING || !passwordInput}
+                >
+                  {appState === AppState.AUTHENTICATING ? '認証中...' : '認証'}
+                </button>
+              </form>
+            </div>
+          </div>
+        );
+      case AppState.SEARCHING:
+      case AppState.LOADING_CONVO:
+        return <LoadingSpinner />;
+      case AppState.AUTHENTICATED_IDLE:
+        return <InfoPanel message="上部のバーから電話番号を検索してください。" />;
+      case AppState.CANDIDATES:
+        if (!searchData) return <InfoPanel message="検索データが見つかりません。" type="error" />;
+        return <CandidateSelection candidates={searchData.candidates} onSelect={(userId) => handleSelectCandidate(userId)} />;
+      case AppState.NO_MATCH:
+        return (
+          <div className="p-4 md:p-6 max-w-md mx-auto h-full flex flex-col justify-center">
+            <InfoPanel message={`"${phoneInput}"に一致する候補が見つかりませんでした。`} type="warning" />
+            <div className="mt-4">
+              <ManualRequestForm onSubmit={handleManualRequest} />
+            </div>
+          </div>
+        );
+      case AppState.CONVERSATION:
+      case AppState.PAGINATING:
+        if (!conversationData || !searchData) return <InfoPanel message="会話データが見つかりません。" type="error" />;
+        const candidate = searchData.candidates.find(c => c.userId === conversationData.userId);
+        if (!candidate) return <InfoPanel message="ユーザー情報が見つかりません。" type="error" />;
+        const searchInfo = {
+          maskedPhone: searchData.maskedPhone,
+          userId: conversationData.userId,
+          count: candidate.count,
+          lastTs: candidate.lastTs
+        };
+        return (
+          <ConversationView
+            messages={conversationData.messages}
+            nextBefore={conversationData.nextBefore}
+            onLoadMore={handleLoadMore}
+            isPaginating={appState === AppState.PAGINATING}
+            searchInfo={searchInfo}
+          />
+        );
+      case AppState.ERROR:
+        return <InfoPanel message={error || '不明なエラーが発生しました。'} type="error" onRetry={handleReAuth} />;
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div className="h-screen w-screen flex flex-col font-sans antialiased bg-[#EDEEF2] text-gray-900">
+      <TopBar isAuthenticated={isAuthenticated} onReAuth={handleReAuth} />
+      <ControlsBar
+        isAuthenticated={isAuthenticated}
+        appState={appState}
+        passwordInput={passwordInput}
+        setPasswordInput={setPasswordInput}
+        phoneInput={phoneInput}
+        setPhoneInput={setPhoneInput}
+        onAuthSubmit={handleAuth}
+        onSearchSubmit={handleSearch}
+      />
+      <main className="flex-1 overflow-y-auto relative">
+        {renderContent()}
+      </main>
+      
+      <footer className="shrink-0 bg-white/80 backdrop-blur-sm p-2 border-t border-gray-200 text-xs text-gray-600 text-center">
+        ©タマシステム 2025
+      </footer>
+
+      <div aria-live="assertive" className="fixed top-16 right-4 space-y-2 z-50 pointer-events-none">
+          {toasts.map((toast) => (
+            <div
+              key={toast.id}
+              className={`max-w-sm w-full shadow-lg rounded-lg pointer-events-auto p-4 text-white ${
+                toast.type === 'success' ? 'bg-green-500' : 'bg-red-500'
+              }`}
             >
-                <ChatBubbleBottomCenterTextIcon className="h-7 w-7" />
-            </button>
-        </div>
-    );
+              {toast.message}
+            </div>
+          ))}
+      </div>
+    </div>
+  );
 };
 
 export default App;
