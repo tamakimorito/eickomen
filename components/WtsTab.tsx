@@ -11,7 +11,7 @@ import { FormInput, FormSelect, FormRadioGroup, FormTextArea, FormDateInput, For
 
 
 const WtsTab = () => {
-    const { formData, handleInputChange, handleDateBlurWithValidation, handleNameBlur, handleIdBlur, invalidFields, handlePhoneBlur, handleKanaBlur } = useContext(AppContext);
+    const { formData, handleInputChange, handleDateBlurWithValidation, handleNameBlur, handleIdBlur, invalidFields, handlePhoneBlur, handleKanaBlur, handlePostalCodeBlur } = useContext(AppContext);
     const { wtsCustomerType, isSakaiRoute, wtsServerType } = formData;
     
     const colorOptions = useMemo(() => {
@@ -142,6 +142,7 @@ const WtsTab = () => {
                                     name="wtsShippingPostalCode"
                                     value={formData.wtsShippingPostalCode}
                                     onChange={handleInputChange}
+                                    onBlur={(e) => handlePostalCodeBlur('wtsShippingPostalCode', e.target.value)}
                                     isInvalid={invalidFields.includes('wtsShippingPostalCode')}
                                     required
                                 />
@@ -202,15 +203,28 @@ const WtsTab = () => {
                         isInvalid={invalidFields.includes('wtsCreditCard')}
                         required
                     />
-                    <FormSelect
-                        label={isCorporate ? "⑫キャリア" : "⑪キャリア"}
-                        name="wtsCarrier"
-                        value={formData.wtsCarrier}
-                        onChange={handleInputChange}
-                        options={WTS_CARRIER_OPTIONS}
-                        isInvalid={invalidFields.includes('wtsCarrier')}
-                        required
-                    />
+                    <div className="md:col-span-1">
+                        <FormSelect
+                            label={isCorporate ? "⑫キャリア" : "⑪キャリア"}
+                            name="wtsCarrier"
+                            value={formData.wtsCarrier}
+                            onChange={handleInputChange}
+                            options={WTS_CARRIER_OPTIONS}
+                            isInvalid={invalidFields.includes('wtsCarrier')}
+                            required
+                        />
+                         {formData.wtsCarrier === 'その他' && (
+                            <FormInput
+                                label="キャリア名（任意）"
+                                name="wtsCarrierOther"
+                                value={formData.wtsCarrierOther}
+                                onChange={handleInputChange}
+                                className="mt-2"
+                                placeholder="例: 楽天モバイル"
+                                isInvalid={invalidFields.includes('wtsCarrierOther')}
+                            />
+                        )}
+                    </div>
                     <FormDateInput
                         label={isCorporate ? "⑬入居予定日" : "⑫入居予定日"}
                         name="moveInDate"
@@ -235,6 +249,7 @@ const WtsTab = () => {
                             <div className="mt-2 p-4 bg-blue-50/50 rounded-lg border border-blue-200 grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <FormInput
                                     label="現住所の郵便番号" name="currentPostalCode" value={formData.currentPostalCode} onChange={handleInputChange}
+                                    onBlur={(e) => handlePostalCodeBlur('currentPostalCode', e.target.value)}
                                     isInvalid={invalidFields.includes('currentPostalCode')} required
                                 />
                                 <FormInput

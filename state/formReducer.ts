@@ -1,7 +1,6 @@
 // FIX: Add WTS_COLORS to import to resolve missing member error.
-import { INITIAL_FORM_DATA, WTS_COLORS } from '../constants.ts';
+import { INITIAL_FORM_DATA, WTS_COLORS, ELEC_ID_PREFIX_OPTIONS, GAS_ID_PREFIX_OPTIONS, RACK_OPTIONS_CHINTAI_FREE_10G, RACK_OPTIONS_CHINTAI_FREE_MANSION, RACK_OPTIONS_1G, RACK_OPTIONS_10G } from '../constants.ts';
 import type { FormData, FormAction } from '../types.ts';
-import { ELEC_ID_PREFIX_OPTIONS, GAS_ID_PREFIX_OPTIONS, RACK_OPTIONS_CHINTAI_FREE_10G, RACK_OPTIONS_CHINTAI_FREE_MANSION, RACK_OPTIONS_1G, RACK_OPTIONS_10G } from '../constants.ts';
 
 const getRackOptions = (product, housingType) => {
     const isChintaiFree = product === '賃貸ねっと【無料施策】';
@@ -188,7 +187,7 @@ export const formReducer = (state: FormData, action: FormAction): FormData => {
         newState.gmoDocomoOwnerName = '';
         newState.gmoDocomoOwnerPhone = '';
       }
-      // FIX: Ensure all code paths in the reducer function return a value. The 'UPDATE_FIELD' case was missing its return statement.
+// FIX: Ensure all code paths in the reducer function return a value. The 'UPDATE_FIELD' case was missing its return statement.
       return newState;
     }
 

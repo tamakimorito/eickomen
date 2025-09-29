@@ -10,7 +10,7 @@ import { FormInput, FormSelect, FormRadioGroup, FormTextArea, FormDateInput, For
 
 // A component to render the mailing address section based on provider rules
 const MailingAddressSection = () => {
-    const { formData, handleInputChange, invalidFields } = useContext(AppContext);
+    const { formData, handleInputChange, invalidFields, handlePostalCodeBlur } = useContext(AppContext);
     const { elecProvider, mailingOption, currentPostalCode, currentAddress, mailingBuildingInfo } = formData;
     
     const config = useMemo(() => {
@@ -49,6 +49,17 @@ const MailingAddressSection = () => {
         return null;
     }
 
+    const handleDetachedHouseChange = (e) => {
+        const isChecked = e.target.checked;
+        const currentBuildingInfo = mailingBuildingInfo || '';
+        let baseInfo = currentBuildingInfo.replace(/戸建て$/, '').trim();
+        const newValue = isChecked ? `${baseInfo}戸建て`.trim() : baseInfo;
+        
+        handleInputChange({
+            target: { name: 'mailingBuildingInfo', value: newValue, type: 'text' }
+        });
+    };
+
     return (
         <div className="border-t-2 border-dashed border-blue-300 pt-6 space-y-4">
             <h3 className="text-lg font-bold text-blue-700">書面送付先</h3>
@@ -73,11 +84,12 @@ const MailingAddressSection = () => {
                         name="currentPostalCode"
                         value={currentPostalCode}
                         onChange={handleInputChange}
+                        onBlur={(e) => handlePostalCodeBlur('currentPostalCode', e.target.value)}
                         isInvalid={invalidFields.includes('currentPostalCode')}
                         required={config.isRequired}
                     />
                     <FormInput
-                        label={elecProvider === 'リミックスでんき' ? "郵送先住所" : "現住所・物件名・部屋番号"}
+                        label={elecProvider === 'リミックスでんき' ? "郵送先住所" : "現住所"}
                         name="currentAddress"
                         value={currentAddress}
                         onChange={handleInputChange}
@@ -85,16 +97,25 @@ const MailingAddressSection = () => {
                         isInvalid={invalidFields.includes('currentAddress')}
                         required={config.isRequired}
                     />
-                    {elecProvider === 'リミックスでんき' && (
+                    <div className="md:col-span-2 flex items-end gap-2">
                         <FormInput
-                            label="郵送先物件名"
+                            label={elecProvider === 'リミックスでんき' ? "郵送先物件名" : "現住所の物件名＋部屋番号"}
                             name="mailingBuildingInfo"
                             value={mailingBuildingInfo}
                             onChange={handleInputChange}
-                            className="md-col-span-2"
+                            className="flex-grow"
                             isInvalid={invalidFields.includes('mailingBuildingInfo')}
                         />
-                    )}
+                         <FormCheckbox
+                            label="戸建て"
+                            name="isMailingDetached" // UI-only name
+                            checked={(mailingBuildingInfo || '').endsWith('戸建て')}
+                            onChange={handleDetachedHouseChange}
+                            className="pb-2"
+                            description=""
+                            isInvalid={invalidFields.includes('mailingBuildingInfo')}
+                        />
+                    </div>
                 </div>
             )}
         </div>
@@ -103,7 +124,7 @@ const MailingAddressSection = () => {
 
 
 const ElectricityTab = () => {
-    const { formData, handleInputChange, handleDateBlurWithValidation, handleNameBlur, handleIdBlur, invalidFields, handlePhoneBlur, handleKanaBlur } = useContext(AppContext);
+    const { formData, handleInputChange, handleDateBlurWithValidation, handleNameBlur, handleIdBlur, invalidFields, handlePhoneBlur, handleKanaBlur, handlePostalCodeBlur } = useContext(AppContext);
     const { elecProvider, elecRecordIdPrefix, isGasSet, isSakaiRoute, recordId, hasContractConfirmation, isAllElectric } = formData;
 
     useEffect(() => {
@@ -302,7 +323,7 @@ const ElectricityTab = () => {
             <div className="border-t-2 border-dashed border-blue-300 pt-6 space-y-4">
                 <h3 className="text-lg font-bold text-blue-700">設置先情報</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormInput label="郵便番号" name="postalCode" value={formData.postalCode} onChange={handleInputChange} isInvalid={invalidFields.includes('postalCode')} required className="md:col-span-2" />
+                    <FormInput label="郵便番号" name="postalCode" value={formData.postalCode} onChange={handleInputChange} onBlur={(e) => handlePostalCodeBlur('postalCode', e.target.value)} isInvalid={invalidFields.includes('postalCode')} required className="md:col-span-2" />
                     <FormInput label="住所" name="address" value={formData.address} onChange={handleInputChange} className="md:col-span-2" isInvalid={invalidFields.includes('address')} required />
                     <div className="md:col-span-2 flex items-end gap-2">
                          <FormInput
@@ -386,7 +407,6 @@ const ElectricityTab = () => {
                 <FormTextArea label="備考" name="elecRemarks" value={formData.elecRemarks} onChange={handleInputChange} rows={3} isInvalid={invalidFields.includes('elecRemarks')} />
                 {isQenes && (
                     <div className="pt-4 space-y-4">
-                         {/* FIX: Added missing description prop to FormCheckbox */}
                          <FormCheckbox
                             label="法人契約"
                             name="qenesIsCorporate"

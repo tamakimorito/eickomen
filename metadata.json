@@ -1,5 +1,6 @@
 {
-  "name": "LINE スコープ",
-  "description": "A read-only LINE-style conversation viewer that fetches data from an internal API after authentication.",
-  "requestFramePermissions": []
+  "name": "営業コメント作成ツール～エイコメン～",
+  "description": "電気、ガス、インターネット(SB光/Air/賃貸ねっと)、ウォーターサーバーなど、複数の商材に対応した営業コメント作成ツール。入力内容はリアルタイムでチェック・共有され、必要な情報を正確なフォーマットで自動生成します。",
+  "requestFramePermissions": [],
+  "prompt": ""
 }

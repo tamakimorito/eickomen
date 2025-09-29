@@ -40,6 +40,13 @@ const OwnerInfo = ({ isChintai }) => {
               required
             />
             <FormInput
+              label="担当者名（フリガナ）"
+              name="contactPersonKana"
+              value={formData.contactPersonKana}
+              onChange={handleInputChange}
+              isInvalid={invalidFields.includes('contactPersonKana')}
+            />
+            <FormInput
               label="④ビル調査希望"
               name="buildingSurveyRequest"
               value={formData.buildingSurveyRequest}
@@ -75,8 +82,14 @@ const OwnerInfo = ({ isChintai }) => {
               name="contactPerson"
               value={formData.contactPerson}
               onChange={handleInputChange}
-              className="md:col-span-2"
               isInvalid={invalidFields.includes('contactPerson')}
+            />
+             <FormInput
+              label="担当者（フリガナ）"
+              name="contactPersonKana"
+              value={formData.contactPersonKana}
+              onChange={handleInputChange}
+              isInvalid={invalidFields.includes('contactPersonKana')}
             />
             <div className="md:col-span-2 space-y-4">
                 <FormCheckbox

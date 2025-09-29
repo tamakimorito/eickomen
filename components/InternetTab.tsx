@@ -15,7 +15,7 @@ import { FormInput, FormSelect, FormRadioGroup, FormTextArea, FormDateInput, For
 import OwnerInfo from './OwnerInfo.tsx';
 
 const DefaultInternetForm = () => {
-    const { formData, handleInputChange, handleDateBlurWithValidation, handleIdBlur, invalidFields, handlePhoneBlur, handleKanaBlur, handleNameBlur } = useContext(AppContext);
+    const { formData, handleInputChange, handleDateBlurWithValidation, handleIdBlur, invalidFields, handlePhoneBlur, handleKanaBlur, handleNameBlur, handlePostalCodeBlur } = useContext(AppContext);
     
     const is10G = formData.product === 'SoftBank光10G';
     const isAir = formData.product === 'SB Air';
@@ -100,7 +100,7 @@ const DefaultInternetForm = () => {
             <div className="border-t-2 border-dashed border-blue-300 pt-6 space-y-4">
                 <h3 className="text-lg font-bold text-blue-700">設置先情報</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormInput label="郵便番号" name="postalCode" value={formData.postalCode} onChange={handleInputChange} isInvalid={invalidFields.includes('postalCode')} required className="md:col-span-2" />
+                    <FormInput label="郵便番号" name="postalCode" value={formData.postalCode} onChange={handleInputChange} onBlur={(e) => handlePostalCodeBlur('postalCode', e.target.value)} isInvalid={invalidFields.includes('postalCode')} required className="md:col-span-2" />
                     <FormInput label="住所" name="address" value={formData.address} onChange={handleInputChange} className="md:col-span-2" isInvalid={invalidFields.includes('address')} required />
                     <div className="md:col-span-2 flex items-end gap-2">
                         <FormInput
@@ -141,6 +141,7 @@ const DefaultInternetForm = () => {
                     <div className="p-4 bg-blue-50/50 rounded-lg border border-blue-200 grid grid-cols-1 md:grid-cols-2 gap-4">
                         <FormInput
                             label="現住所の郵便番号" name="currentPostalCode" value={formData.currentPostalCode} onChange={handleInputChange}
+                            onBlur={(e) => handlePostalCodeBlur('currentPostalCode', e.target.value)}
                             isInvalid={invalidFields.includes('currentPostalCode')} required
                         />
                         <FormInput
@@ -361,7 +362,7 @@ const GmoTokutokuForm = () => {
 };
 
 const AuHikariForm = () => {
-    const { formData, handleInputChange, handleDateBlurWithValidation, invalidFields, handlePhoneBlur, handleNameBlur } = useContext(AppContext);
+    const { formData, handleInputChange, handleDateBlurWithValidation, invalidFields, handlePhoneBlur, handleNameBlur, handlePostalCodeBlur } = useContext(AppContext);
 
     return (
         <div className="space-y-6">
@@ -389,7 +390,7 @@ const AuHikariForm = () => {
             <div className="border-t-2 border-dashed border-blue-300 pt-6 space-y-4">
                 <h3 className="text-lg font-bold text-blue-700">設置先情報</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormInput label="郵便番号" name="postalCode" value={formData.postalCode} onChange={handleInputChange} isInvalid={invalidFields.includes('postalCode')} required className="md:col-span-2" />
+                    <FormInput label="郵便番号" name="postalCode" value={formData.postalCode} onChange={handleInputChange} onBlur={(e) => handlePostalCodeBlur('postalCode', e.target.value)} isInvalid={invalidFields.includes('postalCode')} required className="md:col-span-2" />
                     <FormInput label="住所※物件名部屋番号まで全部" name="address" value={formData.address} onChange={handleInputChange} className="md:col-span-2" isInvalid={invalidFields.includes('address')} required />
                 </div>
             </div>

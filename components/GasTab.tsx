@@ -9,14 +9,14 @@ import { AppContext } from '../context/AppContext.tsx';
 import { FormInput, FormSelect, FormRadioGroup, FormTextArea, FormDateInput, FormCheckbox } from './FormControls.tsx';
 
 const MailingAddressSection = () => {
-    const { formData, handleInputChange, invalidFields } = useContext(AppContext);
-    const { gasProvider, mailingOption, currentPostalCode, currentAddress } = formData;
+    const { formData, handleInputChange, invalidFields, handlePostalCodeBlur } = useContext(AppContext);
+    const { gasProvider, mailingOption, currentPostalCode, currentAddress, mailingBuildingInfo } = formData;
     
     const config = useMemo(() => {
         const defaultConfig = { showOptions: false, showFields: false, isRequired: false, fixedValue: null, description: null };
         switch(gasProvider) {
             case 'すまいのでんき（ストエネ）': // This is "すまいのガス"
-                 return { ...defaultConfig, description: '新住所郵送（指定も可能。その場合は備考欄に特記事項としてわかりやすく記載）' };
+                 return { ...defaultConfig, showOptions: true, showFields: mailingOption === '現住所', isRequired: mailingOption === '現住所', description: '新住所郵送（指定も可能。その場合は備考欄に特記事項としてわかりやすく記載）' };
             case 'ニチガス単品':
             case '大阪ガス単品':
                 return { ...defaultConfig, showOptions: true, showFields: mailingOption === '現住所', isRequired: mailingOption === '現住所', description: '書面送付先を選択してください。' };
@@ -38,6 +38,17 @@ const MailingAddressSection = () => {
     if (!config.showOptions && !config.showFields && !config.description) {
         return null;
     }
+    
+    const handleDetachedHouseChange = (e) => {
+        const isChecked = e.target.checked;
+        const currentBuildingInfo = mailingBuildingInfo || '';
+        let baseInfo = currentBuildingInfo.replace(/戸建て$/, '').trim();
+        const newValue = isChecked ? `${baseInfo}戸建て`.trim() : baseInfo;
+        
+        handleInputChange({
+            target: { name: 'mailingBuildingInfo', value: newValue, type: 'text' }
+        });
+    };
 
     return (
         <div className="border-t-2 border-dashed border-blue-300 pt-6 space-y-4">
@@ -63,11 +74,12 @@ const MailingAddressSection = () => {
                         name="currentPostalCode"
                         value={currentPostalCode}
                         onChange={handleInputChange}
+                        onBlur={(e) => handlePostalCodeBlur('currentPostalCode', e.target.value)}
                         isInvalid={invalidFields.includes('currentPostalCode')}
                         required={config.isRequired}
                     />
                     <FormInput
-                        label="現住所・物件名・部屋番号"
+                        label="現住所"
                         name="currentAddress"
                         value={currentAddress}
                         onChange={handleInputChange}
@@ -75,6 +87,25 @@ const MailingAddressSection = () => {
                         isInvalid={invalidFields.includes('currentAddress')}
                         required={config.isRequired}
                     />
+                    <div className="md:col-span-2 flex items-end gap-2">
+                         <FormInput
+                            label="現住所の物件名＋部屋番号"
+                            name="mailingBuildingInfo"
+                            value={mailingBuildingInfo}
+                            onChange={handleInputChange}
+                            className="flex-grow"
+                            isInvalid={invalidFields.includes('mailingBuildingInfo')}
+                        />
+                        <FormCheckbox
+                            label="戸建て"
+                            name="isMailingDetached" // UI-only name
+                            checked={(mailingBuildingInfo || '').endsWith('戸建て')}
+                            onChange={handleDetachedHouseChange}
+                            className="pb-2"
+                            description=""
+                            isInvalid={invalidFields.includes('mailingBuildingInfo')}
+                        />
+                    </div>
                 </div>
             )}
         </div>
@@ -83,7 +114,7 @@ const MailingAddressSection = () => {
 
 
 const GasTab = () => {
-    const { formData, handleInputChange, handleDateBlurWithValidation, handleNameBlur, handleIdBlur, invalidFields, handlePhoneBlur, handleKanaBlur } = useContext(AppContext);
+    const { formData, handleInputChange, handleDateBlurWithValidation, handleNameBlur, handleIdBlur, invalidFields, handlePhoneBlur, handleKanaBlur, handlePostalCodeBlur } = useContext(AppContext);
     const { gasProvider, gasRecordIdPrefix, isSakaiRoute } = formData;
     
     const isSumainoGas = gasProvider === 'すまいのでんき（ストエネ）';
@@ -253,7 +284,7 @@ const GasTab = () => {
             <div className="border-t-2 border-dashed border-blue-300 pt-6 space-y-4">
                 <h3 className="text-lg font-bold text-blue-700">設置先情報</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormInput label="郵便番号" name="postalCode" value={formData.postalCode} onChange={handleInputChange} isInvalid={invalidFields.includes('postalCode')} required className="md:col-span-2" />
+                    <FormInput label="郵便番号" name="postalCode" value={formData.postalCode} onChange={handleInputChange} onBlur={(e) => handlePostalCodeBlur('postalCode', e.target.value)} isInvalid={invalidFields.includes('postalCode')} required className="md:col-span-2" />
                     <FormInput label="住所" name="address" value={formData.address} onChange={handleInputChange} className="md:col-span-2" isInvalid={invalidFields.includes('address')} required />
                     <div className="md:col-span-2 flex items-end gap-2">
                          <FormInput

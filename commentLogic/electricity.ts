@@ -52,24 +52,26 @@ const formatPostalCode = (postalCodeStr: string, providerName: string): string =
 export const generateElectricityCommentLogic = (formData: FormData): string => {
     const {
         elecProvider, elecRecordIdPrefix, isAllElectric, isVacancy, hasContractConfirmation, isGasSet,
-        recordId, primaryProductStatus, greeting, apName, contractorName, contractorNameKana, gender, dob, phone,
-        postalCode, address, buildingInfo, moveInDate, paymentMethod, elecRemarks, attachedOption,
+        recordId, primaryProductStatus, greeting, apName, contractorName, contractorNameKana, gender, phone,
+        postalCode, address, buildingInfo, paymentMethod, elecRemarks, attachedOption,
         elecConfirmationTime, elecImportCompanyName, elecPostConfirmationDateTime, email, isNewConstruction,
         postConfirmationTime, currentAddress, currentPostalCode, mailingOption, contactPersonName, contactPersonNameKana, gasOpeningTimeSlot,
-        gasArea, gasWitness, gasPreContact, gasOpeningDate, mailingBuildingInfo, qenesIsCorporate
-    } = { 
-        ...formData, 
-        dob: formatDate(formData.dob), 
-        moveInDate: formatDate(formData.moveInDate),
-        gasOpeningDate: formatDate(formData.gasOpeningDate) 
-    };
+        gasArea, gasWitness, gasPreContact, mailingBuildingInfo, qenesIsCorporate
+    } = formData;
+
+    const dob = formatDate(formData.dob);
+    const moveInDate = formatDate(formData.moveInDate);
+    const gasOpeningDate = formatDate(formData.gasOpeningDate);
 
     let comment = '該当するテンプレートがありません。';
     const tag = "250811";
 
     const isSet = isGasSet === 'セット' || ['ニチガス電気セット', '東邦ガスセット', '東京ガス電気セット', '大阪ガス電気セット'].includes(elecProvider);
     
-    const formattedPhone = formatPhoneNumberWithHyphens(phone);
+    const noHyphenProviders = ['すまいのでんき（ストエネ）', 'プラチナでんき（ジャパン）'];
+    const formattedPhone = noHyphenProviders.includes(elecProvider)
+        ? (phone || '').replace(/\D/g, '')
+        : formatPhoneNumberWithHyphens(phone);
     const formattedGasPreContact = formatPhoneNumberWithHyphens(gasPreContact);
     
     const formattedPostalCode = formatPostalCode(postalCode, elecProvider);
@@ -131,7 +133,7 @@ export const generateElectricityCommentLogic = (formData: FormData): string => {
                 case 'STJP:':
                     if (hasContractConfirmation === 'なし') {
                         const code = elecRecordIdPrefix === 'S' ? 'HAHZZT276' : 'HAHZZT293';
-                        const planSImp = isGasSet === 'セット' ? 'すまいのセット' : 'すまいのでんきのみ';
+                        const planSImp = isGasSet === 'セット' ? 'すまいのセット' : 'すまいの電気のみ';
                         comment = `【ストエネ/★インポートのみ/すまいの】
 ${code}※ ${tag}
 ${baseInfo}
@@ -147,7 +149,7 @@ ${attachedOptionLine}支払い方法：${paymentMethod || ''}
                         const code = elecRecordIdPrefix === 'S' ? 'HAHZZT276' : 'HAHZZT293';
                         const planS = isAllElectric === 'あり'
                             ? 'すまいのでんきオール電化'
-                            : (isGasSet === 'セット' ? 'すまいのでんきセット' : 'すまいのでんきのみ');
+                            : (isGasSet === 'セット' ? 'すまいのでんきセット' : 'すまいの電気のみ');
                         comment = `【ストエネ】\n${code}※ ${tag}\n契確時間：${elecConfirmationTime || ''}\n${primaryProductStatus ? `主商材受注状況：${primaryProductStatus}\n` : ''}${baseInfo}\nプラン：${planS}\n${contractInfo}\n${addressInfo}\n${elecDateLine}\n支払い方法：${paymentMethod || ''}\n備考：${elecRemarks || ''}`;
                     }
                     break;
@@ -167,7 +169,7 @@ ${attachedOptionLine}支払い方法：${paymentMethod || ''}
                         
                         const plan = isAllElectric === 'あり'
                             ? 'すまいのでんきオール電化プラン'
-                            : (isGasSet === 'セット' ? 'すまいのセット' : 'すまいのでんきのみ');
+                            : (isGasSet === 'セット' ? 'すまいのセット' : 'すまいの電気のみ');
                         
                         comment = `${header} ${tag}\n${baseInfo}\nプラン：${plan}\n${contractInfo}\n性別：${gender || ''}\n${importAddressInfo}\n${elecDateLine}\n${attachedOptionLine}支払い方法：${paymentMethod || ''}\n備考：${elecRemarks || ''}`;
                     } else {
@@ -179,7 +181,7 @@ ${attachedOptionLine}支払い方法：${paymentMethod || ''}
                         } else {
                             const planElse = isAllElectric === 'あり'
                                 ? 'すまいのでんきオール電化プラン'
-                                : (isGasSet === 'セット' ? 'すまいのでんきセット' : 'すまいのでんきのみ');
+                                : (isGasSet === 'セット' ? 'すまいのでんきセット' : 'すまいの電気のみ');
                             comment = `【ストエネ】 ${tag}\n契確時間：${elecConfirmationTime || ''}\n${primaryProductStatus ? `主商材受注状況：${primaryProductStatus}\n` : ''}${baseInfo}\nプラン：${planElse}\n${contractInfo}\n${addressInfo}\n${elecDateLine}\n支払い方法：${paymentMethod || ''}\n備考：${elecRemarks || ''}`;
                         }
                     }

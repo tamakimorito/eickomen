@@ -41,7 +41,7 @@ export const generateWtsCommentLogic = (formData: FormData): string => {
     const {
         apName, customerId, contractorName, contractorNameKana, dob, phone, wtsShippingDestination,
         wtsShippingPostalCode, wtsShippingAddress,
-        wtsServerColor, wtsFiveYearPlan, wtsFreeWater, wtsCreditCard, wtsCarrier,
+        wtsServerColor, wtsFiveYearPlan, wtsFreeWater, wtsCreditCard, wtsCarrier, wtsCarrierOther,
         moveInDate, wtsWaterPurifier, wtsMultipleUnits, wtsCustomerType,
         wtsU20HighSchool, wtsU20ParentalConsent, wtsCorporateInvoice, wtsRemarks, wtsMailingAddress,
         recordId, isSakaiRoute, wtsServerType, wtsEmail, currentAddress, currentPostalCode
@@ -97,7 +97,10 @@ export const generateWtsCommentLogic = (formData: FormData): string => {
     commentLines.push(`${currentIndex++}）契約年数：${wtsFiveYearPlan || ''}`);
     commentLines.push(`${currentIndex++}）無料水：${wtsFreeWater || ''}`);
     commentLines.push(`${currentIndex++}）クレカ：${wtsCreditCard || ''}`);
-    commentLines.push(`${currentIndex++}）キャリア：${wtsCarrier || ''}`);
+
+    const carrierLabel = wtsCarrier === 'その他' ? (wtsCarrierOther || 'その他') : wtsCarrier;
+    commentLines.push(`${currentIndex++}）キャリア：${carrierLabel || ''}`);
+
     commentLines.push(`${currentIndex++}）入居予定日：${moveInDate || ''}`);
     
     let mailingAddressText = wtsMailingAddress || '';

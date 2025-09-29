@@ -60,28 +60,38 @@ export const generateGasCommentLogic = (formData: FormData): string => {
     let comment = '該当するテンプレートがありません。';
     const tag = "250811";
     
-    const formattedPhone = formatPhoneNumberWithHyphens(phone);
+    const noHyphenProviders = ['すまいのでんき（ストエネ）'];
+    const formattedPhone = noHyphenProviders.includes(gasProvider)
+        ? (phone || '').replace(/\D/g, '')
+        : formatPhoneNumberWithHyphens(phone);
+
     const formattedGasPreContact = formatPhoneNumberWithHyphens(gasPreContact);
 
     const formattedPostalCode = formatPostalCode(postalCode, gasProvider);
     const formattedCurrentPostalCode = formatPostalCode(currentPostalCode, gasProvider);
+    
+    // --- すまいのガス（契確なし）のインポート専用ロジック ---
+    if (gasProvider === 'すまいのでんき（ストエネ）' && gasHasContractConfirmation === 'なし') {
+        const baseInfo = `レコードID：${recordId || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}`;
+        const contractInfo = `契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${formattedPhone || ''}`;
+        const importAddressInfo = `郵便番号：${formattedPostalCode || ''}\n住所：${address || ''}\n物件名：${buildingInfo || ''}`;
+        const dateLine = `利用開始日：電気→　　ガス→${gasOpeningDate || ''} ${gasOpeningTimeSlot || ''}`;
+        const attachedOptionLine = `付帯OP：${attachedOption || ''}\n`;
+        const plan = gasIsVacancy === 'あり' ? '※空室プラン　すまいのガスのみ' : 'すまいのガスのみ';
+        const header = `【ストエネ/★インポートのみ/すまいの${gasIsVacancy === 'あり' ? '/※空室プランHAHZZT223' : ''}】`;
+
+        comment = `${header} ${tag}\n${baseInfo}\nプラン：${plan}\n${contractInfo}\n性別：${gender || ''}\n${importAddressInfo}\n${dateLine}\n${attachedOptionLine}支払い方法：${paymentMethod || ''}\n備考：${gasRemarks || ''}`;
+        return comment;
+    }
+
 
     switch (gasProvider) {
-        case 'すまいのでんき（ストエネ）': // This is "すまいのガス"
+        case 'すまいのでんき（ストエネ）': // This is "すまいのガス" (契確あり)
             const suteneMailingAddress = mailingOption === '現住所' ? `書面送付先：現住所（${currentAddress || ''}）` : '書面送付先：新住所';
-            const baseSuteneComment = (plan: string) => `レコードID：${recordId || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：${plan}\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n性別：${gender || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${formattedPhone || ''}\n郵便番号：${formattedPostalCode || ''}\n住所：${address || ''}\n物件名：${buildingInfo || ''}\n利用開始日：電気→　　ガス→${gasOpeningDate || ''} ${gasOpeningTimeSlot || ''}\n付帯OP：${attachedOption || ''}\n支払い方法：${paymentMethod || ''}\n${suteneMailingAddress}\n備考：${gasRemarks || ''}`;
-
+            
             switch (gasRecordIdPrefix) {
                 case 'SR':
-                     if (gasIsVacancy === 'あり') {
-                        comment = `【ストエネ/★インポートのみ/すまいの/※空室プランHAHZZT223】 ${tag}\n${baseSuteneComment('※空室プラン　すまいのガスのみ')}`;
-                    } else { // なし
-                        if (gasHasContractConfirmation === 'あり') {
-                            comment = `【ストエネ/賃貸】 ${tag}\n主商材受注状況：${primaryProductStatus || ''}\n契確時間：${elecConfirmationTime || ''}\nレコードID：${recordId || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：賃貸ガスのみ\nガス：あり/なし\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n性別：${gender || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${formattedPhone || ''}\n郵便番号：${formattedPostalCode || ''}\n引越し先住所：${address || ''}\n物件名：${buildingInfo || ''}\n利用開始日：電気→　　ガス→${gasOpeningDate || ''} ${gasOpeningTimeSlot || ''}\n支払い方法：${paymentMethod || ''}\n${suteneMailingAddress}\n備考：${gasRemarks || ''}`;
-                        } else {
-                            comment = `【ストエネ/★インポートのみ/すまいの】 ${tag}\n${baseSuteneComment('すまいのガスのみ')}`;
-                        }
-                    }
+                    comment = `【ストエネ/賃貸】 ${tag}\n主商材受注状況：${primaryProductStatus || ''}\n契確時間：${elecConfirmationTime || ''}\nレコードID：${recordId || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：賃貸ガスのみ\nガス：あり/なし\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n性別：${gender || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${formattedPhone || ''}\n郵便番号：${formattedPostalCode || ''}\n引越し先住所：${address || ''}\n物件名：${buildingInfo || ''}\n利用開始日：電気→　　ガス→${gasOpeningDate || ''} ${gasOpeningTimeSlot || ''}\n支払い方法：${paymentMethod || ''}\n${suteneMailingAddress}\n備考：${gasRemarks || ''}`;
                     break;
                 case 'S':
                 case 'STJP:':

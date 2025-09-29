@@ -1,4 +1,5 @@
 
+
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { BUG_REPORT_SCRIPT_URL } from '../constants.ts';
 import { generateElectricityCommentLogic } from '../commentLogic/electricity.ts';
@@ -374,7 +375,6 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
         if (contractorNameLength >= 9 || contractorNameKanaLength >= 9) {
             const invalidField = contractorNameLength >= 9 ? 'contractorName' : 'contractorNameKana';
             setInvalidFields(prev => [...new Set([...prev, invalidField])]);
-            // FIX: Add missing onCancel property
             setModalState({
                 isOpen: true,
                 title: '契約者名義の確認',
@@ -393,12 +393,36 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
         }
     }, [formData.elecProvider, formData.gasProvider, formData.contractorName, formData.contractorNameKana, setModalState, setInvalidFields, closeModal]);
     
+    const handlePostalCodeBlur = useCallback((fieldName: 'postalCode' | 'currentPostalCode' | 'wtsShippingPostalCode', value: string) => {
+        if (!value) return;
+        const digits = value.replace(/\D/g, '');
+        if (digits.length > 0 && digits.length !== 7) {
+            setModalState({
+                isOpen: true,
+                title: '郵便番号の確認',
+                message: '郵便番号が7桁ではありません。修正しますか？',
+                confirmText: 'このまま進む', // "Continue as is"
+                cancelText: '修正する',     // "Fix it"
+                type: 'warning',
+                onConfirm: () => { // "Continue as is" clicked
+                    closeModal();
+                },
+                onCancel: () => { // "Fix it" clicked
+                    dispatch({ type: 'UPDATE_FIELD', payload: { name: fieldName, value: '' } });
+                    // Focusing is not directly possible here. The user will have to re-focus.
+                    closeModal();
+                },
+                isErrorBanner: false,
+                bannerMessage: '',
+            });
+        }
+    }, [dispatch, setModalState, closeModal]);
+
     const handleCopy = useCallback(() => {
         const { missingFields, missingLabels } = getRequiredFields(formData, activeTab);
 
         if (missingFields.length > 0) {
             setInvalidFields(missingFields);
-            // FIX: Change onCancel from null to a function to match state type
             setModalState({
                 isOpen: true,
                 title: '必須項目が未入力です',
@@ -417,10 +441,25 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
         setInvalidFields([]);
         setModalState(prev => ({...prev, isErrorBanner: false}));
 
+        if (['electricity', 'gas', 'internet'].includes(activeTab) && !formData.buildingInfo.trim()) {
+            setModalState({
+                isOpen: true,
+                title: '入力エラー',
+                message: '『物件名＋部屋番号』が空です。戸建ての場合はチェック、集合住宅は号室までご入力ください。',
+                confirmText: 'OK',
+                cancelText: null,
+                type: 'warning',
+                onConfirm: closeModal,
+                onCancel: closeModal,
+                isErrorBanner: true,
+                bannerMessage: '物件名＋部屋番号が未入力です。'
+            });
+            return; // Stop copy
+        }
+
         // --- Address Number Check for AU Hikari ---
         if (activeTab === 'internet' && formData.product === 'AUひかり' && formData.address && !/\d/.test(formData.address)) {
             setInvalidFields(['address']);
-            // FIX: Change onCancel from null to a function to match state type
             setModalState({
                 isOpen: true,
                 title: '入力エラー',
@@ -445,7 +484,6 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
                 setToast({ message: 'コメントをコピーしました！', type: 'success' });
 
                 // After copy, show reset confirmation modal
-                // FIX: Add missing isErrorBanner and bannerMessage properties to setModalState call
                 setModalState({
                     isOpen: true,
                     title: 'フォームのリセット',
@@ -583,7 +621,6 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
         }
     
         if (dateErrors.length > 0) {
-            // FIX: Add missing bannerMessage property
             setModalState({
                 isOpen: true,
                 title: '入力内容の確認',
@@ -602,45 +639,34 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
     }, [generatedComment, formData, activeTab, resetForm, closeModal, setInvalidFields, setToast]);
 
     const handleResetRequest = useCallback(() => {
-        // FIX: Add missing bannerMessage property
         setModalState({
             isOpen: true,
             title: 'フォームのリセット確認',
-            message: '入力内容をすべてリセットします。よろしいですか？（担当者名は保持されます）',
-            onConfirm: () => {
-                resetForm(true);
-                closeModal();
-                setToast({ message: 'フォームをリセットしました', type: 'info' });
-                setInvalidFields([]);
-                setModalState(prev => ({...prev, isErrorBanner: false }));
-            },
-            onCancel: closeModal,
+            message: '入力内容をリセットしてもよろしいですか？（担当者名は保持されます）',
             confirmText: 'はい、リセットする',
             cancelText: 'キャンセル',
             type: 'danger',
+            onConfirm: () => {
+                resetForm(true);
+                setToast({ message: 'フォームをリセットしました', type: 'info' });
+                closeModal();
+            },
+            onCancel: closeModal,
             isErrorBanner: false,
             bannerMessage: '',
         });
-    }, [resetForm, closeModal, setInvalidFields]);
-    
-    const onTabChange = useCallback((newTab) => {
+    }, [resetForm, closeModal, setToast]);
+
+    const onTabChange = useCallback((tabId) => {
         if (resetTimerRef.current) {
             clearTimeout(resetTimerRef.current);
             resetTimerRef.current = null;
-            setToast({ message: 'タブを切り替えたため、自動リセットはキャンセルされました。', type: 'info' });
+            setToast({ message: '自動リセットがキャンセルされました', type: 'info' });
         }
-        
-        // If switching to the internet tab and the record ID indicates an "Itanji" case,
-        // clear the greeting field as it should not be carried over.
-        if (newTab === 'internet' && formData.recordId.toLowerCase().startsWith('id:')) {
-            dispatch({ type: 'UPDATE_FIELD', payload: { name: 'greeting', value: '' } });
-        }
-        
-        setActiveTab(newTab);
-        setInvalidFields([]);
-        setModalState(prev => ({...prev, isErrorBanner: false }));
-    }, [formData.recordId, dispatch, setInvalidFields, setToast]);
-
+        setActiveTab(tabId);
+    }, [setActiveTab, setToast]);
+    
+    // --- Bug Report Logic ---
     const handleOpenBugReport = () => setIsBugReportOpen(true);
     const handleCloseBugReport = () => {
         setIsBugReportOpen(false);
@@ -652,292 +678,39 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
     };
 
     const handleBugReportSubmit = useCallback(async () => {
-        if (!formData.apName.trim()) {
-            setToast({ message: '「担当者/AP名」を入力してください。', type: 'error' });
-            return;
-        }
         if (!bugReportState.text.trim()) {
             setBugReportState(prev => ({ ...prev, isInvalid: true }));
             return;
         }
-        setBugReportState(prev => ({ ...prev, isSubmitting: true, isInvalid: false }));
+
+        setBugReportState(prev => ({ ...prev, isSubmitting: true }));
+        
+        const reportData = {
+            apName: formData.apName,
+            reportText: bugReportState.text,
+            currentFormData: JSON.stringify(formData, null, 2),
+        };
+
         try {
-            const payload = {
-                reportText: bugReportState.text,
-                apName: formData.apName,
-                currentFormData: JSON.stringify(formData, null, 2),
-            };
-            await fetch(BUG_REPORT_SCRIPT_URL, {
+            const response = await fetch(BUG_REPORT_SCRIPT_URL, {
                 method: 'POST',
-                body: JSON.stringify(payload),
+                mode: 'no-cors', // Important for Google Apps Script web apps
                 headers: {
-                    'Content-Type': 'text/plain;charset=utf-8',
+                    'Content-Type': 'application/json',
                 },
-                mode: 'no-cors'
+                body: JSON.stringify(reportData),
             });
+            // no-cors means we can't inspect the response, so we just assume success
             setToast({ message: '報告が送信されました。ご協力ありがとうございます！', type: 'success' });
             handleCloseBugReport();
 
         } catch (error) {
-            console.error('Error submitting bug report:', error);
+            console.error('Bug report submission error:', error);
             setToast({ message: '報告の送信に失敗しました。', type: 'error' });
         } finally {
             setBugReportState(prev => ({ ...prev, isSubmitting: false }));
         }
     }, [bugReportState.text, formData]);
-
-    const handleDateBlurWithValidation = useCallback((e) => {
-        const { name, value } = e.target;
-        if (!value) return;
-
-        let processedValue = value.trim();
-        let isValidDate = false;
-
-        // Try to parse different formats
-        // YYYYMMDD
-        if (/^\d{8}$/.test(processedValue)) {
-            processedValue = `${processedValue.substring(0, 4)}/${processedValue.substring(4, 6)}/${processedValue.substring(6, 8)}`;
-        }
-        // YYYY-MM-DD or YYYY.MM.DD or YYYY/MM/DD
-        else if (/^\d{4}[-./]\d{1,2}[-./]\d{1,2}$/.test(processedValue)) {
-            const parts = processedValue.replace(/[.-]/g, '/').split('/');
-            processedValue = `${parts[0]}/${String(parts[1]).padStart(2, '0')}/${String(parts[2]).padStart(2, '0')}`;
-        }
-        // YYYY年M月D日
-        else if (/^\d{4}年\d{1,2}月\d{1,2}日$/.test(processedValue)) {
-            const match = processedValue.match(/^(\d{4})年(\d{1,2})月(\d{1,2})日$/);
-            if (match) {
-              const year = match[1];
-              const month = match[2].padStart(2, '0');
-              const day = match[3].padStart(2, '0');
-              processedValue = `${year}/${month}/${day}`;
-            }
-        }
-        // M/D
-        else if (/^\d{1,2}\/\d{1,2}$/.test(processedValue)) {
-            const today = new Date();
-            const currentYear = today.getFullYear();
-            const parts = processedValue.split('/');
-            processedValue = `${currentYear}/${String(parts[0]).padStart(2, '0')}/${String(parts[1]).padStart(2, '0')}`;
-        }
-
-        // Final validation using component check to be timezone-safe
-        if (/^\d{4}\/\d{2}\/\d{2}$/.test(processedValue)) {
-            const [y, m, d] = processedValue.split('/').map(n => parseInt(n, 10));
-            const date = new Date(y, m - 1, d);
-            // Check if the date is valid (e.g., not 2025/02/30) by checking if the components match after construction
-            if (!isNaN(date.getTime()) &&
-                date.getFullYear() === y &&
-                date.getMonth() + 1 === m &&
-                date.getDate() === d
-            ) {
-                isValidDate = true;
-            }
-        }
-
-        if (!isValidDate) {
-            setToast({ message: '日付はYYYY/MM/DD形式で入力してください（例：2025/09/16）', type: 'error' });
-            setInvalidFields(prev => [...new Set([...prev, name])]);
-            return;
-        }
-
-        if (processedValue !== value) {
-            dispatch({ type: 'UPDATE_FIELD', payload: { name, value: processedValue } });
-        }
-        
-        setInvalidFields(prev => prev.filter(f => f !== name));
-
-        // 2. Validation Logic (Age, etc.)
-        const dateToValidate = new Date(processedValue);
-        if (isNaN(dateToValidate.getTime())) return;
-
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        // DOB check (under 15)
-        if (name === 'dob') {
-            const fifteenYearsAgo = new Date(today.getFullYear() - 15, today.getMonth(), today.getDate());
-            if (dateToValidate > fifteenYearsAgo) {
-                setModalState({
-                    isOpen: true,
-                    title: '入力内容の確認',
-                    message: '生年月日は正しいですか？ (15歳未満です)',
-                    onConfirm: closeModal,
-                    onCancel: closeModal,
-                    confirmText: 'このまま進む',
-                    cancelText: '修正する',
-                    type: 'warning',
-                    isErrorBanner: false,
-                    bannerMessage: '',
-                });
-            }
-        }
-
-        // Move-in date check (5+ years ago)
-        const moveInDateFields = ['moveInDate', 'gasOpeningDate'];
-        if (moveInDateFields.includes(name)) {
-            const fiveYearsAgo = new Date(today.getFullYear() - 5, today.getMonth(), today.getDate());
-            if (dateToValidate <= fiveYearsAgo) {
-                setModalState({
-                    isOpen: true,
-                    title: '入力内容の確認',
-                    message: `${FIELD_LABELS[name] || '日付'}は正しいですか？ (5年以上前です)`,
-                    onConfirm: closeModal,
-                    onCancel: closeModal,
-                    confirmText: 'このまま進む',
-                    cancelText: '修正する',
-                    type: 'warning',
-                    isErrorBanner: false,
-                    bannerMessage: '',
-                });
-            }
-        }
-    }, [dispatch, setModalState, closeModal, setToast, setInvalidFields]);
-    
-    const handlePhoneBlur = useCallback((e) => {
-        const { name, value } = e.target;
-        const currentTarget = e.currentTarget;
-        if (!value) return;
-        if (/[^\d\-]/.test(value)) {
-            setModalState({
-                isOpen: true,
-                title: '入力内容の確認',
-                message: '電話番号じゃないものが入ってるようですが、修正しますか？',
-                confirmText: '修正する',
-                cancelText: 'しない',
-                type: 'default',
-                onConfirm: () => {
-                    dispatch({ type: 'UPDATE_FIELD', payload: { name, value: '' } });
-                    closeModal();
-                    currentTarget.focus();
-                },
-                onCancel: closeModal,
-                isErrorBanner: false,
-                bannerMessage: '',
-            });
-        }
-    }, [dispatch, setModalState, closeModal]);
-    
-    const handleNameBlur = useCallback((e) => {
-        const { name, value } = e.target;
-        const currentTarget = e.currentTarget;
-        if (!value) return;
-
-        const isTokyoGasProduct = formData.elecProvider === '東京ガス電気セット' || formData.gasProvider === '東京ガス単品';
-        if (isTokyoGasProduct && effectiveLen(value) >= 9) {
-            setInvalidFields(prev => [...new Set([...prev, name])]);
-            // FIX: Add missing onCancel property
-            setModalState({
-                isOpen: true,
-                title: '契約者名義の確認',
-                message: '契約者名義が9文字以上です。\n東京ガス受付では短縮表記が必要です。',
-                confirmText: '修正する',
-                cancelText: null,
-                type: 'default',
-                onConfirm: () => {
-                    closeModal();
-                    currentTarget.focus();
-                },
-                onCancel: closeModal,
-                isErrorBanner: true,
-                bannerMessage: '契約者名義が長すぎます。修正してください。'
-            });
-            return;
-        } else {
-            setInvalidFields(prev => prev.filter(f => f !== name));
-        }
-
-        if (/\d/.test(value)) {
-            console.warn(`Validation Warning: Numbers in name field ${name}: "${value}"`);
-        }
-
-        if (name === 'contractorName' && !/[\s\u3000]/.test(value)) {
-            setModalState({
-                isOpen: true,
-                title: '入力内容の確認',
-                message: '姓と名の間にスペース（全角/半角）がありません。修正をお願いします。',
-                confirmText: '修正する',
-                cancelText: 'このまま続行',
-                type: 'default',
-                onConfirm: () => {
-                    closeModal();
-                    currentTarget.focus();
-                },
-                onCancel: closeModal,
-                isErrorBanner: false,
-                bannerMessage: '',
-            });
-        }
-    }, [formData.elecProvider, formData.gasProvider, setModalState, closeModal, setInvalidFields]);
-
-
-    const handleKanaBlur = useCallback((e) => {
-        const { name, value } = e.target;
-        const currentTarget = e.currentTarget;
-        if (!value) return;
-        
-        const isTokyoGasProduct = formData.elecProvider === '東京ガス電気セット' || formData.gasProvider === '東京ガス単品';
-        if (isTokyoGasProduct && effectiveLen(value) >= 9) {
-            setInvalidFields(prev => [...new Set([...prev, name])]);
-            // FIX: Add missing onCancel property
-            setModalState({
-                isOpen: true,
-                title: '契約者名義の確認',
-                message: 'フリガナが9文字以上です。\n東京ガス受付では短縮表記が必要です。',
-                confirmText: '修正する',
-                cancelText: null,
-                type: 'default',
-                onConfirm: () => {
-                    closeModal();
-                    currentTarget.focus();
-                },
-                onCancel: closeModal,
-                isErrorBanner: true,
-                bannerMessage: '契約者名義が長すぎます。修正してください。'
-            });
-            return;
-        } else {
-            setInvalidFields(prev => prev.filter(f => f !== name));
-        }
-        
-        if (!/^[ァ-ヶー・\s\u3000]+$/.test(value)) {
-             setModalState({
-                isOpen: true,
-                title: '入力内容の確認',
-                message: 'フリガナはカタカナで入力してください。修正しますか？',
-                confirmText: '修正する',
-                cancelText: 'しない',
-                type: 'default',
-                onConfirm: () => {
-                    dispatch({ type: 'UPDATE_FIELD', payload: { name, value: '' } });
-                    closeModal();
-                    currentTarget.focus();
-                },
-                onCancel: closeModal,
-                isErrorBanner: false,
-                bannerMessage: '',
-            });
-            return;
-        }
-        
-        if (name === 'contractorNameKana' && !/[\s\u3000]/.test(value)) {
-            setModalState({
-                isOpen: true,
-                title: '入力内容の確認',
-                message: '姓と名の間にスペース（全角/半角）がありません。修正をお願いします。',
-                confirmText: '修正する',
-                cancelText: 'このまま続行',
-                type: 'default',
-                onConfirm: () => {
-                    closeModal();
-                    currentTarget.focus();
-                },
-                onCancel: closeModal,
-                isErrorBanner: false,
-                bannerMessage: '',
-            });
-        }
-    }, [dispatch, setModalState, closeModal, formData.elecProvider, formData.gasProvider, setInvalidFields]);
     
     return {
         activeTab,
@@ -959,9 +732,6 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
         handleBugReportSubmit,
         handleCopy,
         handleResetRequest,
-        handleDateBlurWithValidation,
-        handlePhoneBlur,
-        handleNameBlur,
-        handleKanaBlur,
+        handlePostalCodeBlur,
     };
 };

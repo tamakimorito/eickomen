@@ -72,6 +72,7 @@ const generateDefaultInternetComment = (formData: FormData): string => {
         managementCompany,
         managementNumber,
         contactPerson,
+        contactPersonKana,
         noDrilling,
         drawingSubmission,
         drawingSubmissionContact,
@@ -255,7 +256,8 @@ const generateDefaultInternetComment = (formData: FormData): string => {
                             `管理会社情報`,
                             `①管理会社名：${managementCompany || ''}`,
                             `②管理連絡先：${managementContact || ''}`,
-                            `③担当者名：${contactPerson || ''}`,
+                            `③担当者名：${contactPerson || ''}様`,
+                            `担当者（フリガナ）：${contactPersonKana || ''}`,
                             `④ビル調査希望：${buildingSurveyRequest || '無'}`,
                             `⑤図面提出方法と送付先：${drawingSubmissionContact || '無'}`
                         );
@@ -274,7 +276,8 @@ const generateDefaultInternetComment = (formData: FormData): string => {
             `オーナー情報`,
             `・管理会社：${managementCompany || ''}`,
             `・管理番号：${managementNumber || ''}`,
-            `・担当者：${contactPerson || ''}`
+            `・担当者：${contactPerson || ''}様`,
+            `・担当者（フリガナ）：${contactPersonKana || ''}`
         );
         if (noDrilling) {
             commentLines.push(`穴あけ・ビス止めNG`);
