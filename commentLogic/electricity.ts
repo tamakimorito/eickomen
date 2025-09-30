@@ -301,7 +301,8 @@ ${attachedOptionLine}支払い方法：${paymentMethod || ''}
             comment = comment.replace(/^\s*\n/gm, '');
             break;
         case 'ニチガス電気セット':
-            comment = `【ニチガス_電気セット】 ${tag}\nレコードID：${recordId || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：ニチガス_電気セット\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${formattedPhone || ''}\n郵便番号：${formattedPostalCode || ''}\n住所：${address || ''}\n物件名：${buildingInfo || ''}\nガスエリア：${gasArea || ''}（何ガスエリアかいれる）\n利用開始日：電気→${moveInDate || ''}　ガス→${gasOpeningDate || ''} ${gasOpeningTimeSlot || ''}\n立会者：${gasWitness || ''}\nガス事前連絡先：${formattedGasPreContact || ''}\n支払方法：${paymentMethod || ''}\n書面送付先：${mailingOption === '現住所' ? `現住所（${currentAddress || ''}）` : '設置先'}\n備考：${elecRemarks || ''}`;
+            const nichigasMailingAddress = mailingOption === '現住所' ? `現住所（${(currentAddress || '') + (mailingBuildingInfo ? ' ' + mailingBuildingInfo : '')}）` : '設置先';
+            comment = `【ニチガス_電気セット】 ${tag}\nレコードID：${recordId || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：ニチガス_電気セット\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${formattedPhone || ''}\n郵便番号：${formattedPostalCode || ''}\n住所：${address || ''}\n物件名：${buildingInfo || ''}\nガスエリア：${gasArea || ''}（何ガスエリアかいれる）\n利用開始日：電気→${moveInDate || ''}　ガス→${gasOpeningDate || ''} ${gasOpeningTimeSlot || ''}\n立会者：${gasWitness || ''}\nガス事前連絡先：${formattedGasPreContact || ''}\n支払方法：${paymentMethod || ''}\n書面送付先：${nichigasMailingAddress}\n備考：${elecRemarks || ''}`;
             break;
         case 'ユーパワー UPOWER':
             const upowerHeader = isNewConstruction === 'はい' ? `【U-POWER】【新築再点】` : `【U-POWER】`;

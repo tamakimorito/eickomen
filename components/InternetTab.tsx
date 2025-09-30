@@ -1,4 +1,4 @@
-import React, { useMemo, useContext } from 'react';
+import React, { useMemo, useContext, useEffect, useCallback } from 'react';
 import { 
     PRODUCTS, HOUSING_TYPES_1G, HOUSING_TYPES_10G, HOUSING_TYPES_AIR, HOUSING_TYPES_CHINTAI, HOUSING_TYPES_CHINTAI_FREE,
     RACK_OPTIONS_1G, RACK_OPTIONS_10G, RACK_OPTIONS_CHINTAI_FREE_MANSION, RACK_OPTIONS_CHINTAI_FREE_10G,
@@ -14,14 +14,117 @@ import { AppContext } from '../context/AppContext.tsx';
 import { FormInput, FormSelect, FormRadioGroup, FormTextArea, FormDateInput, FormCheckbox } from './FormControls.tsx';
 import OwnerInfo from './OwnerInfo.tsx';
 
+const calculateAge = (dobString) => {
+    if (!dobString) return null;
+    // YYYY/MM/DD format check
+    const parts = dobString.split('/');
+    if (parts.length !== 3) return null;
+    const [year, month, day] = parts.map(p => parseInt(p, 10));
+    if (isNaN(year) || isNaN(month) || isNaN(day)) return null;
+
+    const birthDate = new Date(year, month - 1, day);
+    if (birthDate.getFullYear() !== year || birthDate.getMonth() + 1 !== month || birthDate.getDate() !== day) {
+        return null; // Invalid date like 2023/02/30
+    }
+    
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+    }
+    return age;
+};
+
 const DefaultInternetForm = () => {
-    const { formData, handleInputChange, handleDateBlurWithValidation, handleIdBlur, invalidFields, handlePhoneBlur, handleKanaBlur, handleNameBlur, handlePostalCodeBlur } = useContext(AppContext);
+    const { formData, handleInputChange, handleDateBlurWithValidation, handleIdBlur, invalidFields, handlePhoneBlur, handleKanaBlur, handleNameBlur, handlePostalCodeBlur, setModalState, closeModal } = useContext(AppContext);
     
     const is10G = formData.product === 'SoftBank光10G';
     const isAir = formData.product === 'SB Air';
     const isChintai = formData.product === '賃貸ねっと';
     const isChintaiFree = formData.product === '賃貸ねっと【無料施策】';
     const is1G = formData.product === 'SoftBank光1G';
+
+    const age = useMemo(() => calculateAge(formData.dob), [formData.dob]);
+    const isU25O60 = age !== null && (age <= 25 || age >= 60);
+
+    const AIR_U25O60_CAMPAIGNS = [
+      { value: 'U25O60CP', label: 'U25O60CP' },
+      { value: 'U25O60CP+あんしん乗り換え', label: 'U25O60CP+あんしん乗り換え' },
+    ];
+
+    const campaignOptions = isAir && isU25O60 ? AIR_U25O60_CAMPAIGNS : (isAir ? CAMPAIGNS_AIR_NEW : is10G ? CAMPAIGNS_10G_NEW : CAMPAIGNS_1G);
+    
+    useEffect(() => {
+        if (isAir) {
+            const currentCampaignIsValid = campaignOptions.some(opt => opt.value === formData.campaign);
+            if (formData.campaign && !currentCampaignIsValid) {
+                handleInputChange({ target: { name: 'campaign', value: '' } });
+            }
+        }
+    }, [isAir, campaignOptions, formData.campaign, handleInputChange]);
+
+    // Service Fee Automation
+    useEffect(() => {
+        if (is10G) {
+            const defaultFee = '6カ月0円→6930円';
+            const threeMonthFee = '3カ月0円→6930円';
+
+            if (formData.campaign === '10ギガめちゃトク割3カ月') {
+                if (formData.serviceFee === '' || formData.serviceFee === defaultFee) {
+                    handleInputChange({ target: { name: 'serviceFee', value: threeMonthFee } });
+                }
+            } else {
+                if (formData.serviceFee === threeMonthFee) {
+                    handleInputChange({ target: { name: 'serviceFee', value: defaultFee } });
+                } else if (formData.serviceFee === '') {
+                    handleInputChange({ target: { name: 'serviceFee', value: defaultFee } });
+                }
+            }
+        } else if (isAir) {
+            const u25o60Fee = '2年3278円、3年以降5368円';
+            if (isU25O60) {
+                if (formData.serviceFee === '') {
+                    handleInputChange({ target: { name: 'serviceFee', value: u25o60Fee } });
+                }
+            } else {
+                if (formData.serviceFee === u25o60Fee) {
+                    handleInputChange({ target: { name: 'serviceFee', value: '' } });
+                }
+            }
+        }
+    }, [is10G, isAir, isU25O60, formData.campaign, formData.serviceFee, handleInputChange]);
+
+    const handleOuchiWariBlur = useCallback(() => {
+        if (formData.homeDiscount === 'あり' && !['SoftBank', 'Y!mobile'].includes(formData.mobileCarrier)) {
+            setModalState({
+                isOpen: true,
+                title: '入力内容の確認',
+                message: 'おうち割の対象携帯キャリアはsoftbankとY!mobileです。修正してください',
+                confirmText: '継続する',
+                cancelText: '修正する',
+                type: 'warning',
+                onConfirm: closeModal,
+                onCancel: closeModal,
+            });
+        }
+    }, [formData.homeDiscount, formData.mobileCarrier, setModalState, closeModal]);
+
+    const handleAnshinNorikaeBlur = useCallback(() => {
+        if (formData.campaign?.includes('あんしん乗り換え') && formData.existingLineStatus === '無し') {
+            setModalState({
+                isOpen: true,
+                title: '入力内容の確認',
+                message: '利用回線無しなのに安心乗り換えが選択されてます',
+                confirmText: '継続する',
+                cancelText: '修正する',
+                type: 'warning',
+                onConfirm: closeModal,
+                onCancel: closeModal,
+            });
+        }
+    }, [formData.campaign, formData.existingLineStatus, setModalState, closeModal]);
+
 
     const housingTypeOptions = isAir ? HOUSING_TYPES_AIR : is10G ? HOUSING_TYPES_10G : isChintai ? HOUSING_TYPES_CHINTAI : isChintaiFree ? HOUSING_TYPES_CHINTAI_FREE : HOUSING_TYPES_1G;
   
@@ -52,7 +155,6 @@ const DefaultInternetForm = () => {
         return baseOptions;
     }, [isChintai, isChintaiFree, is10G, is1G, formData.housingType]);
 
-    const campaignOptions = isAir ? CAMPAIGNS_AIR_NEW : is10G ? CAMPAIGNS_10G_NEW : CAMPAIGNS_1G;
     const discountOptions = is10G ? DISCOUNT_OPTIONS_10G_NEW : DISCOUNT_OPTIONS;
     
     return (
@@ -157,21 +259,21 @@ const DefaultInternetForm = () => {
                 <h3 className="text-lg font-bold text-blue-700">その他</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormInput label="案内料金" name="serviceFee" value={formData.serviceFee} onChange={handleInputChange} isInvalid={invalidFields.includes('serviceFee')} required />
-                    {!isChintai && !isChintaiFree && <FormSelect label="CP" name="campaign" value={formData.campaign} onChange={handleInputChange} options={campaignOptions} isInvalid={invalidFields.includes('campaign')} required />}
+                    {!isChintai && !isChintaiFree && <FormSelect label="CP" name="campaign" value={formData.campaign} onChange={handleInputChange} onBlur={handleAnshinNorikaeBlur} options={campaignOptions} isInvalid={invalidFields.includes('campaign')} required />}
                     
                     {!isAir && !isChintai && !isChintaiFree && (
                          <FormSelect label="開通前レンタル" name="preActivationRental" value={formData.preActivationRental} onChange={handleInputChange} options={RENTAL_OPTIONS} isInvalid={invalidFields.includes('preActivationRental')} required />
                     )}
                     
-                    <FormSelect label="既存回線" name="existingLineStatus" value={formData.existingLineStatus} onChange={handleInputChange} options={EXISTING_LINE_STATUS_OPTIONS} isInvalid={invalidFields.includes('existingLineStatus')} required />
+                    <FormSelect label="既存回線" name="existingLineStatus" value={formData.existingLineStatus} onChange={handleInputChange} onBlur={handleAnshinNorikaeBlur} options={EXISTING_LINE_STATUS_OPTIONS} isInvalid={invalidFields.includes('existingLineStatus')} required />
                     {formData.existingLineStatus === 'あり' && (
                         <FormInput label="回線会社" name="existingLineCompany" value={formData.existingLineCompany} onChange={handleInputChange} isInvalid={invalidFields.includes('existingLineCompany')} required />
                     )}
                     
-                    {!isChintai && !isChintaiFree && <FormSelect label="携帯キャリア" name="mobileCarrier" value={formData.mobileCarrier} onChange={handleInputChange} options={MOBILE_CARRIERS} isInvalid={invalidFields.includes('mobileCarrier')} required />}
+                    {!isChintai && !isChintaiFree && <FormSelect label="携帯キャリア" name="mobileCarrier" value={formData.mobileCarrier} onChange={handleInputChange} onBlur={handleOuchiWariBlur} options={MOBILE_CARRIERS} isInvalid={invalidFields.includes('mobileCarrier')} required />}
                     
                     {!isAir && !isChintai && !isChintaiFree && (
-                        <FormSelect label="おうち割" name="homeDiscount" value={formData.homeDiscount} onChange={handleInputChange} options={discountOptions} isInvalid={invalidFields.includes('homeDiscount')} required />
+                        <FormSelect label="おうち割" name="homeDiscount" value={formData.homeDiscount} onChange={handleInputChange} onBlur={handleOuchiWariBlur} options={discountOptions} isInvalid={invalidFields.includes('homeDiscount')} required />
                     )}
                     
                     {is1G && (

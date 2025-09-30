@@ -54,7 +54,7 @@ export const generateGasCommentLogic = (formData: FormData): string => {
         recordId, primaryProductStatus, greeting, apName, contractorName, contractorNameKana, gender, dob, phone,
         postalCode, address, buildingInfo, gasOpeningDate, paymentMethod, gasRemarks, attachedOption,
         elecConfirmationTime, email, gasArea, gasWitness, gasPreContact, gasOpeningTimeSlot, postConfirmationTime, currentAddress, mailingOption, currentPostalCode,
-        gasIsCorporate
+        gasIsCorporate, mailingBuildingInfo
     } = { ...formData, dob: formatDate(formData.dob), gasOpeningDate: formatDate(formData.gasOpeningDate) };
 
     let comment = '該当するテンプレートがありません。';
@@ -221,7 +221,7 @@ export const generateGasCommentLogic = (formData: FormData): string => {
 
         case 'ニチガス単品':
             {
-                const nichiMailingAddress = `書面送付先：${mailingOption === '現住所' ? `現住所（${currentAddress || ''}）` : '設置先'}`;
+                const nichiMailingAddress = `書面送付先：${mailingOption === '現住所' ? `現住所（${(currentAddress || '') + (mailingBuildingInfo ? ' ' + mailingBuildingInfo : '')}）` : '設置先'}`;
                 let nichigasCommentLines = [
                     `【ニチガス_単品】 ${tag}`,
                     `レコードID：${recordId || ''}`,

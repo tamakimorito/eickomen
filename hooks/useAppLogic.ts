@@ -1,5 +1,3 @@
-
-
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { BUG_REPORT_SCRIPT_URL } from '../constants.ts';
 import { generateElectricityCommentLogic } from '../commentLogic/electricity.ts';
@@ -663,8 +661,34 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
             resetTimerRef.current = null;
             setToast({ message: '自動リセットがキャンセルされました', type: 'info' });
         }
-        setActiveTab(tabId);
-    }, [setActiveTab, setToast]);
+
+        const fromInternetOrWts = ['internet', 'wts'].includes(activeTab);
+        const toElecOrGas = ['electricity', 'gas'].includes(tabId);
+
+        if (fromInternetOrWts && toElecOrGas && activeTab !== tabId) {
+            setModalState({
+                isOpen: true,
+                title: '入力内容の確認',
+                message: '顧客情報をリセットしますか？',
+                confirmText: 'リセットする',
+                cancelText: '継続する',
+                type: 'warning',
+                onConfirm: () => {
+                    resetForm(true);
+                    setActiveTab(tabId);
+                    closeModal();
+                },
+                onCancel: () => {
+                    setActiveTab(tabId);
+                    closeModal();
+                },
+                isErrorBanner: false,
+                bannerMessage: '',
+            });
+        } else {
+            setActiveTab(tabId);
+        }
+    }, [activeTab, resetForm, closeModal, setToast, setModalState]);
     
     // --- Bug Report Logic ---
     const handleOpenBugReport = () => setIsBugReportOpen(true);

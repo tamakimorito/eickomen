@@ -4,6 +4,16 @@
 
 ---
 
+## v1.30m (2025/09/30)
+- feat(internet/sb10g): CPを 10ギガめちゃトク割6カ月 / 6カ月＋あんしん乗り換え / 3カ月 に置き換え、案内料金をCP連動（未入力時のみ自動設定）。
+- feat(internet/air): U25/O60時、CP候補を U25O60CP / U25O60CP+あんしん乗り換え の2択に制限し、案内料金を「2年3278円、3年以降5368円」で自動設定（未入力時のみ）。
+- feat(validation): おうち割×携帯キャリア不整合でモーダル警告（onBlur/ブロックなし）。
+- feat(validation): あんしん乗り換え×既存回線「無し」でモーダル警告（onBlur/ブロックなし）。
+- feat(ui): インターネット/WTS→電気/ガス タブ遷移時に「顧客情報をリセットしますか？」確認（OK=リセット＋遷移 / キャンセル=そのまま遷移）。
+- fix(gas/nichigas): 書面送付先=現住所で物件名＋部屋番号が反映されない不具合を修正。
+- fix(elec/nichigas-set): 書面送付先=現住所で物件名＋部屋番号が反映されない不具合を修正。
+- chore(header): Version を v1.30m に更新。
+
 ## v1.211a (2025/09/25)
 - fix: 郵便番号7桁チェックの確認モーダルを実装（postal/current 双方）
 - fix: `INITIAL_FORM_DATA.contactPersonNameKana` 初期値を復元

@@ -222,8 +222,9 @@ export const CAMPAIGNS_1G = [
 ];
 
 export const CAMPAIGNS_10G_NEW = [
-    { value: '10ギガめちゃトク割', label: '10ギгаめちゃトク割' },
-    { value: '10ギガめちゃトク割+あんしん乗り換え', label: '10ギガめちゃトク割+あんしん乗り換え' },
+  { value: '10ギガめちゃトク割6カ月', label: '10ギガめちゃトク割6カ月' },
+  { value: '10ギガめちゃトク割6カ月＋あんしん乗り換え', label: '10ギガめちゃトク割6カ月＋あんしん乗り換え' },
+  { value: '10ギガめちゃトク割3カ月', label: '10ギガめちゃトク割3カ月' },
 ];
 
 export const CAMPAIGNS_AIR_NEW = [
