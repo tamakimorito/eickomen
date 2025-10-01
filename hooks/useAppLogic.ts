@@ -226,6 +226,7 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
     const resetTimerRef = useRef(null);
     const [isManualOpen, setIsManualOpen] = useState(false);
     const [isBugReportOpen, setIsBugReportOpen] = useState(false);
+    const clearedInternetGreetingForIdRef = useRef<string | null>(null);
     
     const [bugReportState, setBugReportState] = useState({
         text: '',
@@ -439,7 +440,12 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
         setInvalidFields([]);
         setModalState(prev => ({...prev, isErrorBanner: false}));
 
-        if (['electricity', 'gas', 'internet'].includes(activeTab) && !formData.buildingInfo.trim()) {
+        const isInternetAU = activeTab === 'internet' && formData.product === 'AUひかり';
+        const needsBuildingInfo =
+            (activeTab === 'electricity' || activeTab === 'gas') ||
+            (activeTab === 'internet' && !isInternetAU);
+
+        if (needsBuildingInfo && !formData.buildingInfo.trim()) {
             setModalState({
                 isOpen: true,
                 title: '入力エラー',
@@ -661,6 +667,15 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
             resetTimerRef.current = null;
             setToast({ message: '自動リセットがキャンセルされました', type: 'info' });
         }
+        
+        if (tabId === 'internet' && ['electricity', 'gas'].includes(activeTab)) {
+            const rec = (formData.recordId || '').toLowerCase();
+            const notClearedYet = clearedInternetGreetingForIdRef.current !== formData.recordId;
+            if (rec.startsWith('id:') && formData.greeting === 'すまえる' && notClearedYet) {
+                dispatch({ type: 'UPDATE_FIELD', payload: { name: 'greeting', value: '' } });
+                clearedInternetGreetingForIdRef.current = formData.recordId || '';
+            }
+        }
 
         const fromInternetOrWts = ['internet', 'wts'].includes(activeTab);
         const toElecOrGas = ['electricity', 'gas'].includes(tabId);
@@ -688,7 +703,7 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
         } else {
             setActiveTab(tabId);
         }
-    }, [activeTab, resetForm, closeModal, setToast, setModalState]);
+    }, [activeTab, resetForm, closeModal, setToast, setModalState, formData, dispatch]);
     
     // --- Bug Report Logic ---
     const handleOpenBugReport = () => setIsBugReportOpen(true);

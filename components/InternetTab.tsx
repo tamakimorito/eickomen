@@ -480,6 +480,14 @@ const GmoTokutokuForm = () => {
 const AuHikariForm = () => {
     const { formData, handleInputChange, handleDateBlurWithValidation, invalidFields, handlePhoneBlur, handleNameBlur, handlePostalCodeBlur } = useContext(AppContext);
 
+    const handleAuDetachedChange = (e) => {
+        const isChecked = e.target.checked;
+        const current = formData.address || '';
+        const base = current.replace(/戸建て$/, '').trim();
+        const next = isChecked ? `${base}戸建て`.trim() : base;
+        handleInputChange({ target: { name: 'address', value: next, type: 'text' } });
+    };
+
     return (
         <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -507,7 +515,26 @@ const AuHikariForm = () => {
                 <h3 className="text-lg font-bold text-blue-700">設置先情報</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormInput label="郵便番号" name="postalCode" value={formData.postalCode} onChange={handleInputChange} onBlur={(e) => handlePostalCodeBlur('postalCode', e.target.value)} isInvalid={invalidFields.includes('postalCode')} required className="md:col-span-2" />
-                    <FormInput label="住所※物件名部屋番号まで全部" name="address" value={formData.address} onChange={handleInputChange} className="md:col-span-2" isInvalid={invalidFields.includes('address')} required />
+                    <div className="md:col-span-2 flex items-end gap-2">
+                        <FormInput
+                            label="住所※物件名部屋番号まで全部"
+                            name="address"
+                            value={formData.address}
+                            onChange={handleInputChange}
+                            className="flex-grow"
+                            isInvalid={invalidFields.includes('address')}
+                            required
+                        />
+                        <FormCheckbox
+                            label="戸建て"
+                            name="auIsDetached"
+                            checked={(formData.address || '').endsWith('戸建て')}
+                            onChange={handleAuDetachedChange}
+                            className="pb-2"
+                            description=""
+                            isInvalid={false}
+                        />
+                    </div>
                 </div>
             </div>
 
