@@ -222,7 +222,7 @@ export const CAMPAIGNS_1G = [
 ];
 
 export const CAMPAIGNS_10G_NEW = [
-  { value: '10ギガめちゃトク割6カ月', label: '10ギガめちゃトク割6カ月' },
+  { value: '10ギガもっとめちゃトク割6カ月', label: '10ギガもっとめちゃトク割6カ月' },
   { value: '10ギガめちゃトク割6カ月＋あんしん乗り換え', label: '10ギガめちゃトク割6カ月＋あんしん乗り換え' },
   { value: '10ギガめちゃトク割3カ月', label: '10ギガめちゃトク割3カ月' },
 ];
@@ -230,6 +230,11 @@ export const CAMPAIGNS_10G_NEW = [
 export const CAMPAIGNS_AIR_NEW = [
     { value: 'Airめちゃトク割サポートCP', label: 'Airめちゃトク割サポートCP' },
     { value: 'Airめちゃトク割サポートCP／＋あんしん乗り換え', label: 'Airめちゃトク割サポートCP／＋あんしん乗り換え' },
+];
+
+export const CAMPAIGNS_AIR_U25O60 = [
+  { value: 'スマートライフ割', label: 'スマートライフ割' },
+  { value: 'スマートライフ割+あんしん乗り換え', label: 'スマートライフ割+あんしん乗り換え' },
 ];
 
 export const GENDERS = [

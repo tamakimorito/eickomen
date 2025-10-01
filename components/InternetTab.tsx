@@ -2,7 +2,7 @@ import React, { useMemo, useContext, useEffect, useCallback } from 'react';
 import { 
     PRODUCTS, HOUSING_TYPES_1G, HOUSING_TYPES_10G, HOUSING_TYPES_AIR, HOUSING_TYPES_CHINTAI, HOUSING_TYPES_CHINTAI_FREE,
     RACK_OPTIONS_1G, RACK_OPTIONS_10G, RACK_OPTIONS_CHINTAI_FREE_MANSION, RACK_OPTIONS_CHINTAI_FREE_10G,
-    CAMPAIGNS_1G, CAMPAIGNS_10G_NEW, CAMPAIGNS_AIR_NEW,
+    CAMPAIGNS_1G, CAMPAIGNS_10G_NEW, CAMPAIGNS_AIR_NEW, CAMPAIGNS_AIR_U25O60,
     GENDERS, MAILING_OPTIONS, RENTAL_OPTIONS, 
     EXISTING_LINE_STATUS_OPTIONS, MOBILE_CARRIERS, 
     DISCOUNT_OPTIONS, DISCOUNT_OPTIONS_10G_NEW, ROUTER_OPTIONS,
@@ -48,12 +48,7 @@ const DefaultInternetForm = () => {
     const age = useMemo(() => calculateAge(formData.dob), [formData.dob]);
     const isU25O60 = age !== null && (age <= 25 || age >= 60);
 
-    const AIR_U25O60_CAMPAIGNS = [
-      { value: 'U25O60CP', label: 'U25O60CP' },
-      { value: 'U25O60CP+あんしん乗り換え', label: 'U25O60CP+あんしん乗り換え' },
-    ];
-
-    const campaignOptions = isAir && isU25O60 ? AIR_U25O60_CAMPAIGNS : (isAir ? CAMPAIGNS_AIR_NEW : is10G ? CAMPAIGNS_10G_NEW : CAMPAIGNS_1G);
+    const campaignOptions = isAir && isU25O60 ? CAMPAIGNS_AIR_U25O60 : (isAir ? CAMPAIGNS_AIR_NEW : is10G ? CAMPAIGNS_10G_NEW : CAMPAIGNS_1G);
     
     useEffect(() => {
         if (isAir) {
@@ -64,8 +59,27 @@ const DefaultInternetForm = () => {
         }
     }, [isAir, campaignOptions, formData.campaign, handleInputChange]);
 
+    const smartLifeFee = '2年3278円、3年以降5368円';
+    const isSmartLifeCP = ['スマートライフ割', 'スマートライフ割+あんしん乗り換え'].includes(formData.campaign);
+
+    const handleServiceFeeBlur = useCallback(() => {
+        if (isAir && isSmartLifeCP) {
+            if (formData.serviceFee !== smartLifeFee) {
+                handleInputChange({ target: { name: 'serviceFee', value: smartLifeFee } });
+            }
+        }
+    }, [isAir, isSmartLifeCP, formData.serviceFee, handleInputChange]);
+
+
     // Service Fee Automation
     useEffect(() => {
+        if (isAir && isSmartLifeCP) {
+            if (formData.serviceFee !== smartLifeFee) {
+                handleInputChange({ target: { name: 'serviceFee', value: smartLifeFee } });
+            }
+            return; // Exit early to prevent conflict with older logic.
+        }
+
         if (is10G) {
             const defaultFee = '6カ月0円→6930円';
             const threeMonthFee = '3カ月0円→6930円';
@@ -93,7 +107,7 @@ const DefaultInternetForm = () => {
                 }
             }
         }
-    }, [is10G, isAir, isU25O60, formData.campaign, formData.serviceFee, handleInputChange]);
+    }, [is10G, isAir, isU25O60, formData.campaign, formData.serviceFee, handleInputChange, isSmartLifeCP]);
 
     const handleOuchiWariBlur = useCallback(() => {
         if (formData.homeDiscount === 'あり' && !['SoftBank', 'Y!mobile'].includes(formData.mobileCarrier)) {
@@ -258,7 +272,7 @@ const DefaultInternetForm = () => {
             <div className="border-t-2 border-dashed border-blue-300 pt-6 space-y-4">
                 <h3 className="text-lg font-bold text-blue-700">その他</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormInput label="案内料金" name="serviceFee" value={formData.serviceFee} onChange={handleInputChange} isInvalid={invalidFields.includes('serviceFee')} required />
+                    <FormInput label="案内料金" name="serviceFee" value={formData.serviceFee} onChange={handleInputChange} onBlur={handleServiceFeeBlur} isInvalid={invalidFields.includes('serviceFee')} required />
                     {!isChintai && !isChintaiFree && <FormSelect label="CP" name="campaign" value={formData.campaign} onChange={handleInputChange} onBlur={handleAnshinNorikaeBlur} options={campaignOptions} isInvalid={invalidFields.includes('campaign')} required />}
                     
                     {!isAir && !isChintai && !isChintaiFree && (
