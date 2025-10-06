@@ -50,6 +50,8 @@ const DefaultInternetForm = () => {
 
     const campaignOptions = isAir && isU25O60 ? CAMPAIGNS_AIR_U25O60 : (isAir ? CAMPAIGNS_AIR_NEW : is10G ? CAMPAIGNS_10G_NEW : CAMPAIGNS_1G);
     
+    const CROSS_PATH_ROUTER_OPTIONS_FOR_FREE = [{ value: 'プレゼント', label: 'プレゼント' }];
+
     useEffect(() => {
         if (isAir) {
             const currentCampaignIsValid = campaignOptions.some(opt => opt.value === formData.campaign);
@@ -58,6 +60,12 @@ const DefaultInternetForm = () => {
             }
         }
     }, [isAir, campaignOptions, formData.campaign, handleInputChange]);
+
+    useEffect(() => {
+      if (isChintaiFree && formData.crossPathRouter !== 'プレゼント') {
+        handleInputChange({ target: { name: 'crossPathRouter', value: 'プレゼント', type: 'text' } } as any);
+      }
+    }, [isChintaiFree, formData.crossPathRouter, handleInputChange]);
 
     const smartLifeFee = '2年3278円、3年以降5368円';
     const isSmartLifeCP = ['スマートライフ割', 'スマートライフ割+あんしん乗り換え'].includes(formData.campaign);
@@ -301,7 +309,7 @@ const DefaultInternetForm = () => {
                         <FormInput label="銀行名" name="bankName" value={formData.bankName} onChange={handleInputChange} isInvalid={invalidFields.includes('bankName')} required />
                     )}
                      {(isChintai || isChintaiFree) && (
-                         <FormSelect label="クロスパス無線ルーター" name="crossPathRouter" value={formData.crossPathRouter} onChange={handleInputChange} options={CROSS_PATH_ROUTER_OPTIONS} isInvalid={invalidFields.includes('crossPathRouter')} required disabled={isChintaiFree} />
+                         <FormSelect label="クロスパス無線ルーター" name="crossPathRouter" value={formData.crossPathRouter} onChange={handleInputChange} options={isChintaiFree ? CROSS_PATH_ROUTER_OPTIONS_FOR_FREE : CROSS_PATH_ROUTER_OPTIONS} isInvalid={invalidFields.includes('crossPathRouter')} required />
                     )}
                 </div>
                 <FormTextArea label="備考" name="internetRemarks" value={formData.internetRemarks} onChange={handleInputChange} rows={3} isInvalid={invalidFields.includes('internetRemarks')} />
@@ -313,7 +321,7 @@ const DefaultInternetForm = () => {
 };
 
 const GmoDocomoForm = () => {
-    const { formData, handleInputChange, handleDateBlurWithValidation, handleNameBlur, invalidFields, handlePhoneBlur } = useContext(AppContext);
+    const { formData, handleInputChange, handleDateBlurWithValidation, handleNameBlur, invalidFields, handlePhoneBlur, handleKanaBlur } = useContext(AppContext);
     
     const isFamily = formData.housingType?.includes('ファミリー');
     const isNoPair = formData.housingType?.includes('ペアなし');
@@ -478,7 +486,7 @@ const GmoTokutokuForm = () => {
 };
 
 const AuHikariForm = () => {
-    const { formData, handleInputChange, handleDateBlurWithValidation, invalidFields, handlePhoneBlur, handleNameBlur, handlePostalCodeBlur } = useContext(AppContext);
+    const { formData, handleInputChange, handleDateBlurWithValidation, invalidFields, handlePhoneBlur, handleNameBlur, handlePostalCodeBlur, handleKanaBlur } = useContext(AppContext);
 
     const handleAuDetachedChange = (e) => {
         const isChecked = e.target.checked;

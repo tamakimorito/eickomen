@@ -171,7 +171,10 @@ export const generateGasCommentLogic = (formData: FormData): string => {
 
         case '東急ガス':
             {
-                const tokyuCurrentAddress = currentPostalCode ? `〒${formattedCurrentPostalCode} ${currentAddress || ''}` : currentAddress || '';
+                const tokyuCurrentAddress =
+                  formattedCurrentPostalCode
+                    ? `〒${formattedCurrentPostalCode} ${(currentAddress || '')}${mailingBuildingInfo ? ' ' + mailingBuildingInfo : ''}`
+                    : `${currentAddress || ''}${mailingBuildingInfo ? ' ' + mailingBuildingInfo : ''}`;
                 let tokyuCommentLines = [
                     `【えねこねガス_開栓】 ${tag}`,
                     `契確時間：${elecConfirmationTime || ''}`,

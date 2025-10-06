@@ -16,7 +16,7 @@ const MailingAddressSection = () => {
         const defaultConfig = { showOptions: false, showFields: false, isRequired: false, fixedValue: null, description: null };
         switch(gasProvider) {
             case 'すまいのでんき（ストエネ）': // This is "すまいのガス"
-                 return { ...defaultConfig, showOptions: true, showFields: mailingOption === '現住所', isRequired: mailingOption === '現住所', description: '新住所郵送（指定も可能。その場合は備考欄に特記事項としてわかりやすく記載）' };
+                 return { ...defaultConfig, showOptions: false, showFields: false, isRequired: false, fixedValue: null, description: '新住所郵送（指定も可能、その場合備考欄に特記事項としてわかりやすく書くこと）' };
             case 'ニチガス単品':
             case '大阪ガス単品':
                 return { ...defaultConfig, showOptions: true, showFields: mailingOption === '現住所', isRequired: mailingOption === '現住所', description: '書面送付先を選択してください。' };

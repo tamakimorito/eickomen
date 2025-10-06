@@ -218,6 +218,27 @@ const effectiveLen = (str: string | undefined | null): number => {
     return str.replace(/[\s\u3000]/g, '').length;
 };
 
+const normalizePartialDateToFuture = (raw: string): string => {
+  if (!raw) return raw;
+  const m = raw.match(/^\s*(\d{1,2})\/(\d{1,2})\s*$/);
+  if (!m) return raw;
+  const mm = parseInt(m[1], 10);
+  const dd = parseInt(m[2], 10);
+  if (mm < 1 || mm > 12 || dd < 1 || dd > 31) return raw;
+
+  const today = new Date();
+  const y = today.getFullYear();
+  const candidate = new Date(y, mm - 1, dd);
+  
+  if (candidate < new Date(today.getFullYear(), today.getMonth(), today.getDate())) {
+    candidate.setFullYear(y + 1);
+  }
+  const yyyy = candidate.getFullYear();
+  const MM = String(candidate.getMonth() + 1).padStart(2, '0');
+  const DD = String(candidate.getDate()).padStart(2, '0');
+  return `${yyyy}/${MM}/${DD}`;
+};
+
 
 export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields }) => {
     const [activeTab, setActiveTab] = useState('electricity');
@@ -417,6 +438,44 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
         }
     }, [dispatch, setModalState, closeModal]);
 
+    const handleDateBlurWithValidation = useCallback((e) => {
+      const { name, value } = e.target;
+      if (name === 'moveInDate' || name === 'gasOpeningDate') {
+        const normalized = normalizePartialDateToFuture(value);
+        if (normalized !== value) {
+          dispatch({ type: 'UPDATE_FIELD', payload: { name, value: normalized, type: 'text' }});
+        }
+      }
+    }, [dispatch]);
+
+    const nameHasSpace = (s: string) => /\s|\u3000/.test(s?.trim() || '');
+
+    const openNameSpaceModal = (fieldName: 'contractorName'|'contractorNameKana') => {
+      setInvalidFields(prev => Array.from(new Set([...prev, fieldName])));
+      setModalState({
+        isOpen: true,
+        title: '入力の確認',
+        message: '姓と名の間にスペースがありません。修正しますか？',
+        confirmText: '修正する',
+        cancelText: '続行',
+        type: 'warning',
+        onConfirm: () => { closeModal(); },
+        onCancel: () => { setInvalidFields(prev => prev.filter(x => x !== fieldName)); closeModal(); },
+        isErrorBanner: false, bannerMessage: ''
+      });
+    };
+    
+    const handleNameBlur = useCallback((e) => {
+      const { value } = e.target;
+      if (value && !nameHasSpace(value)) openNameSpaceModal('contractorName');
+    }, [setInvalidFields, setModalState, closeModal]);
+
+    const handleKanaBlur = useCallback((e) => {
+      const { value } = e.target;
+      if (value && !nameHasSpace(value)) openNameSpaceModal('contractorNameKana');
+    }, [setInvalidFields, setModalState, closeModal]);
+
+
     const handleCopy = useCallback(() => {
         const { missingFields, missingLabels } = getRequiredFields(formData, activeTab);
 
@@ -439,45 +498,6 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
         
         setInvalidFields([]);
         setModalState(prev => ({...prev, isErrorBanner: false}));
-
-        const isInternetAU = activeTab === 'internet' && formData.product === 'AUひかり';
-        const needsBuildingInfo =
-            (activeTab === 'electricity' || activeTab === 'gas') ||
-            (activeTab === 'internet' && !isInternetAU);
-
-        if (needsBuildingInfo && !formData.buildingInfo.trim()) {
-            setModalState({
-                isOpen: true,
-                title: '入力エラー',
-                message: '『物件名＋部屋番号』が空です。戸建ての場合はチェック、集合住宅は号室までご入力ください。',
-                confirmText: 'OK',
-                cancelText: null,
-                type: 'warning',
-                onConfirm: closeModal,
-                onCancel: closeModal,
-                isErrorBanner: true,
-                bannerMessage: '物件名＋部屋番号が未入力です。'
-            });
-            return; // Stop copy
-        }
-
-        // --- Address Number Check for AU Hikari ---
-        if (activeTab === 'internet' && formData.product === 'AUひかり' && formData.address && !/\d/.test(formData.address)) {
-            setInvalidFields(['address']);
-            setModalState({
-                isOpen: true,
-                title: '入力エラー',
-                message: '「住所※物件名部屋番号まで全部」に番地などの数字が含まれていません。修正してください。',
-                onConfirm: closeModal,
-                onCancel: closeModal,
-                confirmText: 'OK',
-                cancelText: null,
-                type: 'warning',
-                isErrorBanner: true,
-                bannerMessage: '住所に数字が含まれていません。'
-            });
-            return; // Stop copy
-        }
 
         const performCopy = () => {
             if (!generatedComment) {
@@ -520,6 +540,67 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
                 console.error('Copy failed', err);
             });
         };
+        
+        if (
+          activeTab === 'gas' &&
+          formData.gasProvider === 'すまいのでんき（ストエネ）' &&
+          formData.isGasSet !== 'セット' &&
+          ((/^CC/i.test(formData.recordId || '')) || (/^No\./i.test(formData.recordId || '')))
+        ) {
+          setModalState({
+            isOpen: true,
+            title: '注意',
+            message: '本来案内しないはずのすまいのガス単品が選択されてます、コピーしていいですか？',
+            confirmText: '続行',
+            cancelText: 'やめる',
+            type: 'warning',
+            onConfirm: () => { closeModal(); performCopy(); },
+            onCancel: closeModal,
+            isErrorBanner: false,
+            bannerMessage: ''
+          });
+          return;
+        }
+
+        const isInternetAU = activeTab === 'internet' && formData.product === 'AUひかり';
+        const isInternetGmoDocomo = activeTab === 'internet' && formData.product === 'GMOドコモ光';
+        const needsBuildingInfo =
+          (activeTab === 'electricity' || activeTab === 'gas') ||
+          (activeTab === 'internet' && !isInternetAU && !isInternetGmoDocomo);
+
+        if (needsBuildingInfo && !formData.buildingInfo.trim()) {
+            setModalState({
+                isOpen: true,
+                title: '入力エラー',
+                message: '『物件名＋部屋番号』が空です。戸建ての場合はチェック、集合住宅は号室までご入力ください。',
+                confirmText: 'OK',
+                cancelText: null,
+                type: 'warning',
+                onConfirm: closeModal,
+                onCancel: closeModal,
+                isErrorBanner: true,
+                bannerMessage: '物件名＋部屋番号が未入力です。'
+            });
+            return; // Stop copy
+        }
+
+        // --- Address Number Check for AU Hikari ---
+        if (activeTab === 'internet' && formData.product === 'AUひかり' && formData.address && !/\d/.test(formData.address)) {
+            setInvalidFields(['address']);
+            setModalState({
+                isOpen: true,
+                title: '入力エラー',
+                message: '「住所※物件名部屋番号まで全部」に番地などの数字が含まれていません。修正してください。',
+                onConfirm: closeModal,
+                onCancel: closeModal,
+                confirmText: 'OK',
+                cancelText: null,
+                type: 'warning',
+                isErrorBanner: true,
+                bannerMessage: '住所に数字が含まれていません。'
+            });
+            return; // Stop copy
+        }
         
         // --- Address Number Check ---
         if (formData.address && !/\d/.test(formData.address)) {
@@ -772,5 +853,8 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
         handleCopy,
         handleResetRequest,
         handlePostalCodeBlur,
+        handleDateBlurWithValidation,
+        handleNameBlur,
+        handleKanaBlur,
     };
 };
