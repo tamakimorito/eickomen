@@ -55,7 +55,9 @@ export const generateWtsCommentLogic = (formData: FormData): string => {
     const formattedShippingPostalCode = formatPostalCode(wtsShippingPostalCode);
     
     let header = `【プレミアムウォーター】 ${tag}`;
-    if (wtsCustomerType === 'U-20') {
+    if (wtsCustomerType === 'ジライフウォーター') {
+        header = `【ジライフウォーター】 ${tag}`;
+    } else if (wtsCustomerType === 'U-20') {
         header = `【プレミアムウォーターU20】 ${tag}`;
     } else if (wtsCustomerType === '法人') {
         header = `【プレミアムウォーター法人】 ${tag}`;

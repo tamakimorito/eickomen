@@ -14,6 +14,26 @@ const WtsTab = () => {
     const { formData, handleInputChange, handleDateBlurWithValidation, handleNameBlur, handleIdBlur, invalidFields, handlePhoneBlur, handleKanaBlur, handlePostalCodeBlur } = useContext(AppContext);
     const { wtsCustomerType, isSakaiRoute, wtsServerType } = formData;
     
+    const serverOptions = useMemo(() => {
+        if (wtsCustomerType === 'ジライフウォーター') {
+            // 除外：リッタ / ロッカスマート / スリムR2 / AURA
+            const filtered = WTS_SERVERS.filter(x => !['リッタ','ロッカスマート','スリムR2','AURA'].includes(x.value));
+            // 追加：スタンダードサーバー（色はWTS_COLORSで定義済み）
+            const addStd = { value: 'スタンダードサーバー', label: 'スタンダードサーバー' };
+            // 並び替え：amadana → スタンダードサーバー → fam2 → スリム4ロング → スリム4ショート
+            const byValue = (v: string) => (o: any) => o.value === v;
+            return [
+                filtered.find(byValue('amadana')),
+                addStd,
+                filtered.find(byValue('fam2')),
+                filtered.find(byValue('スリム4ロング')),
+                filtered.find(byValue('スリム4ショート')),
+            ].filter(Boolean);
+        }
+        // プレミアム/U-20/法人は従来通り
+        return WTS_SERVERS;
+    }, [wtsCustomerType]);
+
     const colorOptions = useMemo(() => {
         return WTS_COLORS[wtsServerType] || [];
     }, [wtsServerType]);
@@ -162,7 +182,7 @@ const WtsTab = () => {
                         name="wtsServerType"
                         value={formData.wtsServerType}
                         onChange={handleInputChange}
-                        options={WTS_SERVERS}
+                        options={serverOptions}
                         isInvalid={invalidFields.includes('wtsServerType')}
                         required
                     />

@@ -468,7 +468,8 @@ export const TIME_SLOTS_TOHO_GAS_SETUP = [
 
 // --- WTS Constants ---
 export const WTS_CUSTOMER_TYPES = [
-    { value: '通常', label: '通常' },
+    { value: 'ジライフウォーター', label: 'ジライフウォーター' },
+    { value: '通常', label: 'プレミアムウォーター' },
     { value: 'U-20', label: 'U-20' },
     { value: '法人', label: '法人' },
 ];
@@ -554,6 +555,10 @@ export const WTS_COLORS = {
         { value: 'ブラック', label: 'ブラック' },
         { value: 'ブルーブラック', label: 'ブルーブラック' },
         { value: 'メタリック', label: 'メタリック' },
+    ],
+    'スタンダードサーバー': [
+        { value: 'ホワイト', label: 'ホワイト' },
+        { value: 'ブラック', label: 'ブラック' },
     ],
 };
 

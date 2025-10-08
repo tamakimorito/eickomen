@@ -154,7 +154,7 @@ const DefaultInternetForm = () => {
         if (isChintaiFree) {
             if (formData.housingType === 'マンション10G') return RACK_OPTIONS_CHINTAI_FREE_10G;
             if (formData.housingType === 'マンション') return RACK_OPTIONS_CHINTAI_FREE_MANSION;
-            return [];
+            return [...RACK_OPTIONS_CHINTAI_FREE_MANSION, ...RACK_OPTIONS_CHINTAI_FREE_10G];
         }
         
         let baseOptions;
@@ -190,7 +190,6 @@ const DefaultInternetForm = () => {
                     <FormSelect
                         label="ラック" name="rackType" value={formData.rackType} onChange={handleInputChange}
                         options={currentRackOptions} isInvalid={invalidFields.includes('rackType')} required
-                        disabled={isChintaiFree && formData.housingType === 'マンション10G'}
                     />
                 )}
                 <FormInput
