@@ -26,7 +26,7 @@ const MailingAddressSection = () => {
                 return { ...defaultConfig, showOptions: true, showFields: mailingOption === '現住所', isRequired: true, description: '書面送付先を選択してください。' };
             
             case 'ニチガス電気セット':
-                return { ...defaultConfig, showOptions: true, showFields: mailingOption === '現住所', isRequired: true, description: '書面送付先を選択してください。' };
+                return { ...defaultConfig, showOptions: false, showFields: false, isRequired: false, fixedValue: null, description: '書面送付先のヒアリングは不要です。' };
 
             case '東京ガス電気セット':
                  return { ...defaultConfig, fixedValue: '現住所', showFields: true, isRequired: true, description: '書面は現住所へ送付されます。' };

@@ -758,6 +758,21 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
             }
         }
 
+        // Add address consolidation logic here
+        if (['internet', 'wts'].includes(tabId) && ['electricity', 'gas'].includes(activeTab)) {
+            const mailingOpt = (formData.mailingOption || '').trim();
+            const base = (formData.currentAddress || '').trim();
+            const extra = (formData.mailingBuildingInfo || '').trim();
+
+            if (mailingOpt === '現住所' && extra) {
+                const alreadyHas = base.includes(extra);
+                if (!alreadyHas) {
+                    const merged = base ? `${base} ${extra}` : extra;
+                    dispatch({ type: 'UPDATE_FIELD', payload: { name: 'currentAddress', value: merged } });
+                }
+            }
+        }
+
         const fromInternetOrWts = ['internet', 'wts'].includes(activeTab);
         const toElecOrGas = ['electricity', 'gas'].includes(tabId);
 
