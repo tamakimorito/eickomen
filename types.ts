@@ -81,6 +81,11 @@ export type FormData = {
   auContactType: string;
   auPreCheckTime: string;
 
+  // --- Flets Toss Specific ---
+  fletsRegion: string;
+  fletsPlan: string;
+  fletsHasFixedPhone: string;
+
   // --- Electricity Specific ---
   elecProvider: string;
   elecRecordIdPrefix: string;

@@ -245,7 +245,7 @@ const GasTab = () => {
                                         <FormInput label="ガスエリア" name="gasArea" value={formData.gasArea} onChange={handleInputChange} placeholder="例: 東京ガス" isInvalid={invalidFields.includes('gasArea')} required />
                                     </>
                                 )}
-                                {isTokyo && (
+                                {(isTokyo || isToho) && (
                                     <div className="md:col-span-2 space-y-4">
                                         <FormCheckbox
                                             label="法人契約"

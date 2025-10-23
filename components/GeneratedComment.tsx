@@ -14,6 +14,7 @@ const GeneratedComment = () => {
   const handleFocus = () => {
     if (hasConfirmedEdit) return;
 
+    // FIX: Added missing isErrorBanner and bannerMessage properties to align with the modal state type.
     setModalState({
       isOpen: true,
       title: '編集の確認',
@@ -30,6 +31,8 @@ const GeneratedComment = () => {
         textareaRef.current?.blur();
         closeModal();
       },
+      isErrorBanner: false,
+      bannerMessage: '',
     });
   };
 

@@ -19,9 +19,10 @@ export const useFormLogic = () => {
         setInvalidFields([]);
     }, [dispatch, formData.apName]);
 
-    const handleIdBlur = useCallback(() => {
-        // dispatch({ type: 'UPDATE_DERIVED_FIELDS_FROM_ID' });
-        // This logic is now handled inside the main formReducer for consistency.
+    const handleIdBlur = useCallback((e) => {
+        // This function is intentionally left empty here.
+        // The actual implementation is in useAppLogic.ts to have access to modal state.
+        // It's included here to satisfy the combined context object structure.
     }, []);
 
     return {

@@ -351,19 +351,36 @@ const ElectricityTab = () => {
             {isElecGasSetSelected || elecProvider === 'ニチガス電気セット' || elecProvider === '東邦ガスセット' || elecProvider === '東京ガス電気セット' || elecProvider === '大阪ガス電気セット' ? (
                 <div className="border-t-2 border-dashed border-blue-300 pt-6 space-y-4">
                     <h3 className="text-lg font-bold text-blue-700">利用開始日・開栓日</h3>
-                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-blue-50/50 rounded-lg border border-blue-200">
-                        <FormDateInput label="電気利用開始日" name="moveInDate" value={formData.moveInDate} onChange={handleInputChange} onBlur={handleDateBlurWithValidation} isInvalid={invalidFields.includes('moveInDate')} placeholder="例: 2024/08/01" required />
-                        <FormDateInput label="ガス開栓日" name="gasOpeningDate" value={formData.gasOpeningDate} onChange={handleInputChange} onBlur={handleDateBlurWithValidation} isInvalid={invalidFields.includes('gasOpeningDate')} placeholder="例: 2024/08/01" required />
-                        <FormSelect label="ガス立会時間枠" name="gasOpeningTimeSlot" value={formData.gasOpeningTimeSlot} onChange={handleInputChange} options={gasTimeSlotOptions} isInvalid={invalidFields.includes('gasOpeningTimeSlot')} required className="md:col-span-2" />
-                        {isNichigasSet && (
-                            <>
-                                <FormInput label="ガスエリア" name="gasArea" value={formData.gasArea} onChange={handleInputChange} placeholder="例: 東京ガス" isInvalid={invalidFields.includes('gasArea')} required />
-                                <FormInput label="立会者" name="gasWitness" value={formData.gasWitness} onChange={handleInputChange} isInvalid={invalidFields.includes('gasWitness')} required />
-                                <FormInput label="ガス事前連絡先" name="gasPreContact" value={formData.gasPreContact} onChange={handleInputChange} onBlur={handlePhoneBlur} isInvalid={invalidFields.includes('gasPreContact')} required />
-                            </>
-                        )}
-                         {(isToho || elecProvider === '東京ガス電気セット') && (
-                            <FormInput label="現住所" name="currentAddress" value={formData.currentAddress} onChange={handleInputChange} placeholder="！！必須！！" className="md:col-span-2" isInvalid={invalidFields.includes('currentAddress')} required />
+                     <div className="p-4 bg-blue-50/50 rounded-lg border border-blue-200 space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <FormDateInput label="電気利用開始日" name="moveInDate" value={formData.moveInDate} onChange={handleInputChange} onBlur={handleDateBlurWithValidation} isInvalid={invalidFields.includes('moveInDate')} placeholder="例: 2024/08/01" required />
+                            <FormDateInput label="ガス開栓日" name="gasOpeningDate" value={formData.gasOpeningDate} onChange={handleInputChange} onBlur={handleDateBlurWithValidation} isInvalid={invalidFields.includes('gasOpeningDate')} placeholder="例: 2024/08/01" required />
+                            <FormSelect label="ガス立会時間枠" name="gasOpeningTimeSlot" value={formData.gasOpeningTimeSlot} onChange={handleInputChange} options={gasTimeSlotOptions} isInvalid={invalidFields.includes('gasOpeningTimeSlot')} required className="md:col-span-2" />
+                            {isNichigasSet && (
+                                <>
+                                    <FormInput label="ガスエリア" name="gasArea" value={formData.gasArea} onChange={handleInputChange} placeholder="例: 東京ガス" isInvalid={invalidFields.includes('gasArea')} required />
+                                    <FormInput label="立会者" name="gasWitness" value={formData.gasWitness} onChange={handleInputChange} isInvalid={invalidFields.includes('gasWitness')} required />
+                                    <FormInput label="ガス事前連絡先" name="gasPreContact" value={formData.gasPreContact} onChange={handleInputChange} onBlur={handlePhoneBlur} isInvalid={invalidFields.includes('gasPreContact')} required />
+                                </>
+                            )}
+                        </div>
+                        {(isToho || elecProvider === '東京ガス電気セット') && (
+                            <div className="pt-4 mt-4 border-t border-blue-200">
+                                 <FormCheckbox
+                                    label="法人契約"
+                                    name="gasIsCorporate"
+                                    checked={formData.gasIsCorporate}
+                                    onChange={handleInputChange}
+                                    isInvalid={invalidFields.includes('gasIsCorporate')}
+                                    description="法人契約の場合はチェックを入れてください"
+                                />
+                                {formData.gasIsCorporate && (
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 mt-2 border-t border-gray-200">
+                                        <FormInput label="立ち合い担当者フルネーム" name="gasWitness" value={formData.gasWitness} onChange={handleInputChange} onBlur={handleNameBlur} isInvalid={invalidFields.includes('gasWitness')} required={formData.gasIsCorporate} />
+                                        <FormInput label="立ち合い連絡先" name="gasPreContact" value={formData.gasPreContact} onChange={handleInputChange} onBlur={handlePhoneBlur} isInvalid={invalidFields.includes('gasPreContact')} required={formData.gasIsCorporate} />
+                                    </div>
+                                )}
+                            </div>
                         )}
                     </div>
                 </div>

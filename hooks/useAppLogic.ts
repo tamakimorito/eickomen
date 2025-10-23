@@ -28,6 +28,7 @@ const FIELD_LABELS = {
     gmoTokutokuPlan: 'プラン', gmoTokutokuCampaign: 'CP',
     auContactType: '連絡先種別',
     auPlanProvider: '案内プラン/プロバイダ',
+    fletsRegion: 'エリア', fletsPlan: 'プラン', fletsHasFixedPhone: '固定電話',
     // Elec/Gas
     elecProvider: '電気商材', gasProvider: 'ガス商材', isAllElectric: 'オール電化', isVacancy: '空室',
     hasContractConfirmation: '契約確認は必要ですか？', isGasSet: 'ガスセット', primaryProductStatus: '主商材受注状況',
@@ -78,6 +79,13 @@ const getRequiredFields = (formData, activeTab) => {
                     'recordId', 'greeting', 'contractorName', 'existingLineCompany', 'postalCode', 'address',
                     'phone', 'auContactType', 'auPlanProvider', 'serviceFee'
                 );
+            } else if (product === 'フレッツ光トス') {
+                 required.push('greeting', 'customerId', 'fletsRegion', 'fletsPlan', 'fletsHasFixedPhone', 'postConfirmationTime', 'contractorName', 'contractorNameKana', 'phone');
+                const companyKeywords = ['株式会社', '有限会社', '合同会社', '会社'];
+                const contractorIsCompany = companyKeywords.some(kw => (formData.contractorName || '').includes(kw) || (formData.contractorNameKana || '').includes(kw));
+                if (contractorIsCompany) {
+                    required.push('contactPersonName');
+                }
             } else if (product.includes('SoftBank') || product.includes('賃貸ねっと')) {
                 required.push('greeting', 'housingType', 'rackType', 'contractorName', 'contractorNameKana', 'dob', 'phone', 'postalCode', 'address', 'buildingInfo', 'moveInDate', 'mailingOption');
                 if (formData.mailingOption === '現住所') required.push('currentPostalCode', 'currentAddress');
@@ -145,6 +153,9 @@ const getRequiredFields = (formData, activeTab) => {
             if (['ニチガス電気セット'].includes(elecProvider)) {
                 required.push('gasArea', 'gasWitness', 'gasPreContact');
             }
+             if (elecProvider === '東邦ガスセット' && formData.gasIsCorporate) {
+                required.push('gasWitness', 'gasPreContact');
+            }
             if (['東邦ガスセット', '東京ガス電気セット'].includes(elecProvider)) {
                 required.push('currentAddress');
             }
@@ -178,7 +189,7 @@ const getRequiredFields = (formData, activeTab) => {
              if(gasProvider === 'ニチガス単品') {
                 required.push('gasWitness', 'gasPreContact', 'gasArea');
              }
-             if(gasProvider === '東京ガス単品' && formData.gasIsCorporate) {
+             if((gasProvider === '東京ガス単品' || gasProvider === '東邦ガス単品') && formData.gasIsCorporate) {
                 required.push('gasWitness', 'gasPreContact');
              }
              if(formData.mailingOption === '現住所' && ['すまいのでんき（ストエネ）', 'ニチガス単品', '東邦ガス単品', '東急ガス', '大阪ガス単品'].includes(gasProvider)){
@@ -417,6 +428,7 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
         if (!value) return;
         const digits = value.replace(/\D/g, '');
         if (digits.length > 0 && digits.length !== 7) {
+            // FIX: Added missing isErrorBanner and bannerMessage properties to match the modal state type.
             setModalState({
                 isOpen: true,
                 title: '郵便番号の確認',
@@ -440,15 +452,45 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
 
     const handleDateBlurWithValidation = useCallback((e) => {
       const { name, value } = e.target;
+       if (!value) return;
+
+      let normalized = value;
       if (name === 'moveInDate' || name === 'gasOpeningDate') {
-        const normalized = normalizePartialDateToFuture(value);
+        normalized = normalizePartialDateToFuture(value);
         if (normalized !== value) {
           dispatch({ type: 'UPDATE_FIELD', payload: { name, value: normalized, type: 'text' }});
         }
       }
-    }, [dispatch]);
+
+      const dateToCheck = new Date(normalized);
+       if (!isNaN(dateToCheck.getTime()) && /^\d{4}\/\d{2}\/\d{2}$/.test(normalized)) {
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          if (dateToCheck < today) {
+               // FIX: Added missing isErrorBanner and bannerMessage properties to match the modal state type, resolving a TypeScript error.
+               setModalState({
+                  isOpen: true,
+                  title: '日付を確認してください',
+                  message: '入力された日付が過去日です。続行しますか？',
+                  confirmText: '続行',
+                  cancelText: '修正する',
+                  type: 'warning',
+                  onConfirm: closeModal,
+                  onCancel: () => {
+                      dispatch({ type: 'UPDATE_FIELD', payload: { name, value: '', type: 'text' }});
+                      closeModal();
+                  },
+                  isErrorBanner: false,
+                  bannerMessage: '',
+              });
+          }
+      }
+
+    }, [dispatch, setModalState, closeModal]);
 
     const nameHasSpace = (s: string) => /\s|\u3000/.test(s?.trim() || '');
+    const companyKeywords = ['株式会社', '有限会社', '合同会社', '会社'];
+    const isCompanyName = (s: string) => companyKeywords.some(kw => (s || '').includes(kw));
 
     const openNameSpaceModal = (fieldName: 'contractorName'|'contractorNameKana') => {
       setInvalidFields(prev => Array.from(new Set([...prev, fieldName])));
@@ -467,13 +509,46 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
     
     const handleNameBlur = useCallback((e) => {
       const { value } = e.target;
-      if (value && !nameHasSpace(value)) openNameSpaceModal('contractorName');
+      if (value && !nameHasSpace(value) && !isCompanyName(value)) {
+          openNameSpaceModal('contractorName');
+      }
     }, [setInvalidFields, setModalState, closeModal]);
 
     const handleKanaBlur = useCallback((e) => {
       const { value } = e.target;
-      if (value && !nameHasSpace(value)) openNameSpaceModal('contractorNameKana');
+      if (value && !nameHasSpace(value) && !isCompanyName(value)) {
+          openNameSpaceModal('contractorNameKana');
+      }
     }, [setInvalidFields, setModalState, closeModal]);
+
+    const handleIdBlur = useCallback((e) => {
+        const { name, value } = e.target;
+        const fieldName = name === 'customerId' ? 'customerId' : 'recordId';
+
+        if (value && !/[A-Za-z]/.test(value)) {
+            // FIX: Added missing isErrorBanner and bannerMessage properties to match the modal state type, resolving a TypeScript error.
+            setModalState({
+                isOpen: true,
+                title: 'レコードIDを確認してください',
+                message: 'レコードIDに英字（A-Z）が含まれていません。続行しますか？',
+                confirmText: '続行',
+                cancelText: '修正する',
+                type: 'warning',
+                onConfirm: () => { // "続行" button
+                    setInvalidFields(prev => prev.filter(f => f !== fieldName));
+                    closeModal();
+                },
+                onCancel: () => { // "修正する" button
+                    setInvalidFields(prev => [...new Set([...prev, fieldName])]);
+                    closeModal();
+                },
+                isErrorBanner: false,
+                bannerMessage: '',
+            });
+        } else {
+             setInvalidFields(prev => prev.filter(f => f !== fieldName));
+        }
+    }, [setModalState, closeModal, setInvalidFields]);
 
 
     const handleCopy = useCallback(() => {
@@ -871,5 +946,6 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
         handleDateBlurWithValidation,
         handleNameBlur,
         handleKanaBlur,
+        handleIdBlur,
     };
 };

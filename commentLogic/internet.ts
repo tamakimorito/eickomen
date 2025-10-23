@@ -498,6 +498,42 @@ const generateGmoTokutokuComment = (formData: FormData): string => {
     return commentLines.join('\n');
 };
 
+const generateFletsHikariTossComment = (formData: FormData): string => {
+    const {
+        apName, greeting, customerId, fletsRegion, fletsPlan, fletsHasFixedPhone,
+        contractorName, contractorNameKana, contactPersonName, contactPerson, phone,
+        postConfirmationTime, internetRemarks
+    } = formData;
+
+    const tag = "250811";
+    const formattedPhone = formatPhoneNumberWithHyphens(phone);
+
+    const companyKeywords = ['株式会社', '有限会社', '合同会社', '会社'];
+    const contractorIsCompany = companyKeywords.some(kw => (contractorName || '').includes(kw) || (contractorNameKana || '').includes(kw));
+
+    const contactPersonValue = contractorIsCompany ? (contactPersonName || contactPerson || '') : '';
+
+    const commentLines = [
+        `AP名：${apName || ''}`,
+        `名乗り会社名：${greeting || ''}`,
+        `顧客ID：${customerId || ''}`,
+        `【フレッツ光トス】${fletsRegion || ''} ${tag}`,
+        `①プラン：${fletsPlan || ''}`,
+        `②固定電話：${fletsHasFixedPhone || ''}`,
+        `③会社名：${contractorName || ''}`,
+        `④会社名カナ：${contractorNameKana || ''}`,
+        `⑤担当名(フルネーム必須)：${contactPersonValue}`,
+        `⑥連絡先(なるべく携帯)：${formattedPhone || ''}`,
+        `⑦後確時間(平日10-19時)：${postConfirmationTime || ''}`,
+    ];
+    
+    if (internetRemarks) {
+        commentLines.push(`備考：${internetRemarks}`);
+    }
+
+    return commentLines.join('\n');
+};
+
 export const generateInternetCommentLogic = (formData: FormData): string => {
     const { product } = formData;
     switch (product) {
@@ -507,6 +543,8 @@ export const generateInternetCommentLogic = (formData: FormData): string => {
             return generateGmoTokutokuComment(formData);
         case 'AUひかり':
             return generateAuHikariComment(formData);
+        case 'フレッツ光トス':
+            return generateFletsHikariTossComment(formData);
         case 'SoftBank光1G':
         case 'SoftBank光10G':
         case 'SB Air':

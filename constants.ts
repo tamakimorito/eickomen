@@ -83,6 +83,11 @@ export const INITIAL_FORM_DATA: FormData = {
   auContactType: '',
   auPreCheckTime: '',
 
+  // --- Flets Toss Specific ---
+  fletsRegion: '',
+  fletsPlan: '',
+  fletsHasFixedPhone: '',
+
   // --- Electricity Specific ---
   elecProvider: '',
   elecRecordIdPrefix: 'それ以外',
@@ -150,6 +155,17 @@ export const PRODUCTS = [
     { value: 'GMOドコモ光', label: 'GMOドコモ光' },
     { value: 'GMOとくとく光', label: 'GMOとくとく光' },
     { value: 'AUひかり', label: 'AUひかり' },
+    { value: 'フレッツ光トス', label: 'フレッツ光トス' },
+];
+
+export const FLETS_REGIONS = [
+    {value:'東',label:'東'},
+    {value:'西',label:'西'}
+];
+
+export const FLETS_PLAN_OPTIONS = [
+    {value:'マンションタイプ',label:'マンションタイプ'},
+    {value:'ファミリータイプ',label:'ファミリータイプ'}
 ];
 
 export const HOUSING_TYPES_1G = [

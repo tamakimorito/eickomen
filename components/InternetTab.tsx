@@ -8,7 +8,8 @@ import {
     DISCOUNT_OPTIONS, DISCOUNT_OPTIONS_10G_NEW, ROUTER_OPTIONS,
     PAYMENT_METHOD_OPTIONS, CROSS_PATH_ROUTER_OPTIONS,
     HOUSING_TYPES_GMO, GMO_TOKUTOKU_PLANS, GMO_COMPENSATION_OPTIONS, GMO_ROUTER_OPTIONS, GMO_NO_PAIR_ROUTER_OPTIONS,
-    GMO_NO_PAIR_ID_OPTIONS, GMO_CALLBACK_TIME_SLOTS, AU_CONTACT_TYPE_OPTIONS, AU_PLAN_PROVIDER_OPTIONS
+    GMO_NO_PAIR_ID_OPTIONS, GMO_CALLBACK_TIME_SLOTS, AU_CONTACT_TYPE_OPTIONS, AU_PLAN_PROVIDER_OPTIONS,
+    FLETS_REGIONS, FLETS_PLAN_OPTIONS, YES_NO_OPTIONS
 } from '../constants.ts';
 import { AppContext } from '../context/AppContext.tsx';
 import { FormInput, FormSelect, FormRadioGroup, FormTextArea, FormDateInput, FormCheckbox } from './FormControls.tsx';
@@ -178,6 +179,14 @@ const DefaultInternetForm = () => {
     }, [isChintai, isChintaiFree, is10G, is1G, formData.housingType]);
 
     const discountOptions = is10G ? DISCOUNT_OPTIONS_10G_NEW : DISCOUNT_OPTIONS;
+
+    const handleCurrentAddressDetachedChange = (e) => {
+        const isChecked = e.target.checked;
+        const current = formData.currentAddress || '';
+        const base = current.replace(/戸建て$/, '').trim();
+        const next = isChecked ? `${base}戸建て`.trim() : base;
+        handleInputChange({ target: { name: 'currentAddress', value: next, type: 'text' } });
+    };
     
     return (
         <div className="space-y-6">
@@ -195,7 +204,7 @@ const DefaultInternetForm = () => {
                 <FormInput
                     label="顧客ID" name="customerId" value={formData.customerId} onChange={handleInputChange}
                     onBlur={handleIdBlur}
-                    isInvalid={invalidFields.includes('customerId')} 
+                    isInvalid={invalidFields.includes('customerId') || invalidFields.includes('recordId')} 
                     required={!formData.isSakaiRoute}
                     disabled={formData.isSakaiRoute}
                     placeholder={formData.isSakaiRoute ? 'サカイ販路選択時は入力不要' : ''}
@@ -267,11 +276,24 @@ const DefaultInternetForm = () => {
                             onBlur={(e) => handlePostalCodeBlur('currentPostalCode', e.target.value)}
                             isInvalid={invalidFields.includes('currentPostalCode')} required
                         />
-                        <FormInput
-                            label="現住所・物件名・部屋番号" name="currentAddress"
-                            value={formData.currentAddress}
-                            onChange={handleInputChange} className="md:col-span-2" isInvalid={invalidFields.includes('currentAddress')} required
-                        />
+                        <div className="md:col-span-2 flex items-end gap-2">
+                             <FormInput
+                                label="現住所・物件名・部屋番号" name="currentAddress"
+                                value={formData.currentAddress}
+                                onChange={handleInputChange} 
+                                className="flex-grow" 
+                                isInvalid={invalidFields.includes('currentAddress')} required
+                            />
+                            <FormCheckbox
+                                label="戸建て"
+                                name="isCurrentDetached"
+                                checked={(formData.currentAddress || '').endsWith('戸建て')}
+                                onChange={handleCurrentAddressDetachedChange}
+                                className="pb-2"
+                                description=""
+                                isInvalid={false}
+                            />
+                        </div>
                     </div>
                 )}
             </div>
@@ -426,6 +448,14 @@ const GmoDocomoForm = () => {
 const GmoTokutokuForm = () => {
     const { formData, handleInputChange, handleDateBlurWithValidation, invalidFields, handlePhoneBlur, handleNameBlur, handleKanaBlur } = useContext(AppContext);
     const isFamily = formData.gmoTokutokuPlan === 'ファミリー';
+
+    const handleCurrentAddressDetachedChange = (e) => {
+        const isChecked = e.target.checked;
+        const current = formData.currentAddress || '';
+        const base = current.replace(/戸建て$/, '').trim();
+        const next = isChecked ? `${base}戸建て`.trim() : base;
+        handleInputChange({ target: { name: 'currentAddress', value: next, type: 'text' } });
+    };
     
     return (
         <div className="space-y-6">
@@ -460,7 +490,24 @@ const GmoTokutokuForm = () => {
                 {formData.mailingOption === '現住所' && (
                     <div className="p-4 bg-blue-50/50 rounded-lg border border-blue-200 grid grid-cols-1 md:grid-cols-2 gap-4">
                         <FormInput label="現住所の郵便番号" name="currentPostalCode" value={formData.currentPostalCode} onChange={handleInputChange} isInvalid={invalidFields.includes('currentPostalCode')} required />
-                        <FormInput label="現住所・物件名・部屋番号" name="currentAddress" value={formData.currentAddress} onChange={handleInputChange} className="md:col-span-2" isInvalid={invalidFields.includes('currentAddress')} required />
+                         <div className="md:col-span-2 flex items-end gap-2">
+                             <FormInput
+                                label="現住所・物件名・部屋番号" name="currentAddress"
+                                value={formData.currentAddress}
+                                onChange={handleInputChange} 
+                                className="flex-grow" 
+                                isInvalid={invalidFields.includes('currentAddress')} required
+                            />
+                            <FormCheckbox
+                                label="戸建て"
+                                name="isCurrentDetached"
+                                checked={(formData.currentAddress || '').endsWith('戸建て')}
+                                onChange={handleCurrentAddressDetachedChange}
+                                className="pb-2"
+                                description=""
+                                isInvalid={false}
+                            />
+                        </div>
                     </div>
                 )}
             </div>
@@ -485,7 +532,7 @@ const GmoTokutokuForm = () => {
 };
 
 const AuHikariForm = () => {
-    const { formData, handleInputChange, handleDateBlurWithValidation, invalidFields, handlePhoneBlur, handleNameBlur, handlePostalCodeBlur, handleKanaBlur } = useContext(AppContext);
+    const { formData, handleInputChange, handleDateBlurWithValidation, invalidFields, handlePhoneBlur, handleNameBlur, handlePostalCodeBlur, handleKanaBlur, handleIdBlur } = useContext(AppContext);
 
     const handleAuDetachedChange = (e) => {
         const isChecked = e.target.checked;
@@ -500,6 +547,7 @@ const AuHikariForm = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormInput
                     label="レコードID" name="recordId" value={formData.recordId} onChange={handleInputChange}
+                    onBlur={handleIdBlur}
                     isInvalid={invalidFields.includes('recordId')} required
                 />
                 <FormInput
@@ -562,6 +610,43 @@ const AuHikariForm = () => {
     );
 };
 
+const FletsHikariTossForm = () => {
+    const { formData, handleInputChange, handleIdBlur, handlePhoneBlur, handleNameBlur, handleKanaBlur, invalidFields } = useContext(AppContext);
+
+    const companyKeywords = ['株式会社', '有限会社', '合同会社', '会社'];
+    const contractorIsCompany = companyKeywords.some(kw => (formData.contractorName || '').includes(kw) || (formData.contractorNameKana || '').includes(kw));
+
+    return (
+        <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormInput label="名乗り会社名" name="greeting" value={formData.greeting} onChange={handleInputChange} isInvalid={invalidFields.includes('greeting')} required />
+                <FormInput label="顧客ID" name="customerId" value={formData.customerId} onChange={handleInputChange} onBlur={handleIdBlur} isInvalid={invalidFields.includes('customerId') || invalidFields.includes('recordId')} required />
+            </div>
+            <div className="border-t-2 border-dashed border-blue-300 pt-6 space-y-4">
+                <h3 className="text-lg font-bold text-blue-700">プラン情報</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormSelect label="①エリア" name="fletsRegion" value={formData.fletsRegion} onChange={handleInputChange} options={FLETS_REGIONS} isInvalid={invalidFields.includes('fletsRegion')} required />
+                    <FormSelect label="①プラン" name="fletsPlan" value={formData.fletsPlan} onChange={handleInputChange} options={FLETS_PLAN_OPTIONS} isInvalid={invalidFields.includes('fletsPlan')} required />
+                    <FormRadioGroup label="②固定電話" name="fletsHasFixedPhone" value={formData.fletsHasFixedPhone} onChange={handleInputChange} options={YES_NO_OPTIONS} isInvalid={invalidFields.includes('fletsHasFixedPhone')} required className="md:col-span-2" />
+                </div>
+            </div>
+            <div className="border-t-2 border-dashed border-blue-300 pt-6 space-y-4">
+                <h3 className="text-lg font-bold text-blue-700">契約者情報</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormInput label="③会社名" name="contractorName" value={formData.contractorName} onChange={handleInputChange} onBlur={handleNameBlur} isInvalid={invalidFields.includes('contractorName')} required />
+                    <FormInput label="④会社名カナ" name="contractorNameKana" value={formData.contractorNameKana} onChange={handleInputChange} onBlur={handleKanaBlur} isInvalid={invalidFields.includes('contractorNameKana')} required />
+                    <FormInput label="⑤担当名(フルネーム必須)" name="contactPersonName" value={formData.contactPersonName} onChange={handleInputChange} onBlur={handleNameBlur} isInvalid={invalidFields.includes('contactPersonName')} required={contractorIsCompany} />
+                    <FormInput label="⑥連絡先(なるべく携帯)" name="phone" value={formData.phone} onChange={handleInputChange} onBlur={handlePhoneBlur} isInvalid={invalidFields.includes('phone')} required />
+                    <FormInput label="⑦後確時間(平日10-19時)" name="postConfirmationTime" value={formData.postConfirmationTime} onChange={handleInputChange} isInvalid={invalidFields.includes('postConfirmationTime')} required className="md:col-span-2" placeholder="順次 または YYYY/MM/DD HH:mm" />
+                </div>
+            </div>
+            <div className="border-t-2 border-dashed border-blue-300 pt-6 space-y-4">
+                <FormTextArea label="備考" name="internetRemarks" value={formData.internetRemarks} onChange={handleInputChange} rows={3} isInvalid={invalidFields.includes('internetRemarks')} />
+            </div>
+        </div>
+    );
+};
+
 
 const InternetTab = () => {
     const { formData, handleInputChange, invalidFields } = useContext(AppContext);
@@ -574,6 +659,8 @@ const InternetTab = () => {
                 return <GmoTokutokuForm />;
             case 'AUひかり':
                 return <AuHikariForm />;
+            case 'フレッツ光トス':
+                return <FletsHikariTossForm />;
             default:
                 return <DefaultInternetForm />;
         }

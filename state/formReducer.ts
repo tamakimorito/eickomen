@@ -39,10 +39,14 @@ const computeServiceFee = (product: string, housingType: string): string => {
     case 'SB Air':
       return '3カ月1485円、2年4950円、3年以降5368円';
     case '賃貸ねっと':
-    case '賃貸ねっと【無料施策】':
       if (housingType === 'マンション' || housingType === 'マンション10G') return '3960';
       if (housingType === 'ファミリー') return '5060';
       if (housingType === '10G') return '6160';
+      return '';
+    case '賃貸ねっと【無料施策】':
+      if (housingType === 'マンション') return '3960';
+      if (housingType === 'ファミリー') return '5060';
+      if (housingType === '10G' || housingType === 'マンション10G') return '6160';
       return '';
     default:
       return '';
