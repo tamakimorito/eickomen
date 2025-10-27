@@ -54,7 +54,7 @@ export const generateGasCommentLogic = (formData: FormData): string => {
         recordId, primaryProductStatus, greeting, apName, contractorName, contractorNameKana, gender, dob, phone,
         postalCode, address, buildingInfo, gasOpeningDate, paymentMethod, gasRemarks, attachedOption,
         elecConfirmationTime, email, gasArea, gasWitness, gasPreContact, gasOpeningTimeSlot, postConfirmationTime, currentAddress, mailingOption, currentPostalCode,
-        gasIsCorporate, mailingBuildingInfo
+        gasIsCorporate, mailingBuildingInfo, isSakaiRoute
     } = { ...formData, dob: formatDate(formData.dob), gasOpeningDate: formatDate(formData.gasOpeningDate) };
 
     let comment = '該当するテンプレートがありません。';
@@ -99,7 +99,8 @@ export const generateGasCommentLogic = (formData: FormData): string => {
                     comment = `【ストエネ】${code} ${tag}\n契確時間：${elecConfirmationTime || ''}\nレコードID：${recordId || ''}\n主商材受注状況：${primaryProductStatus || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：すまいのガスのみ\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${formattedPhone || ''}\n郵便番号：${formattedPostalCode || ''}\n引越し先住所：${address || ''}\n物件名：${buildingInfo || ''}\n利用開始日：${gasOpeningDate || ''} ${gasOpeningTimeSlot || ''}\n支払い方法：${paymentMethod || ''}\n備考：${gasRemarks || ''}\n性別：${gender || ''}`;
                     break;
                 case 'サカイ':
-                    comment = `【ストエネ】HAHZZT259 ${tag}\nFM取込社名：サカイ販路\n後確希望日/時間：${postConfirmationTime || ''}\n名乗り：ライフイン24\n担当者：${apName || ''}\nプラン：すまいのガスのみ\nガス：なし\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${formattedPhone || ''}\n郵便番号：${formattedPostalCode || ''}\n住所：${address || ''}\n物件名：${buildingInfo || ''}\n利用開始日：${gasOpeningDate || ''} ${gasOpeningTimeSlot || ''}\n支払い方法：${paymentMethod || ''}\n備考：${gasRemarks || ''}`;
+                    const sakaiCodeGas = (isSakaiRoute && buildingInfo === '戸建て') ? 'HAHZZT305' : 'HAHZZT259';
+                    comment = `【ストエネ】${sakaiCodeGas} ${tag}\nFM取込社名：サカイ販路\n後確希望日/時間：${postConfirmationTime || ''}\n名乗り：ライフイン24\n担当者：${apName || ''}\nプラン：すまいのガスのみ\nガス：なし\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${formattedPhone || ''}\n郵便番号：${formattedPostalCode || ''}\n住所：${address || ''}\n物件名：${buildingInfo || ''}\n利用開始日：${gasOpeningDate || ''} ${gasOpeningTimeSlot || ''}\n支払い方法：${paymentMethod || ''}\n備考：${gasRemarks || ''}`;
                     break;
                 case 'それ以外':
                     if (gasIsVacancy === 'あり') {

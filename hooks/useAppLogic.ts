@@ -466,23 +466,45 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
        if (!isNaN(dateToCheck.getTime()) && /^\d{4}\/\d{2}\/\d{2}$/.test(normalized)) {
           const today = new Date();
           today.setHours(0, 0, 0, 0);
-          if (dateToCheck < today) {
-               // FIX: Added missing isErrorBanner and bannerMessage properties to match the modal state type, resolving a TypeScript error.
-               setModalState({
-                  isOpen: true,
-                  title: '日付を確認してください',
-                  message: '入力された日付が過去日です。続行しますか？',
-                  confirmText: '続行',
-                  cancelText: '修正する',
-                  type: 'warning',
-                  onConfirm: closeModal,
-                  onCancel: () => {
-                      dispatch({ type: 'UPDATE_FIELD', payload: { name, value: '', type: 'text' }});
-                      closeModal();
-                  },
-                  isErrorBanner: false,
-                  bannerMessage: '',
-              });
+
+          if (name === 'moveInDate' || name === 'gasOpeningDate') {
+            if (dateToCheck < today) {
+                setModalState({
+                    isOpen: true,
+                    title: '日付を確認してください',
+                    message: '入力された日付が過去日です。続行しますか？',
+                    confirmText: '続行',
+                    cancelText: '修正する',
+                    type: 'warning',
+                    onConfirm: closeModal,
+                    onCancel: () => {
+                        dispatch({ type: 'UPDATE_FIELD', payload: { name, value: '', type: 'text' }});
+                        closeModal();
+                    },
+                    isErrorBanner: false,
+                    bannerMessage: '',
+                });
+            }
+          }
+          
+          if (name === 'dob') {
+            if (dateToCheck > today) {
+                setModalState({
+                    isOpen: true,
+                    title: '日付を確認してください',
+                    message: '入力された日付が未来日です。続行しますか？',
+                    confirmText: '続行',
+                    cancelText: '修正する',
+                    type: 'warning',
+                    onConfirm: closeModal,
+                    onCancel: () => {
+                        dispatch({ type: 'UPDATE_FIELD', payload: { name, value: '', type: 'text' }});
+                        closeModal();
+                    },
+                    isErrorBanner: false,
+                    bannerMessage: '',
+                });
+            }
           }
       }
 
@@ -575,11 +597,36 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
         setModalState(prev => ({...prev, isErrorBanner: false}));
 
         const performCopy = () => {
-            if (!generatedComment) {
+            const toHalfWidth = (str: string | null | undefined): string => {
+                if (!str) return str || '';
+                return str.replace(/[０-９]/g, (s) => String.fromCharCode(s.charCodeAt(0) - 0xFEE0));
+            };
+        
+            const formDataForCopy = JSON.parse(JSON.stringify(formData));
+            formDataForCopy.address = toHalfWidth(formDataForCopy.address);
+            formDataForCopy.currentAddress = toHalfWidth(formDataForCopy.currentAddress);
+            formDataForCopy.buildingInfo = toHalfWidth(formDataForCopy.buildingInfo);
+            formDataForCopy.mailingBuildingInfo = toHalfWidth(formDataForCopy.mailingBuildingInfo);
+            formDataForCopy.wtsShippingAddress = toHalfWidth(formDataForCopy.wtsShippingAddress);
+        
+            let commentToCopy = '';
+            try {
+                switch (activeTab) {
+                    case 'electricity': commentToCopy = generateElectricityCommentLogic(formDataForCopy); break;
+                    case 'gas': commentToCopy = generateGasCommentLogic(formDataForCopy); break;
+                    case 'internet': commentToCopy = generateInternetCommentLogic(formDataForCopy); break;
+                    case 'wts': commentToCopy = generateWtsCommentLogic(formDataForCopy); break;
+                }
+            } catch (error) {
+                console.error("Error generating comment for copy:", error);
+                commentToCopy = "コメントの生成中にエラーが発生しました。";
+            }
+
+            if (!commentToCopy) {
                 setToast({ message: 'コメントが空です', type: 'error' });
                 return;
             }
-            navigator.clipboard.writeText(generatedComment).then(() => {
+            navigator.clipboard.writeText(commentToCopy).then(() => {
                 setToast({ message: 'コメントをコピーしました！', type: 'success' });
 
                 // After copy, show reset confirmation modal
@@ -660,7 +707,7 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
         }
 
         // --- Address Number Check for AU Hikari ---
-        if (activeTab === 'internet' && formData.product === 'AUひかり' && formData.address && !/\d/.test(formData.address)) {
+        if (activeTab === 'internet' && formData.product === 'AUひかり' && formData.address && !/[0-9０-９]/.test(formData.address)) {
             setInvalidFields(['address']);
             setModalState({
                 isOpen: true,
@@ -678,7 +725,7 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
         }
         
         // --- Address Number Check ---
-        if (formData.address && !/\d/.test(formData.address)) {
+        if (formData.address && !/[0-9０-９]/.test(formData.address)) {
             setInvalidFields(prev => [...new Set([...prev, 'address'])]);
             setModalState({
                 isOpen: true,
@@ -700,7 +747,7 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
         }
 
         // --- Current Address Number Check ---
-        if (formData.mailingOption === '現住所' && formData.currentAddress && !/\d/.test(formData.currentAddress)) {
+        if (formData.mailingOption === '現住所' && formData.currentAddress && !/[0-9０-９]/.test(formData.currentAddress)) {
             setInvalidFields(prev => [...new Set([...prev, 'currentAddress'])]);
             setModalState({
                 isOpen: true,
@@ -761,7 +808,7 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
         }
         // --- End of Swap Check ---
 
-        const { moveInDate, dob } = formData;
+        const { moveInDate, dob, gasOpeningDate } = formData;
         const dateErrors = [];
         if (moveInDate) {
             const moveIn = new Date(moveInDate);
@@ -777,6 +824,15 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
             const today = new Date();
             if (!isNaN(birthDate.getTime()) && birthDate > today) {
                 dateErrors.push('・生年月日が未来の日付になっています。');
+            }
+        }
+        if (gasOpeningDate) {
+            const gasOpen = new Date(gasOpeningDate);
+            const today = new Date();
+            gasOpen.setHours(0, 0, 0, 0);
+            today.setHours(0, 0, 0, 0);
+            if (!isNaN(gasOpen.getTime()) && gasOpen < today) {
+                dateErrors.push('・ガス開栓日が過去の日付になっています。');
             }
         }
     
