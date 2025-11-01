@@ -44,9 +44,9 @@ const computeServiceFee = (product: string, housingType: string): string => {
       if (housingType === '10G') return '6160';
       return '';
     case '賃貸ねっと【無料施策】':
-      if (housingType === 'マンション') return '3960';
+      if (housingType === 'マンション') return '0→3960';
       if (housingType === 'ファミリー') return '5060';
-      if (housingType === '10G' || housingType === 'マンション10G') return '6160';
+      if (housingType === '10G' || housingType === 'マンション10G') return '0→6160';
       return '';
     default:
       return '';

@@ -3,7 +3,7 @@ import {
     GAS_PROVIDERS, YES_NO_OPTIONS,
     PRIMARY_PRODUCT_STATUS_OPTIONS, ATTACHED_OPTION_OPTIONS, GENDERS, 
     PAYMENT_METHOD_OPTIONS_EXTENDED, MAILING_OPTIONS, GAS_OPENING_TIME_SLOTS, 
-    TIME_SLOTS_NICHI, TIME_SLOTS_SUTENE_SR, TIME_SLOTS_TOKYO_GAS
+    TIME_SLOTS_NICHI, TIME_SLOTS_SUTENE_SR, TIME_SLOTS_TOKYO_GAS, NICHIGAS_GAS_AREAS
 } from '../constants.ts';
 import { AppContext } from '../context/AppContext.tsx';
 import { FormInput, FormSelect, FormRadioGroup, FormTextArea, FormDateInput, FormCheckbox } from './FormControls.tsx';
@@ -242,7 +242,15 @@ const GasTab = () => {
                                     <>
                                         <FormInput label="立会者" name="gasWitness" value={formData.gasWitness} onChange={handleInputChange} isInvalid={invalidFields.includes('gasWitness')} required />
                                         <FormInput label="ガス事前連絡先" name="gasPreContact" value={formData.gasPreContact} onChange={handleInputChange} onBlur={handlePhoneBlur} isInvalid={invalidFields.includes('gasPreContact')} required />
-                                        <FormInput label="ガスエリア" name="gasArea" value={formData.gasArea} onChange={handleInputChange} placeholder="例: 東京ガス" isInvalid={invalidFields.includes('gasArea')} required />
+                                        <FormSelect
+                                            label="ガスエリア"
+                                            name="gasArea"
+                                            value={formData.gasArea}
+                                            onChange={handleInputChange}
+                                            options={NICHIGAS_GAS_AREAS}
+                                            isInvalid={invalidFields.includes('gasArea')}
+                                            required
+                                        />
                                     </>
                                 )}
                                 {(isTokyo || isToho) && (

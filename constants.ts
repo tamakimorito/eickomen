@@ -481,6 +481,31 @@ export const TIME_SLOTS_TOHO_GAS_SETUP = [
     { value: '15-17', label: '15-17時' },
 ];
 
+export const NICHIGAS_GAS_AREAS = [
+  { value: '東京ガス', label: '東京ガス' },
+  { value: '京葉ガス', label: '京葉ガス' },
+  { value: '京和ガス', label: '京和ガス' },
+  { value: '東部ガス（水戸・土浦・守谷地区）', label: '東部ガス（水戸・土浦・守谷地区）' },
+  { value: '東京ガス山梨', label: '東京ガス山梨' },
+  { value: '角栄ガス（佐倉地区）', label: '角栄ガス（佐倉地区）' },
+  { value: '大東ガス（入間・川口・日野・座間を除く地区）', label: '大東ガス（入間・川口・日野・座間を除く地区）' },
+  { value: '西武ガス（本社地区）', label: '西武ガス（本社地区）' },
+  { value: '栃木ガス', label: '栃木ガス' },
+  { value: '館林ガス', label: '館林ガス' },
+  { value: '厚木ガス', label: '厚木ガス' },
+  { value: '武州ガス', label: '武州ガス' },
+  { value: '鷲宮ガス', label: '鷲宮ガス' },
+  { value: '武陽ガス', label: '武陽ガス' },
+  { value: '野田ガス', label: '野田ガス' },
+  { value: '昭島ガス', label: '昭島ガス' },
+  { value: '秦野ガス', label: '秦野ガス' },
+  { value: '伊奈都市ガス', label: '伊奈都市ガス' },
+  { value: '入間ガス', label: '入間ガス' },
+  { value: '伊勢崎ガス', label: '伊勢崎ガス' },
+  { value: '桐生ガス', label: '桐生ガス' },
+  { value: '静岡ガス', label: '静岡ガス' },
+];
+
 
 // --- WTS Constants ---
 export const WTS_CUSTOMER_TYPES = [

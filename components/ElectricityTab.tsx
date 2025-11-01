@@ -3,7 +3,8 @@ import {
     ELEC_PROVIDERS, YES_NO_OPTIONS, ATTACHED_OPTION_OPTIONS,
     SET_NONE_OPTIONS, PRIMARY_PRODUCT_STATUS_OPTIONS, 
     PAYMENT_METHOD_OPTIONS_EXTENDED, GENDERS, NEW_CONSTRUCTION_OPTIONS, TIME_SLOTS_TOHO, MAILING_OPTIONS,
-    TIME_SLOTS_NICHI, TIME_SLOTS_SUTENE_SR, GAS_OPENING_TIME_SLOTS, TIME_SLOTS_TOKYO_GAS, TIME_SLOTS_TOHO_GAS_SETUP
+    TIME_SLOTS_NICHI, TIME_SLOTS_SUTENE_SR, GAS_OPENING_TIME_SLOTS, TIME_SLOTS_TOKYO_GAS, TIME_SLOTS_TOHO_GAS_SETUP,
+    NICHIGAS_GAS_AREAS
 } from '../constants.ts';
 import { AppContext } from '../context/AppContext.tsx';
 import { FormInput, FormSelect, FormRadioGroup, FormTextArea, FormDateInput, FormCheckbox } from './FormControls.tsx';
@@ -358,7 +359,15 @@ const ElectricityTab = () => {
                             <FormSelect label="ガス立会時間枠" name="gasOpeningTimeSlot" value={formData.gasOpeningTimeSlot} onChange={handleInputChange} options={gasTimeSlotOptions} isInvalid={invalidFields.includes('gasOpeningTimeSlot')} required className="md:col-span-2" />
                             {isNichigasSet && (
                                 <>
-                                    <FormInput label="ガスエリア" name="gasArea" value={formData.gasArea} onChange={handleInputChange} placeholder="例: 東京ガス" isInvalid={invalidFields.includes('gasArea')} required />
+                                    <FormSelect
+                                        label="ガスエリア"
+                                        name="gasArea"
+                                        value={formData.gasArea}
+                                        onChange={handleInputChange}
+                                        options={NICHIGAS_GAS_AREAS}
+                                        isInvalid={invalidFields.includes('gasArea')}
+                                        required
+                                    />
                                     <FormInput label="立会者" name="gasWitness" value={formData.gasWitness} onChange={handleInputChange} isInvalid={invalidFields.includes('gasWitness')} required />
                                     <FormInput label="ガス事前連絡先" name="gasPreContact" value={formData.gasPreContact} onChange={handleInputChange} onBlur={handlePhoneBlur} isInvalid={invalidFields.includes('gasPreContact')} required />
                                 </>
