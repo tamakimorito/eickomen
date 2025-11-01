@@ -144,10 +144,10 @@ const getRequiredFields = (formData, activeTab) => {
              if (elecProvider === 'すまいのでんき（ストエネ）' && formData.isGasSet === 'セット' || ['ニチガス電気セット', '東邦ガスセット', '東京ガス電気セット', '大阪ガス電気セット'].includes(elecProvider)) {
                 required.push('gasOpeningDate', 'gasOpeningTimeSlot');
             }
-             if (mailingOption === '現住所' && ['リミックスでんき', 'ニチガス電気セット', '東京ガス電気セット', '東邦ガスセット'].includes(elecProvider)) {
+             if (mailingOption === '現住所' && ['リミックスでんき', '東京ガス電気セット', '東邦ガスセット'].includes(elecProvider)) {
                 required.push('currentPostalCode', 'currentAddress');
             }
-            if (elecProvider === 'リミックスでんき' || elecProvider === 'ニチガス電気セット') {
+            if (elecProvider === 'リミックスでんき') {
                 required.push('mailingOption');
             }
             if (['ニチガス電気セット'].includes(elecProvider)) {
@@ -686,9 +686,10 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
 
         const isInternetAU = activeTab === 'internet' && formData.product === 'AUひかり';
         const isInternetGmoDocomo = activeTab === 'internet' && formData.product === 'GMOドコモ光';
+        const isInternetFletsToss = activeTab === 'internet' && formData.product === 'フレッツ光トス';
         const needsBuildingInfo =
           (activeTab === 'electricity' || activeTab === 'gas') ||
-          (activeTab === 'internet' && !isInternetAU && !isInternetGmoDocomo);
+          (activeTab === 'internet' && !isInternetAU && !isInternetGmoDocomo && !isInternetFletsToss);
 
         if (needsBuildingInfo && !formData.buildingInfo.trim()) {
             setModalState({
