@@ -37,6 +37,59 @@ const formatPostalCode = (postalCodeStr: string): string => {
   return postalCodeStr.replace(/\D/g, '');
 };
 
+// GMOドコモ光専用：年未入力 (MM/DD, M月D日, 全角混在) の場合に
+// 今日(Asia/Tokyo)から見て「最も近い未来年」で YYYY/MM/DD を返す。
+// 年が含まれる場合は既存 formatDate(dateStr) に委ねる（＝従来どおり）。
+const formatDateNearestFutureYYYYMMDD = (dateStr) => {
+  if (!dateStr) return '';
+
+  const toHalf = (s) =>
+    String(s)
+      .trim()
+      .replace(/[０-９]/g, (d) => String.fromCharCode(d.charCodeAt(0) - 0xFEE0))
+      .replace(/／/g, '/')
+      .replace(/\s+/g, '');
+
+  const s = toHalf(dateStr);
+
+  // 年が明示されている場合は従来関数で整形（副作用回避）
+  if (/\d{4}/.test(s)) {
+    return formatDate(s);
+  }
+
+  // 「M月D日」→「M/D」に正規化
+  const mdFromKanji = s.match(/^(\d{1,2})\s*月\s*(\d{1,2})\s*日$/);
+  const mds = mdFromKanji ? `${mdFromKanji[1]}/${mdFromKanji[2]}` : s;
+
+  // 「M/D」だけが入っている前提で解釈
+  const md = mds.match(/^(\d{1,2})\s*\/\s*(\d{1,2})$/);
+  if (!md) {
+    // 解釈不能は現行踏襲：原文返し
+    return dateStr;
+  }
+  const m = parseInt(md[1], 10);
+  const d = parseInt(md[2], 10);
+  if (!(m >= 1 && m <= 12)) return dateStr;
+
+  // Tokyo ローカル日付の「今日」
+  const now = new Date(); // 実行環境は日本運用前提
+  const y = now.getFullYear();
+  const today = new Date(y, now.getMonth(), now.getDate());
+
+  const candThis = new Date(y, m - 1, d);
+  const chosenY = (candThis >= today) ? y : (y + 1);
+
+  // 妥当日チェック（例：2/30 はNG）
+  const cand = new Date(chosenY, m - 1, d);
+  if (cand.getMonth() + 1 !== m || cand.getDate() !== d) {
+    return dateStr; // 不正日は原文返し
+  }
+
+  const MM = String(m).padStart(2, '0');
+  const DD = String(d).padStart(2, '0');
+  return `${chosenY}/${MM}/${DD}`;
+};
+
 
 const generateDefaultInternetComment = (formData: FormData): string => {
     const {
@@ -354,9 +407,9 @@ const generateGmoDocomoComment = (formData: FormData): string => {
     }
 
     commentLines.push('後確希望時間枠');
-    commentLines.push(`第一希望：${formatDate(gmoCallbackDate1) || ''} ${gmoCallback1 || ''}`.trim());
-    commentLines.push(`第二希望：${formatDate(gmoCallbackDate2) || ''} ${gmoCallback2 || ''}`.trim());
-    commentLines.push(`第三希望：${formatDate(gmoCallbackDate3) || ''} ${gmoCallback3 || ''}`.trim());
+    commentLines.push(`第一希望：${formatDateNearestFutureYYYYMMDD(gmoCallbackDate1) || ''} ${gmoCallback1 || ''}`.trim());
+    commentLines.push(`第二希望：${formatDateNearestFutureYYYYMMDD(gmoCallbackDate2) || ''} ${gmoCallback2 || ''}`.trim());
+    commentLines.push(`第三希望：${formatDateNearestFutureYYYYMMDD(gmoCallbackDate3) || ''} ${gmoCallback3 || ''}`.trim());
 
     if (isFamily) {
         commentLines.push(
