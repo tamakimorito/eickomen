@@ -1,4 +1,4 @@
-import React, { useMemo, useContext } from 'react';
+import React, { useMemo, useContext, useEffect } from 'react';
 import { 
     GAS_PROVIDERS, YES_NO_OPTIONS,
     PRIMARY_PRODUCT_STATUS_OPTIONS, ATTACHED_OPTION_OPTIONS, GENDERS, 
@@ -117,6 +117,12 @@ const MailingAddressSection = () => {
 const GasTab = () => {
     const { formData, handleInputChange, handleDateBlurWithValidation, handleNameBlur, handleIdBlur, invalidFields, handlePhoneBlur, handleKanaBlur, handlePostalCodeBlur } = useContext(AppContext);
     const { gasProvider, gasRecordIdPrefix, isSakaiRoute } = formData;
+
+    useEffect(() => {
+        if (formData.gasProvider === '東急ガス' && formData.gasHasContractConfirmation !== 'あり') {
+            handleInputChange({ target: { name: 'gasHasContractConfirmation', value: 'あり', type: 'text' } } as any);
+        }
+    }, [formData.gasProvider, formData.gasHasContractConfirmation, handleInputChange]);
     
     const isSumainoGas = gasProvider === 'すまいのでんき（ストエネ）';
     const isTokyu = gasProvider === '東急ガス';
@@ -201,9 +207,6 @@ const GasTab = () => {
                             <FormRadioGroup label="契約確認は必要ですか？" name="gasHasContractConfirmation" value={formData.gasHasContractConfirmation} onChange={handleInputChange} options={YES_NO_OPTIONS} isInvalid={invalidFields.includes('gasHasContractConfirmation')} />
                             {showAttachedOption && <FormRadioGroup label="付帯OP" name="attachedOption" value={formData.attachedOption} onChange={handleInputChange} options={ATTACHED_OPTION_OPTIONS} isInvalid={invalidFields.includes('attachedOption')} />}
                         </>
-                    )}
-                    {isTokyu && (
-                        <FormRadioGroup label="契確は必要ですか？" name="gasHasContractConfirmation" value={formData.gasHasContractConfirmation} onChange={handleInputChange} options={[{value: 'あり', label: 'あり'}]} disabled isInvalid={invalidFields.includes('gasHasContractConfirmation')} />
                     )}
                     {(isSumainoGas || isTokyu) && formData.gasHasContractConfirmation !== 'なし' && (
                          <FormRadioGroup label="主商材受注状況" name="primaryProductStatus" value={formData.primaryProductStatus} onChange={handleInputChange} options={PRIMARY_PRODUCT_STATUS_OPTIONS} isInvalid={invalidFields.includes('primaryProductStatus')} />

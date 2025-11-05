@@ -44,7 +44,7 @@ export const generateWtsCommentLogic = (formData: FormData): string => {
         wtsServerColor, wtsFiveYearPlan, wtsFreeWater, wtsCreditCard, wtsCarrier, wtsCarrierOther,
         moveInDate, wtsWaterPurifier, wtsMultipleUnits, wtsCustomerType,
         wtsU20HighSchool, wtsU20ParentalConsent, wtsCorporateInvoice, wtsRemarks, wtsMailingAddress,
-        recordId, isSakaiRoute, wtsServerType, wtsEmail, currentAddress, currentPostalCode
+        recordId, isSakaiRoute, wtsServerType, wtsEmail, currentAddress, currentPostalCode, email
     } = { ...formData, dob: formatDate(formData.dob), moveInDate: formatDate(formData.moveInDate) };
     
     const tag = "250811";
@@ -83,9 +83,6 @@ export const generateWtsCommentLogic = (formData: FormData): string => {
     
     commentLines.push(`${currentIndex++}）生年月日：${dob || ''}`);
     commentLines.push(`${currentIndex++}）電話番号：${formattedPhone || ''}`);
-    if (wtsCustomerType === '法人') {
-        commentLines.push(`${currentIndex++}）メアド：${wtsEmail || ''}`);
-    }
 
     let shippingDestinationText = wtsShippingDestination || '';
     if (wtsShippingDestination === 'その他') {
@@ -119,6 +116,8 @@ export const generateWtsCommentLogic = (formData: FormData): string => {
         commentLines.push(`${currentIndex++}）浄水器確認：${wtsWaterPurifier || ''}`);
         commentLines.push(`${currentIndex++}）複数台提案：${wtsMultipleUnits || ''}`);
     }
+    
+    commentLines.push(`${currentIndex++}）メアド：${email || wtsEmail || ''}`);
 
     let comment = commentLines.join('\n');
     

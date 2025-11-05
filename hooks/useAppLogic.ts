@@ -180,7 +180,7 @@ const getRequiredFields = (formData, activeTab) => {
                 required.push('paymentMethod');
             }
             if (gasProvider === '東急ガス') {
-                required.push('email');
+                required.push('email', 'elecConfirmationTime', 'primaryProductStatus');
             }
             
              if(['すまいのでんき（ストエネ）', '東京ガス単品', '東邦ガス単品', '東急ガス', 'ニチガス単品', '大阪ガス単品'].includes(gasProvider)) {
@@ -208,7 +208,7 @@ const getRequiredFields = (formData, activeTab) => {
             required.push('wtsCustomerType', 'contractorName', 'dob', 'phone', 'wtsShippingDestination', 'wtsServerType', 'wtsServerColor', 'wtsFiveYearPlan', 'wtsFreeWater', 'wtsCreditCard', 'wtsCarrier', 'moveInDate', 'wtsMailingAddress', 'wtsWaterPurifier', 'wtsMultipleUnits');
             if (!isSakaiRoute) required.push('customerId');
             if (formData.wtsCustomerType === 'U-20') required.push('wtsU20HighSchool', 'wtsU20ParentalConsent');
-            if (formData.wtsCustomerType === '法人') required.push('wtsEmail', 'wtsCorporateInvoice');
+            if (formData.wtsCustomerType === '法人') required.push('wtsCorporateInvoice');
             if (formData.wtsShippingDestination === 'その他') required.push('wtsShippingPostalCode', 'wtsShippingAddress');
             break;
     }

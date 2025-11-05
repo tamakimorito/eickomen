@@ -134,20 +134,17 @@ const WtsTab = () => {
                         isInvalid={invalidFields.includes('phone')}
                         required
                     />
-                    {isCorporate && (
-                         <FormInput
-                            label="⑤メアド"
-                            name="wtsEmail"
-                            type="email"
-                            value={formData.wtsEmail}
-                            onChange={handleInputChange}
-                            isInvalid={invalidFields.includes('wtsEmail')}
-                            required
-                        />
-                    )}
+                    <FormInput
+                        label="メアド"
+                        name="email"
+                        type="email"
+                        value={formData.email}
+                        onChange={handleInputChange}
+                        isInvalid={invalidFields.includes('email')}
+                    />
                     <div className="md:col-span-2">
                         <FormRadioGroup
-                            label={isCorporate ? "⑥発送先" : "⑤発送先"}
+                            label="⑤発送先"
                             name="wtsShippingDestination"
                             value={formData.wtsShippingDestination}
                             onChange={handleInputChange}
@@ -178,7 +175,7 @@ const WtsTab = () => {
                         )}
                     </div>
                     <FormSelect
-                        label={isCorporate ? "⑦サーバー" : "⑥サーバー"}
+                        label="⑥サーバー"
                         name="wtsServerType"
                         value={formData.wtsServerType}
                         onChange={handleInputChange}
@@ -187,7 +184,7 @@ const WtsTab = () => {
                         required
                     />
                     <FormSelect
-                        label={isCorporate ? "⑧色" : "⑦色"}
+                        label="⑦色"
                         name="wtsServerColor"
                         value={formData.wtsServerColor}
                         onChange={handleInputChange}
@@ -197,7 +194,7 @@ const WtsTab = () => {
                         disabled={!formData.wtsServerType}
                     />
                      <FormSelect
-                        label={isCorporate ? "⑨契約年数" : "⑧契約年数"}
+                        label="⑧契約年数"
                         name="wtsFiveYearPlan"
                         value={formData.wtsFiveYearPlan}
                         onChange={handleInputChange}
@@ -206,7 +203,7 @@ const WtsTab = () => {
                         required
                     />
                      <FormRadioGroup
-                        label={isCorporate ? "⑩無料水" : "⑨無料水"}
+                        label="⑨無料水"
                         name="wtsFreeWater"
                         value={formData.wtsFreeWater}
                         onChange={handleInputChange}
@@ -215,7 +212,7 @@ const WtsTab = () => {
                         required
                     />
                      <FormInput
-                        label={isCorporate ? "⑪クレカ" : "⑩クレカ"}
+                        label="⑩クレカ"
                         name="wtsCreditCard"
                         value={formData.wtsCreditCard}
                         onChange={handleInputChange}
@@ -225,7 +222,7 @@ const WtsTab = () => {
                     />
                     <div className="md:col-span-1">
                         <FormSelect
-                            label={isCorporate ? "⑫キャリア" : "⑪キャリア"}
+                            label="⑪キャリア"
                             name="wtsCarrier"
                             value={formData.wtsCarrier}
                             onChange={handleInputChange}
@@ -246,7 +243,7 @@ const WtsTab = () => {
                         )}
                     </div>
                     <FormDateInput
-                        label={isCorporate ? "⑬入居予定日" : "⑫入居予定日"}
+                        label="⑫入居予定日"
                         name="moveInDate"
                         value={formData.moveInDate}
                         onChange={handleInputChange}
@@ -257,7 +254,7 @@ const WtsTab = () => {
                     />
                      <div className="md:col-span-2">
                         <FormRadioGroup
-                            label={isCorporate ? "⑭書面送付先" : "⑬書面送付先"}
+                            label="⑬書面送付先"
                             name="wtsMailingAddress"
                             value={formData.wtsMailingAddress}
                             onChange={handleInputChange}
@@ -282,7 +279,7 @@ const WtsTab = () => {
                     </div>
                      {isCorporate ? (
                         <FormInput
-                            label="⑮請求書先"
+                            label="⑭請求書先"
                             name="wtsCorporateInvoice"
                             value={formData.wtsCorporateInvoice}
                             onChange={handleInputChange}
@@ -303,7 +300,7 @@ const WtsTab = () => {
 
                     {isCorporate ? (
                          <FormSelect
-                            label="⑯浄水器確認"
+                            label="⑮浄水器確認"
                             name="wtsWaterPurifier"
                             value={formData.wtsWaterPurifier}
                             onChange={handleInputChange}
@@ -325,7 +322,7 @@ const WtsTab = () => {
 
                     {isCorporate && (
                           <FormSelect
-                            label="⑰複数台提案"
+                            label="⑯複数台提案"
                             name="wtsMultipleUnits"
                             value={formData.wtsMultipleUnits}
                             onChange={handleInputChange}

@@ -308,8 +308,10 @@ const DefaultInternetForm = () => {
                          <FormSelect label="開通前レンタル" name="preActivationRental" value={formData.preActivationRental} onChange={handleInputChange} options={RENTAL_OPTIONS} isInvalid={invalidFields.includes('preActivationRental')} required />
                     )}
                     
-                    <FormSelect label="既存回線" name="existingLineStatus" value={formData.existingLineStatus} onChange={handleInputChange} onBlur={handleAnshinNorikaeBlur} options={EXISTING_LINE_STATUS_OPTIONS} isInvalid={invalidFields.includes('existingLineStatus')} required />
-                    {formData.existingLineStatus === 'あり' && (
+                    {!isChintaiFree && (
+                        <FormSelect label="既存回線" name="existingLineStatus" value={formData.existingLineStatus} onChange={handleInputChange} onBlur={handleAnshinNorikaeBlur} options={EXISTING_LINE_STATUS_OPTIONS} isInvalid={invalidFields.includes('existingLineStatus')} required />
+                    )}
+                    {!isChintaiFree && formData.existingLineStatus === 'あり' && (
                         <FormInput label="回線会社" name="existingLineCompany" value={formData.existingLineCompany} onChange={handleInputChange} isInvalid={invalidFields.includes('existingLineCompany')} required />
                     )}
                     
