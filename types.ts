@@ -140,6 +140,7 @@ export type FormData = {
   // Corporate only
   wtsCorporateInvoice: string;
   wtsEmail: string;
+  wtsMoveInAlready: boolean;
 };
 
 // Action types for form reducer

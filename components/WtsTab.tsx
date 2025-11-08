@@ -242,16 +242,31 @@ const WtsTab = () => {
                             />
                         )}
                     </div>
-                    <FormDateInput
-                        label="⑫入居予定日"
-                        name="moveInDate"
-                        value={formData.moveInDate}
-                        onChange={handleInputChange}
-                        onBlur={handleDateBlurWithValidation}
-                        placeholder="YYYY/MM/DD"
-                        isInvalid={invalidFields.includes('moveInDate')}
-                        required
-                    />
+                    <div className="flex items-end gap-4">
+                        <div className="flex-1">
+                            <FormDateInput
+                                label="⑫入居予定日"
+                                name="moveInDate"
+                                value={formData.moveInDate}
+                                onChange={handleInputChange}
+                                onBlur={handleDateBlurWithValidation}
+                                placeholder="YYYY/MM/DD"
+                                isInvalid={invalidFields.includes('moveInDate')}
+                                required={!formData.wtsMoveInAlready}
+                                disabled={formData.wtsMoveInAlready}
+                            />
+                        </div>
+                        <FormCheckbox
+                            label="入居済み"
+                            name="wtsMoveInAlready"
+                            checked={formData.wtsMoveInAlready}
+                            onChange={handleInputChange}
+                            className="pb-2"
+                            description=""
+                            // FIX: Add missing 'isInvalid' property to FormCheckbox component.
+                            isInvalid={invalidFields.includes('wtsMoveInAlready')}
+                        />
+                    </div>
                      <div className="md:col-span-2">
                         <FormRadioGroup
                             label="⑬書面送付先"

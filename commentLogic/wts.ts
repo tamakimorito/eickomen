@@ -44,7 +44,8 @@ export const generateWtsCommentLogic = (formData: FormData): string => {
         wtsServerColor, wtsFiveYearPlan, wtsFreeWater, wtsCreditCard, wtsCarrier, wtsCarrierOther,
         moveInDate, wtsWaterPurifier, wtsMultipleUnits, wtsCustomerType,
         wtsU20HighSchool, wtsU20ParentalConsent, wtsCorporateInvoice, wtsRemarks, wtsMailingAddress,
-        recordId, isSakaiRoute, wtsServerType, wtsEmail, currentAddress, currentPostalCode, email
+        recordId, isSakaiRoute, wtsServerType, wtsEmail, currentAddress, currentPostalCode, email,
+        wtsMoveInAlready
     } = { ...formData, dob: formatDate(formData.dob), moveInDate: formatDate(formData.moveInDate) };
     
     const tag = "250811";
@@ -100,7 +101,7 @@ export const generateWtsCommentLogic = (formData: FormData): string => {
     const carrierLabel = wtsCarrier === 'その他' ? (wtsCarrierOther || 'その他') : wtsCarrier;
     commentLines.push(`${currentIndex++}）キャリア：${carrierLabel || ''}`);
 
-    commentLines.push(`${currentIndex++}）入居予定日：${moveInDate || ''}`);
+    commentLines.push(`${currentIndex++}）入居予定日：${wtsMoveInAlready ? '入居済み' : (moveInDate || '')}`);
     
     let mailingAddressText = wtsMailingAddress || '';
     if (wtsMailingAddress === '現住所') {

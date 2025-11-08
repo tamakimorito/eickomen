@@ -205,7 +205,10 @@ const getRequiredFields = (formData, activeTab) => {
         }
             
         case 'wts':
-            required.push('wtsCustomerType', 'contractorName', 'dob', 'phone', 'wtsShippingDestination', 'wtsServerType', 'wtsServerColor', 'wtsFiveYearPlan', 'wtsFreeWater', 'wtsCreditCard', 'wtsCarrier', 'moveInDate', 'wtsMailingAddress', 'wtsWaterPurifier', 'wtsMultipleUnits');
+            required.push('wtsCustomerType', 'contractorName', 'dob', 'phone', 'wtsShippingDestination', 'wtsServerType', 'wtsServerColor', 'wtsFiveYearPlan', 'wtsFreeWater', 'wtsCreditCard', 'wtsCarrier', 'wtsMailingAddress', 'wtsWaterPurifier', 'wtsMultipleUnits');
+            if (!formData.wtsMoveInAlready) {
+                required.push('moveInDate');
+            }
             if (!isSakaiRoute) required.push('customerId');
             if (formData.wtsCustomerType === 'U-20') required.push('wtsU20HighSchool', 'wtsU20ParentalConsent');
             if (formData.wtsCustomerType === '法人') required.push('wtsCorporateInvoice');
@@ -809,15 +812,18 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
         }
         // --- End of Swap Check ---
 
-        const { moveInDate, dob, gasOpeningDate } = formData;
+        const { moveInDate, dob, gasOpeningDate, wtsMoveInAlready } = formData;
         const dateErrors = [];
         if (moveInDate) {
-            const moveIn = new Date(moveInDate);
-            const today = new Date();
-            moveIn.setHours(0, 0, 0, 0);
-            today.setHours(0, 0, 0, 0);
-            if (!isNaN(moveIn.getTime()) && moveIn < today) {
-                dateErrors.push('・利用開始日が過去の日付になっています。');
+            const skipMoveInDateCheck = activeTab === 'wts' && wtsMoveInAlready;
+            if (!skipMoveInDateCheck) {
+                const moveIn = new Date(moveInDate);
+                const today = new Date();
+                moveIn.setHours(0, 0, 0, 0);
+                today.setHours(0, 0, 0, 0);
+                if (!isNaN(moveIn.getTime()) && moveIn < today) {
+                    dateErrors.push('・利用開始日が過去の日付になっています。');
+                }
             }
         }
         if (dob) {

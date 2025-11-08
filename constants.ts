@@ -140,6 +140,7 @@ export const INITIAL_FORM_DATA: FormData = {
   wtsU20ParentalConsent: '',
   wtsCorporateInvoice: '',
   wtsEmail: '',
+  wtsMoveInAlready: false,
 };
 
 export const BUG_REPORT_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxcxDeiLBs1ViBpWx6NhTWtemiiiWLydybw0piSVbxZpodzSQh2ebzyF66MeFinqou7HA/exec';
