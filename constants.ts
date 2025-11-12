@@ -411,6 +411,7 @@ export const ELEC_PROVIDERS = [
   { value: '東京ガス電気セット', label: '東京ガス電気セット' },
   { value: '東邦ガスセット', label: '東邦ガスセット' },
   { value: '大阪ガス電気セット', label: '大阪ガス電気セット' },
+  { value: '東急でんき', label: '東急でんき' },
 ];
 
 export const GAS_PROVIDERS = [

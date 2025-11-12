@@ -12,7 +12,7 @@ import { FormInput, FormSelect, FormRadioGroup, FormTextArea, FormDateInput, For
 // A component to render the mailing address section based on provider rules
 const MailingAddressSection = () => {
     const { formData, handleInputChange, invalidFields, handlePostalCodeBlur } = useContext(AppContext);
-    const { elecProvider, mailingOption, currentPostalCode, currentAddress, mailingBuildingInfo } = formData;
+    const { elecProvider, mailingOption, currentPostalCode, currentAddress, mailingBuildingInfo, isGasSet } = formData;
     
     const config = useMemo(() => {
         const defaultConfig = { showOptions: false, showFields: false, isRequired: false, fixedValue: null, description: null };
@@ -35,6 +35,12 @@ const MailingAddressSection = () => {
             case '東邦ガスセット':
                  return { ...defaultConfig, fixedValue: '現住所', showFields: true, isRequired: true, description: '現住所が必須となります。' };
 
+            case '東急でんき':
+                if (isGasSet === 'セット') {
+                    return { ...defaultConfig, fixedValue: '現住所', showFields: true, isRequired: true, description: '書面は現住所へ送付されます。' };
+                }
+                return { ...defaultConfig, showOptions: true, showFields: mailingOption === '現住所', isRequired: mailingOption === '現住所', description: '書面送付先を選択してください。' };
+
             case 'ループでんき':
             case 'HTBエナジー':
             case 'ユーパワー UPOWER':
@@ -44,7 +50,7 @@ const MailingAddressSection = () => {
             default:
                 return { ...defaultConfig, showOptions: false, showFields: false };
         }
-    }, [elecProvider, mailingOption]);
+    }, [elecProvider, mailingOption, isGasSet]);
     
     if (!config.showOptions && !config.showFields && !config.description) {
         return null;
@@ -147,10 +153,10 @@ const ElectricityTab = () => {
     const isRemix = elecProvider === 'リミックスでんき';
 
 
-    const showGasSetOption = elecProvider === 'すまいのでんき（ストエネ）' && formData.isAllElectric !== 'あり';
+    const showGasSetOption = (elecProvider === 'すまいのでんき（ストエネ）' && formData.isAllElectric !== 'あり') || elecProvider === '東急でんき';
     
     const showContractConfirmationOption = useMemo(() => {
-        return ['すまいのでんき（ストエネ）', 'プラチナでんき（ジャパン）'].includes(elecProvider);
+        return ['すまいのでんき（ストエネ）', 'プラチナでんき（ジャパン）'].includes(elecProvider) && elecProvider !== '東急でんき';
     }, [elecProvider]);
 
     const isPlatinumOtherConfirmed = useMemo(() => {
@@ -241,11 +247,14 @@ const ElectricityTab = () => {
         if (elecProvider === '大阪ガス電気セット') {
             return GAS_OPENING_TIME_SLOTS;
         }
+        if (elecProvider === '東急でんき' && isGasSet === 'セット') {
+            return GAS_OPENING_TIME_SLOTS;
+        }
         if (isElecGasSetSelected) {
             return GAS_OPENING_TIME_SLOTS;
         }
         return [];
-    }, [elecProvider, elecRecordIdPrefix, isElecGasSetSelected]);
+    }, [elecProvider, elecRecordIdPrefix, isElecGasSetSelected, isGasSet]);
 
      const idPrefixDescription = useMemo(() => {
         const lowerCasePrefix = elecRecordIdPrefix?.toLowerCase();
@@ -267,7 +276,7 @@ const ElectricityTab = () => {
     const isToho = elecProvider === '東邦ガスセット';
     const isOsakaGasSet = elecProvider === '大阪ガス電気セット';
     const isNichigasSet = elecProvider === 'ニチガス電気セット';
-    const emailIsRequired = isQenes || isUpower || isHtb || isRemix || elecProvider === 'ループでんき';
+    const emailIsRequired = isQenes || isUpower || isHtb || isRemix || elecProvider === 'ループでんき' || elecProvider === '東急でんき';
 
     return (
         <div className="space-y-6">
@@ -302,7 +311,7 @@ const ElectricityTab = () => {
                     {showContractConfirmationOption && <FormRadioGroup label="契約確認は必要ですか？" name="hasContractConfirmation" value={formData.hasContractConfirmation} onChange={handleInputChange} options={YES_NO_OPTIONS} isInvalid={invalidFields.includes('hasContractConfirmation')} required />}
                     {showGasSetOption && <FormRadioGroup label="ガスセット" name="isGasSet" value={isGasSet} onChange={handleInputChange} options={SET_NONE_OPTIONS} isInvalid={invalidFields.includes('isGasSet')} />}
                     
-                    { hasContractConfirmation !== 'なし' && !isQenesItanji && !isRemix && <FormRadioGroup label="主商材受注状況" name="primaryProductStatus" value={formData.primaryProductStatus} onChange={handleInputChange} options={PRIMARY_PRODUCT_STATUS_OPTIONS} isInvalid={invalidFields.includes('primaryProductStatus')} required={isQenesOther} /> }
+                    { hasContractConfirmation !== 'なし' && !isQenesItanji && !isRemix && elecProvider !== 'ニチガス電気セット' && <FormRadioGroup label="主商材受注状況" name="primaryProductStatus" value={formData.primaryProductStatus} onChange={handleInputChange} options={PRIMARY_PRODUCT_STATUS_OPTIONS} isInvalid={invalidFields.includes('primaryProductStatus')} required={isQenesOther || elecProvider === '東急でんき'} /> }
 
                     {showNewConstructionOption && <FormRadioGroup label="新築" name="isNewConstruction" value={formData.isNewConstruction} onChange={handleInputChange} options={NEW_CONSTRUCTION_OPTIONS} isInvalid={invalidFields.includes('isNewConstruction')} />}
                 </div>
@@ -349,7 +358,7 @@ const ElectricityTab = () => {
                 </div>
             </div>
             
-            {isElecGasSetSelected || elecProvider === 'ニチガス電気セット' || elecProvider === '東邦ガスセット' || elecProvider === '東京ガス電気セット' || elecProvider === '大阪ガス電気セット' ? (
+            {isElecGasSetSelected || elecProvider === 'ニチガス電気セット' || elecProvider === '東邦ガスセット' || elecProvider === '東京ガス電気セット' || elecProvider === '大阪ガス電気セット' || (elecProvider === '東急でんき' && isGasSet === 'セット') ? (
                 <div className="border-t-2 border-dashed border-blue-300 pt-6 space-y-4">
                     <h3 className="text-lg font-bold text-blue-700">利用開始日・開栓日</h3>
                      <div className="p-4 bg-blue-50/50 rounded-lg border border-blue-200 space-y-4">

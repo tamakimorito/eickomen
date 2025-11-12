@@ -36,7 +36,7 @@ const formatPostalCode = (postalCodeStr: string, providerName: string): string =
   if (!postalCodeStr) return '';
   const digits = postalCodeStr.replace(/\D/g, '');
   
-  const hyphenProviders = ['東邦ガスセット', 'リミックスでんき', '東急ガス', '東邦ガス単品'];
+  const hyphenProviders = ['東邦ガスセット', 'リミックスでんき', '東急ガス', '東邦ガス単品', '東急でんき'];
 
   if (hyphenProviders.includes(providerName)) {
     if (digits.length === 7) {
@@ -364,6 +364,39 @@ ${attachedOptionLine}支払い方法：${paymentMethod || ''}
 支払方法：${paymentMethod || ''}
 備考：${elecRemarks || ''}`;
             comment = comment.replace(/^\s*\n/gm, '');
+            break;
+        case '東急でんき':
+            {
+                const plan = isGasSet === 'セット' ? '東急でんきガスセット' : '東急でんきのみ';
+                const tokyuCurrentAddress = currentPostalCode 
+                    ? `〒${formattedCurrentPostalCode} ${(currentAddress || '')}${mailingBuildingInfo ? ' ' + mailingBuildingInfo : ''}`
+                    : `${currentAddress || ''}${mailingBuildingInfo ? ' ' + mailingBuildingInfo : ''}`;
+
+                let tokyuLines = [
+                    `【東急でんき】`,
+                    `契確時間：${elecConfirmationTime || ''}`,
+                    `レコードID：${recordId || ''}`,
+                    `主商材受注状況：${primaryProductStatus || ''}`,
+                    `名乗り：${greeting || ''}`,
+                    `担当者：${apName || ''}`,
+                    `プラン：${plan}`,
+                    `契約者名義（漢字）：${contractorName || ''}`,
+                    `契約者名義（フリガナ）：${contractorNameKana || ''}`,
+                    `生年月日(西暦)：${dob || ''}`,
+                    `電話番号：${formattedPhone || ''}`,
+                    `郵便番号：${formattedPostalCode || ''}`,
+                    `引越し先住所：${address || ''}`,
+                    `物件名：${buildingInfo || ''}`,
+                    dateLine,
+                    `メアド：${email || ''}`,
+                    `支払い方法：${paymentMethod || ''}`,
+                    `現住所：${tokyuCurrentAddress}`
+                ];
+                comment = tokyuLines.join('\n');
+                if (elecRemarks) {
+                    comment += `\n備考：${elecRemarks}`;
+                }
+            }
             break;
     }
 

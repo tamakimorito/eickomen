@@ -110,7 +110,7 @@ const getRequiredFields = (formData, activeTab) => {
             break;
 
         case 'electricity': {
-            const { elecProvider, recordId, hasContractConfirmation, mailingOption, isSakaiRoute } = formData;
+            const { elecProvider, recordId, hasContractConfirmation, mailingOption, isSakaiRoute, isGasSet } = formData;
             required.push('elecProvider', 'greeting', 'contractorName', 'contractorNameKana', 'dob', 'phone', 'postalCode', 'address', 'buildingInfo', 'moveInDate');
             
             if (elecProvider !== '東京ガス電気セット' && !['すまいのでんき（ストエネ）', 'プラチナでんき（ジャパン）'].includes(elecProvider)) {
@@ -131,23 +131,33 @@ const getRequiredFields = (formData, activeTab) => {
             }
             
             if (hasContractConfirmation === 'あり') {
-                required.push('elecConfirmationTime', 'primaryProductStatus');
+                required.push('elecConfirmationTime');
+            }
+            
+            if (hasContractConfirmation !== 'なし' && !isQenesItanji && !isRemix && elecProvider !== 'ニチガス電気セット') {
+                required.push('primaryProductStatus');
             }
 
             if (isRemix || isQenesItanji) {
                 required.push('attachedOption');
             }
             
-            if (['キューエネスでんき', 'ユーパワー UPOWER', 'HTBエナジー', 'リミックスでんき', 'ループでんき'].includes(elecProvider)) {
+            if (['キューエネスでんき', 'ユーパワー UPOWER', 'HTBエナジー', 'リミックスでんき', 'ループでんき', '東急でんき'].includes(elecProvider)) {
                 required.push('email');
             }
-             if (elecProvider === 'すまいのでんき（ストエネ）' && formData.isGasSet === 'セット' || ['ニチガス電気セット', '東邦ガスセット', '東京ガス電気セット', '大阪ガス電気セット'].includes(elecProvider)) {
+             if ((['すまいのでんき（ストエネ）', '東急でんき'].includes(elecProvider) && isGasSet === 'セット') || ['ニチガス電気セット', '東邦ガスセット', '東京ガス電気セット', '大阪ガス電気セット'].includes(elecProvider)) {
                 required.push('gasOpeningDate', 'gasOpeningTimeSlot');
             }
              if (mailingOption === '現住所' && ['リミックスでんき', '東京ガス電気セット', '東邦ガスセット'].includes(elecProvider)) {
                 required.push('currentPostalCode', 'currentAddress');
             }
-            if (elecProvider === 'リミックスでんき') {
+             if (elecProvider === '東急でんき' && (isGasSet === 'セット' || mailingOption === '現住所')) {
+                required.push('currentPostalCode', 'currentAddress');
+             }
+             if (elecProvider === '東急でんき') {
+                required.push('primaryProductStatus');
+             }
+            if (elecProvider === 'リミックスでんき' || (elecProvider === '東急でんき' && isGasSet !== 'セット')) {
                 required.push('mailingOption');
             }
             if (['ニチガス電気セット'].includes(elecProvider)) {
@@ -398,6 +408,13 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
 
     }, [recordId, greeting, activeTab, isSakaiRoute, dispatch]);
 
+     // 東急でんき: 契確を「あり」に固定
+    useEffect(() => {
+        if (formData.elecProvider === '東急でんき' && formData.hasContractConfirmation !== 'あり') {
+            dispatch({ type: 'UPDATE_FIELD', payload: { name: 'hasContractConfirmation', value: 'あり' } });
+        }
+    }, [formData.elecProvider, formData.hasContractConfirmation, dispatch]);
+
     // Tokyo Gas: check name length on provider change
     useEffect(() => {
         const isTokyoGasProduct = formData.elecProvider === '東京ガス電気セット' || formData.gasProvider === '東京ガス単品';
@@ -470,6 +487,54 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
           const today = new Date();
           today.setHours(0, 0, 0, 0);
 
+           if (name === 'gasOpeningDate' && formData.elecProvider === 'すまいのでんき（ストエネ）' && formData.isGasSet === 'セット' && formData.address) {
+                const KANSAI_PREFECTURES = ['大阪', '兵庫', '京都', '奈良', '滋賀', '和歌山'];
+                const KANTO_PREFECTURES = ['東京', '神奈川', '千葉', '埼玉', '茨城', '栃木', '群馬', '山梨'];
+
+                let region = '';
+                if (KANSAI_PREFECTURES.some(pref => formData.address.includes(pref))) {
+                    region = 'Kansai';
+                } else if (KANTO_PREFECTURES.some(pref => formData.address.includes(pref))) {
+                    region = 'Kanto';
+                }
+
+                if (region) {
+                    const selectedDate = new Date(normalized);
+                    selectedDate.setHours(0, 0, 0, 0);
+                    let isBlocked = false;
+                    
+                    if (region === 'Kansai') {
+                        const startDate = new Date(2025, 11, 28); // Month is 0-indexed
+                        const endDate = new Date(2026, 0, 8);
+                        if (selectedDate >= startDate && selectedDate <= endDate) isBlocked = true;
+                    } else if (region === 'Kanto') {
+                        const startDate = new Date(2025, 11, 28);
+                        const endDate = new Date(2026, 0, 9);
+                        if (selectedDate >= startDate && selectedDate <= endDate) isBlocked = true;
+                    }
+
+                    if (isBlocked) {
+                        setModalState({
+                            isOpen: true,
+                            title: '入力エラー',
+                            message: 'ガス開栓不可日程となります。再入力してください。',
+                            confirmText: '修正する',
+                            cancelText: null,
+                            type: 'default',
+                            onConfirm: () => {
+                                dispatch({ type: 'UPDATE_FIELD', payload: { name: 'gasOpeningDate', value: '', type: 'text' }});
+                                closeModal();
+                            },
+                            onCancel: closeModal,
+                            isErrorBanner: false,
+                            bannerMessage: '',
+                        });
+                        return; // Stop further validation
+                    }
+                }
+            }
+
+
           if (name === 'moveInDate' || name === 'gasOpeningDate') {
             if (dateToCheck < today) {
                 setModalState({
@@ -511,7 +576,7 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
           }
       }
 
-    }, [dispatch, setModalState, closeModal]);
+    }, [dispatch, setModalState, closeModal, formData.elecProvider, formData.isGasSet, formData.address]);
 
     const nameHasSpace = (s: string) => /\s|\u3000/.test(s?.trim() || '');
     const companyKeywords = ['株式会社', '有限会社', '合同会社', '会社'];
