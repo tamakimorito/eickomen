@@ -141,6 +141,24 @@ const GasTab = () => {
     }, [gasProvider]);
 
     const gasTimeSlotOptions = useMemo(() => {
+        // ストエネ関東・期間限定ルール
+        if (gasProvider === 'すまいのでんき（ストエネ）') {
+            const isKanto = /^(東京都|神奈川県|千葉県|埼玉県|茨城県|栃木県|群馬県|山梨県)/.test(formData.address || '');
+            if (isKanto && formData.gasOpeningDate) {
+                const targetDate = new Date(formData.gasOpeningDate);
+                targetDate.setHours(0, 0, 0, 0);
+                const start = new Date(2026, 1, 1); // 2026/02/01
+                const end = new Date(2026, 3, 30);  // 2026/04/30
+
+                if (targetDate >= start && targetDate <= end) {
+                    return [
+                        { value: '9:00〜12:00', label: '9:00〜12:00' },
+                        { value: 'PM 時間指定なし', label: 'PM 時間指定なし' },
+                    ];
+                }
+            }
+        }
+
         if (gasProvider === 'すまいのでんき（ストエネ）' && gasRecordIdPrefix === 'SR') {
             return TIME_SLOTS_SUTENE_SR;
         }
@@ -154,7 +172,7 @@ const GasTab = () => {
             return GAS_OPENING_TIME_SLOTS;
         }
         return [];
-    }, [gasProvider, gasRecordIdPrefix]);
+    }, [gasProvider, gasRecordIdPrefix, formData.address, formData.gasOpeningDate]);
     
     const idPrefixDescription = useMemo(() => {
         const lowerCasePrefix = gasRecordIdPrefix?.toLowerCase();

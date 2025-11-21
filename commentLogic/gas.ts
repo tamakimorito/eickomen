@@ -185,7 +185,7 @@ export const generateGasCommentLogic = (formData: FormData): string => {
                     `主商材受注状況：${primaryProductStatus || ''}`,
                     `名乗り：${greeting || ''}`,
                     `担当者：${apName || ''}`,
-                    `プラン：えねこねガス`,
+                    `プラン：東急ガス`,
                     `契約者名義（漢字）：${contractorName || ''}`,
                     `契約者名義（フリガナ）：${contractorNameKana || ''}`,
                     `生年月日(西暦)：${dob || ''}`,
