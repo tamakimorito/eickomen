@@ -234,6 +234,47 @@ const GasTab = () => {
             </div>
             
             <div className="border-t-2 border-dashed border-blue-300 pt-6 space-y-4">
+                <h3 className="text-lg font-bold text-blue-700">契約者情報</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {showGreeting && <FormInput label="名乗り" name="greeting" value={formData.greeting} onChange={handleInputChange} isInvalid={invalidFields.includes('greeting')} required={isOsakaGas} />}
+                    <FormInput label="契約者名義（漢字）" name="contractorName" value={formData.contractorName} onChange={handleInputChange} onBlur={handleNameBlur} isInvalid={invalidFields.includes('contractorName')} required />
+                    <FormInput label="契約者名義（フリガナ）" name="contractorNameKana" value={formData.contractorNameKana} onChange={handleInputChange} onBlur={handleKanaBlur} isInvalid={invalidFields.includes('contractorNameKana')} required />
+                    {showGender && <FormSelect label="性別" name="gender" value={formData.gender} onChange={handleInputChange} options={GENDERS} isInvalid={invalidFields.includes('gender')} />}
+                    <FormDateInput label="生年月日（西暦）" name="dob" value={formData.dob} onChange={handleInputChange} onBlur={handleDateBlurWithValidation} isInvalid={invalidFields.includes('dob')} placeholder="例: 1990/01/01" required />
+                    <FormInput label="電話番号" name="phone" value={formData.phone} onChange={handleInputChange} onBlur={handlePhoneBlur} isInvalid={invalidFields.includes('phone')} required />
+                    {showEmail && <FormInput label="メアド" name="email" type="email" value={formData.email} onChange={handleInputChange} isInvalid={invalidFields.includes('email')} required={isTokyu} />}
+                </div>
+            </div>
+
+            <div className="border-t-2 border-dashed border-blue-300 pt-6 space-y-4">
+                <h3 className="text-lg font-bold text-blue-700">設置先情報</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormInput label="郵便番号" name="postalCode" value={formData.postalCode} onChange={handleInputChange} onBlur={(e) => handlePostalCodeBlur('postalCode', e.target.value)} isInvalid={invalidFields.includes('postalCode')} required className="md:col-span-2" />
+                    <FormInput label="住所" name="address" value={formData.address} onChange={handleInputChange} className="md:col-span-2" isInvalid={invalidFields.includes('address')} required />
+                    <div className="md:col-span-2 flex items-end gap-2">
+                         <FormInput
+                            label="物件名＋部屋番号"
+                            name="buildingInfo"
+                            value={formData.buildingInfo}
+                            onChange={handleInputChange}
+                            className="flex-grow"
+                            isInvalid={invalidFields.includes('buildingInfo')}
+                            required
+                        />
+                        <FormCheckbox
+                            label="戸建て"
+                            name="isDetachedHouse"
+                            checked={formData.buildingInfo === '戸建て'}
+                            onChange={(e) => handleInputChange({ target: { name: 'buildingInfo', value: e.target.checked ? '戸建て' : '' } })}
+                            className="pb-2"
+                            description=""
+                            isInvalid={invalidFields.includes('buildingInfo')}
+                        />
+                    </div>
+                </div>
+            </div>
+
+                        <div className="border-t-2 border-dashed border-blue-300 pt-6 space-y-4">
                 <h3 className="text-lg font-bold text-blue-700">ガス利用開始情報</h3>
                 <div className="p-4 bg-blue-50/50 rounded-lg border border-blue-200 space-y-4">
                      <FormDateInput
@@ -298,46 +339,7 @@ const GasTab = () => {
                 </div>
             </div>
 
-            <div className="border-t-2 border-dashed border-blue-300 pt-6 space-y-4">
-                <h3 className="text-lg font-bold text-blue-700">契約者情報</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {showGreeting && <FormInput label="名乗り" name="greeting" value={formData.greeting} onChange={handleInputChange} isInvalid={invalidFields.includes('greeting')} required={isOsakaGas} />}
-                    <FormInput label="契約者名義（漢字）" name="contractorName" value={formData.contractorName} onChange={handleInputChange} onBlur={handleNameBlur} isInvalid={invalidFields.includes('contractorName')} required />
-                    <FormInput label="契約者名義（フリガナ）" name="contractorNameKana" value={formData.contractorNameKana} onChange={handleInputChange} onBlur={handleKanaBlur} isInvalid={invalidFields.includes('contractorNameKana')} required />
-                    {showGender && <FormSelect label="性別" name="gender" value={formData.gender} onChange={handleInputChange} options={GENDERS} isInvalid={invalidFields.includes('gender')} />}
-                    <FormDateInput label="生年月日（西暦）" name="dob" value={formData.dob} onChange={handleInputChange} onBlur={handleDateBlurWithValidation} isInvalid={invalidFields.includes('dob')} placeholder="例: 1990/01/01" required />
-                    <FormInput label="電話番号" name="phone" value={formData.phone} onChange={handleInputChange} onBlur={handlePhoneBlur} isInvalid={invalidFields.includes('phone')} required />
-                    {showEmail && <FormInput label="メアド" name="email" type="email" value={formData.email} onChange={handleInputChange} isInvalid={invalidFields.includes('email')} required={isTokyu} />}
-                </div>
-            </div>
 
-            <div className="border-t-2 border-dashed border-blue-300 pt-6 space-y-4">
-                <h3 className="text-lg font-bold text-blue-700">設置先情報</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormInput label="郵便番号" name="postalCode" value={formData.postalCode} onChange={handleInputChange} onBlur={(e) => handlePostalCodeBlur('postalCode', e.target.value)} isInvalid={invalidFields.includes('postalCode')} required className="md:col-span-2" />
-                    <FormInput label="住所" name="address" value={formData.address} onChange={handleInputChange} className="md:col-span-2" isInvalid={invalidFields.includes('address')} required />
-                    <div className="md:col-span-2 flex items-end gap-2">
-                         <FormInput
-                            label="物件名＋部屋番号"
-                            name="buildingInfo"
-                            value={formData.buildingInfo}
-                            onChange={handleInputChange}
-                            className="flex-grow"
-                            isInvalid={invalidFields.includes('buildingInfo')}
-                            required
-                        />
-                        <FormCheckbox
-                            label="戸建て"
-                            name="isDetachedHouse"
-                            checked={formData.buildingInfo === '戸建て'}
-                            onChange={(e) => handleInputChange({ target: { name: 'buildingInfo', value: e.target.checked ? '戸建て' : '' } })}
-                            className="pb-2"
-                            description=""
-                            isInvalid={invalidFields.includes('buildingInfo')}
-                        />
-                    </div>
-                </div>
-            </div>
             
             {!isOsakaGas && <MailingAddressSection />}
 
