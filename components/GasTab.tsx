@@ -18,7 +18,7 @@ const MailingAddressSection = () => {
             case 'すまいのでんき（ストエネ）': // This is "すまいのガス"
                  return { ...defaultConfig, showOptions: false, showFields: false, isRequired: false, fixedValue: null, description: '新住所郵送（指定も可能、その場合備考欄に特記事項としてわかりやすく書くこと）' };
             case 'ニチガス単品':
-                return { ...defaultConfig, showOptions: false, showFields: false, isRequired: false, fixedValue: null, description: '書面送付先のヒアリングは不要です。' };
+                return { ...defaultConfig, showOptions: true, showFields: mailingOption === '現住所', isRequired: mailingOption === '現住所', description: '書面送付先を選択してください。' };
             case '大阪ガス単品':
                 return { ...defaultConfig, showOptions: true, showFields: mailingOption === '現住所', isRequired: mailingOption === '現住所', description: '書面送付先を選択してください。' };
             
@@ -96,6 +96,7 @@ const MailingAddressSection = () => {
                             onChange={handleInputChange}
                             className="flex-grow"
                             isInvalid={invalidFields.includes('mailingBuildingInfo')}
+                            required={config.isRequired}
                         />
                         <FormCheckbox
                             label="戸建て"

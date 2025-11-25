@@ -43,6 +43,7 @@ const FIELD_LABELS = {
     wtsMailingAddress: '書面送付先', wtsWaterPurifier: '浄水器確認', wtsMultipleUnits: '複数台提案',
     wtsU20HighSchool: '高校生ヒアリング', wtsU20ParentalConsent: '親相談OKか',
     wtsCorporateInvoice: '請求書先', wtsEmail: 'メアド',
+    mailingBuildingInfo: '現住所の物件名＋部屋番号',
 };
 
 
@@ -148,7 +149,7 @@ const getRequiredFields = (formData, activeTab) => {
              if ((['すまいのでんき（ストエネ）', '東急でんき'].includes(elecProvider) && isGasSet === 'セット') || ['ニチガス電気セット', '東邦ガスセット', '東京ガス電気セット', '大阪ガス電気セット'].includes(elecProvider)) {
                 required.push('gasOpeningDate', 'gasOpeningTimeSlot');
             }
-             if (mailingOption === '現住所' && ['リミックスでんき', '東京ガス電気セット', '東邦ガスセット'].includes(elecProvider)) {
+             if (mailingOption === '現住所' && ['リミックスでんき', '東京ガス電気セット', '東邦ガスセット', 'ニチガス電気セット'].includes(elecProvider)) {
                 required.push('currentPostalCode', 'currentAddress');
             }
              if (elecProvider === '東急でんき' && (isGasSet === 'セット' || mailingOption === '現住所')) {
@@ -162,6 +163,9 @@ const getRequiredFields = (formData, activeTab) => {
             }
             if (['ニチガス電気セット'].includes(elecProvider)) {
                 required.push('gasArea', 'gasWitness', 'gasPreContact');
+                if (mailingOption === '現住所') {
+                    required.push('mailingBuildingInfo');
+                }
             }
              if (elecProvider === '東邦ガスセット' && formData.gasIsCorporate) {
                 required.push('gasWitness', 'gasPreContact');
@@ -198,11 +202,14 @@ const getRequiredFields = (formData, activeTab) => {
              }
              if(gasProvider === 'ニチガス単品') {
                 required.push('gasWitness', 'gasPreContact', 'gasArea');
+                if (formData.mailingOption === '現住所') {
+                    required.push('currentPostalCode', 'currentAddress', 'mailingBuildingInfo');
+                }
              }
              if((gasProvider === '東京ガス単品' || gasProvider === '東邦ガス単品') && formData.gasIsCorporate) {
                 required.push('gasWitness', 'gasPreContact');
              }
-             if(formData.mailingOption === '現住所' && ['すまいのでんき（ストエネ）', 'ニチガス単品', '東邦ガス単品', '東急ガス', '大阪ガス単品'].includes(gasProvider)){
+             if(formData.mailingOption === '現住所' && ['すまいのでんき（ストエネ）', '東邦ガス単品', '東急ガス', '大阪ガス単品'].includes(gasProvider)){
                 required.push('currentPostalCode', 'currentAddress');
              }
              if(['東邦ガス単品', '東急ガス'].includes(gasProvider)){
