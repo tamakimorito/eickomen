@@ -55,13 +55,14 @@ export const generateElectricityCommentLogic = (formData: FormData): string => {
         recordId, primaryProductStatus, greeting, apName, contractorName, contractorNameKana, gender, phone,
         postalCode, address, buildingInfo, paymentMethod, elecRemarks, attachedOption,
         elecConfirmationTime, elecImportCompanyName, elecPostConfirmationDateTime, email, isNewConstruction,
-        postConfirmationTime, currentAddress, currentPostalCode, mailingOption, contactPersonName, contactPersonNameKana, gasOpeningTimeSlot,
+        postConfirmationDate, postConfirmationTime, currentAddress, currentPostalCode, mailingOption, contactPersonName, contactPersonNameKana, gasOpeningTimeSlot,
         gasArea, gasWitness, gasPreContact, mailingBuildingInfo, qenesIsCorporate, isSakaiRoute, gasIsCorporate
     } = formData;
 
     const dob = formatDate(formData.dob);
     const moveInDate = formatDate(formData.moveInDate);
     const gasOpeningDate = formatDate(formData.gasOpeningDate);
+    const postConfirmationDateFormatted = formatDate(postConfirmationDate);
 
     let comment = '該当するテンプレートがありません。';
     const tag = "250811";
@@ -76,6 +77,8 @@ export const generateElectricityCommentLogic = (formData: FormData): string => {
     
     const formattedPostalCode = formatPostalCode(postalCode, elecProvider);
     const formattedCurrentPostalCode = formatPostalCode(currentPostalCode, elecProvider);
+
+    const tohoPostConfirmation = [postConfirmationDateFormatted, postConfirmationTime].filter(Boolean).join(' ');
 
     // Date line logic
     let dateLine = `利用開始日：${moveInDate || ''}`;
@@ -341,7 +344,7 @@ ${attachedOptionLine}支払い方法：${paymentMethod || ''}
             comment = `【東京ガス 電気セット】 ${tag}\nレコードID：${recordId || ''}\n担当者：${apName || ''}\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${formattedPhone || ''}\n郵便番号：${formattedPostalCode || ''}\n引越し先住所：${address || ''}\n物件名：${buildingInfo || ''}\n${dateLine}\n現住所：${currentAddress || '！！必須！！'}\n備考：${elecRemarks || ''}`;
             break;
         case '東邦ガスセット':
-             let tohoComment = `【東邦ガス_電気セット】 ${tag}\n後確希望時間：${postConfirmationTime || ''}\nレコードID：${recordId || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：東邦ガス_電気セット\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${formattedPhone || ''}\n郵便番号：${formattedPostalCode || ''}\n引越し先住所：${address || ''}\n物件名：${buildingInfo || ''}\n${dateLine}\n支払い方法：${paymentMethod || ''}\n現住所：${currentAddress || '！！必須！！'}\n備考：${elecRemarks || ''}`;
+            let tohoComment = `【東邦ガス_電気セット】 ${tag}\n後確希望時間：${tohoPostConfirmation || ''}\nレコードID：${recordId || ''}\n名乗り：${greeting || ''}\n担当者：${apName || ''}\nプラン：東邦ガス_電気セット\n契約者名義（漢字）：${contractorName || ''}\n契約者名義（フリガナ）：${contractorNameKana || ''}\n生年月日(西暦)：${dob || ''}\n電話番号：${formattedPhone || ''}\n郵便番号：${formattedPostalCode || ''}\n引越し先住所：${address || ''}\n物件名：${buildingInfo || ''}\n${dateLine}\n支払い方法：${paymentMethod || ''}\n現住所：${currentAddress || '！！必須！！'}\n備考：${elecRemarks || ''}`; 
              if (gasIsCorporate) {
                 const formattedGasPreContact = formatPhoneNumberWithHyphens(gasPreContact);
                 tohoComment += `\n（法人の場合下記も）\n立ち合い担当者フルネーム：${gasWitness || ''}\n立ち合い連絡先：${formattedGasPreContact || ''}`;

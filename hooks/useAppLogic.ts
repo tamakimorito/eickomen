@@ -135,7 +135,7 @@ const getRequiredFields = (formData, activeTab) => {
                 required.push('elecConfirmationTime');
             }
             
-            if (hasContractConfirmation !== 'なし' && !isQenesItanji && !isRemix && elecProvider !== 'ニチガス電気セット') {
+            if (hasContractConfirmation !== 'なし' && !isQenesItanji && !isRemix && elecProvider !== 'ニチガス電気セット' && elecProvider !== '東邦ガスセット') {
                 required.push('primaryProductStatus');
             }
 
