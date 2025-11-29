@@ -134,6 +134,21 @@ const DefaultInternetForm = () => {
     }, [formData.homeDiscount, formData.mobileCarrier, setModalState, closeModal]);
 
     const handleAnshinNorikaeBlur = useCallback(() => {
+        const isSoftbankHikari = ['SoftBank光1G', 'SoftBank光10G'].includes(formData.product);
+        if (isSoftbankHikari && formData.campaign === '引っ越し' && formData.existingLineStatus === 'あり') {
+            setModalState({
+                isOpen: true,
+                title: '入力内容の確認',
+                message: '引っ越しキャンペーンで既存回線がありになってますが、のりかえキャンペーンではないですか？',
+                confirmText: '継続する',
+                cancelText: '修正する',
+                type: 'warning',
+                onConfirm: closeModal,
+                onCancel: closeModal,
+            });
+            return;
+        }
+
         if (formData.campaign?.includes('あんしん乗り換え') && formData.existingLineStatus === '無し') {
             setModalState({
                 isOpen: true,

@@ -331,7 +331,7 @@ const ElectricityTab = () => {
                     {showContractConfirmationOption && <FormRadioGroup label="契約確認は必要ですか？" name="hasContractConfirmation" value={formData.hasContractConfirmation} onChange={handleInputChange} options={YES_NO_OPTIONS} isInvalid={invalidFields.includes('hasContractConfirmation')} required />}
                     {showGasSetOption && <FormRadioGroup label="ガスセット" name="isGasSet" value={isGasSet} onChange={handleInputChange} options={SET_NONE_OPTIONS} isInvalid={invalidFields.includes('isGasSet')} />}
                     
-                    { hasContractConfirmation !== 'なし' && !isQenesItanji && !isRemix && elecProvider !== 'ニチガス電気セット' && <FormRadioGroup label="主商材受注状況" name="primaryProductStatus" value={formData.primaryProductStatus} onChange={handleInputChange} options={PRIMARY_PRODUCT_STATUS_OPTIONS} isInvalid={invalidFields.includes('primaryProductStatus')} required={isQenesOther || elecProvider === '東急でんき'} /> }
+                    { hasContractConfirmation !== 'なし' && !isQenesItanji && !isRemix && elecProvider !== 'ニチガス電気セット' && elecProvider !== '東邦ガスセット' && <FormRadioGroup label="主商材受注状況" name="primaryProductStatus" value={formData.primaryProductStatus} onChange={handleInputChange} options={PRIMARY_PRODUCT_STATUS_OPTIONS} isInvalid={invalidFields.includes('primaryProductStatus')} required={isQenesOther || elecProvider === '東急でんき'} /> }
 
                     {showNewConstructionOption && <FormRadioGroup label="新築" name="isNewConstruction" value={formData.isNewConstruction} onChange={handleInputChange} options={NEW_CONSTRUCTION_OPTIONS} isInvalid={invalidFields.includes('isNewConstruction')} />}
                 </div>
@@ -456,7 +456,10 @@ const ElectricityTab = () => {
                         <FormInput label="繋がりやすい時間帯" name="postConfirmationTime" value={formData.postConfirmationTime} onChange={handleInputChange} placeholder="9～17時半" isInvalid={invalidFields.includes('postConfirmationTime')} />
                     )}
                     {isToho && (
-                         <FormSelect label="後確希望時間" name="postConfirmationTime" value={formData.postConfirmationTime} onChange={handleInputChange} options={TIME_SLOTS_TOHO} isInvalid={invalidFields.includes('postConfirmationTime')} />
+                        <>
+                            <FormDateInput label="後確希望日" name="postConfirmationDate" value={formData.postConfirmationDate} onChange={handleInputChange} onBlur={handleDateBlurWithValidation} isInvalid={invalidFields.includes('postConfirmationDate')} />
+                            <FormSelect label="後確希望時間" name="postConfirmationTime" value={formData.postConfirmationTime} onChange={handleInputChange} options={TIME_SLOTS_TOHO} isInvalid={invalidFields.includes('postConfirmationTime')} />
+                        </>
                     )}
                 </div>
                 <FormTextArea label="備考" name="elecRemarks" value={formData.elecRemarks} onChange={handleInputChange} rows={3} isInvalid={invalidFields.includes('elecRemarks')} />

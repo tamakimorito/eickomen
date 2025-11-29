@@ -116,6 +116,7 @@ export const INITIAL_FORM_DATA: FormData = {
   elecConfirmationTime: '順次',
   primaryProductStatus: '',
   attachedOption: '',
+  postConfirmationDate: '',
   postConfirmationTime: '',
   contactPersonName: '',
   contactPersonNameKana: '',

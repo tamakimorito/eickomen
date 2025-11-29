@@ -114,6 +114,7 @@ export type FormData = {
   primaryProductStatus: string;
   attachedOption: string;
   elecConfirmationTime: string;
+  postConfirmationDate: string;
   postConfirmationTime: string;
   contactPersonName: string;
   contactPersonNameKana: string;
