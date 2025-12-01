@@ -83,7 +83,7 @@ const getRequiredFields = (formData, activeTab) => {
             } else if (product === 'フレッツ光トス') {
                  required.push('greeting', 'customerId', 'fletsRegion', 'fletsPlan', 'fletsHasFixedPhone', 'postConfirmationTime', 'contractorName', 'contractorNameKana', 'phone');
                 const companyKeywords = ['株式会社', '有限会社', '合同会社', '会社'];
-                const contractorIsCompany = companyKeywords.some(kw => (formData.contractorName || '').includes(kw) || (formData.contractorNameKana || '').includes(kw));
+                const contractorIsCompany = companyKeywords.some(kw => (formData.contractorName || '').includes(kw));
                 if (contractorIsCompany) {
                     required.push('contactPersonName');
                 }
@@ -242,7 +242,7 @@ const getRequiredFields = (formData, activeTab) => {
     if (formData.product === 'フレッツ光トス') {
         const companyKeywords = ['株式会社', '有限会社', '合同会社', '会社'];
         const hasCompanyKeyword = companyKeywords.some(kw =>
-            (formData.contractorName || '').includes(kw) || (formData.contractorNameKana || '').includes(kw)
+            (formData.contractorName || '').includes(kw)
         );
         if (!hasCompanyKeyword) {
             missingFields = Array.from(new Set([...missingFields, 'contractorName']));
@@ -615,11 +615,11 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
     };
 
     const openCompanyKeywordModal = () => {
-      setInvalidFields(prev => Array.from(new Set([...prev, 'contractorName', 'contractorNameKana'])));
+      setInvalidFields(prev => Array.from(new Set([...prev, 'contractorName'])));
       setModalState({
         isOpen: true,
         title: '会社名の確認',
-        message: '会社名または会社名カナに「株式会社」「有限会社」「合同会社」「会社」を含めてください。',
+        message: '会社名に「株式会社」「有限会社」「合同会社」「会社」を含めてください。',
         confirmText: '修正する',
         cancelText: '戻る',
         type: 'warning',
@@ -630,16 +630,16 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
       });
     };
 
-    const needsCompanyKeyword = (value: string, counterpart: string) => {
+    const needsCompanyKeyword = (value: string) => {
       if (formData.product !== 'フレッツ光トス') return false;
-      return !isCompanyName(value) && !isCompanyName(counterpart);
+      return !isCompanyName(value);
     };
     
     const handleNameBlur = useCallback((e) => {
       const { value } = e.target;
       if (!value) return;
 
-      if (needsCompanyKeyword(value, formData.contractorNameKana)) {
+      if (needsCompanyKeyword(value)) {
         openCompanyKeywordModal();
         return;
       }
@@ -652,11 +652,6 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
     const handleKanaBlur = useCallback((e) => {
       const { value } = e.target;
       if (!value) return;
-
-      if (needsCompanyKeyword(formData.contractorName, value)) {
-        openCompanyKeywordModal();
-        return;
-      }
 
       if (!nameHasSpace(value) && !isCompanyName(value)) {
           openNameSpaceModal('contractorNameKana');
