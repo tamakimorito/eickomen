@@ -81,12 +81,7 @@ const getRequiredFields = (formData, activeTab) => {
                     'phone', 'auContactType', 'auPlanProvider', 'serviceFee'
                 );
             } else if (product === 'フレッツ光トス') {
-                 required.push('greeting', 'customerId', 'fletsRegion', 'fletsPlan', 'fletsHasFixedPhone', 'postConfirmationTime', 'contractorName', 'contractorNameKana', 'phone');
-                const companyKeywords = ['株式会社', '有限会社', '合同会社', '会社'];
-                const contractorIsCompany = companyKeywords.some(kw => (formData.contractorName || '').includes(kw));
-                if (contractorIsCompany) {
-                    required.push('contactPersonName');
-                }
+                required.push('greeting', 'customerId', 'fletsRegion', 'fletsPlan', 'fletsHasFixedPhone', 'postConfirmationTime', 'contractorName', 'contractorNameKana', 'contactPersonName', 'phone');
             } else if (product.includes('SoftBank') || product.includes('賃貸ねっと')) {
                 required.push('greeting', 'housingType', 'rackType', 'contractorName', 'contractorNameKana', 'dob', 'phone', 'postalCode', 'address', 'buildingInfo', 'moveInDate', 'mailingOption');
                 if (formData.mailingOption === '現住所') required.push('currentPostalCode', 'currentAddress');
@@ -246,6 +241,11 @@ const getRequiredFields = (formData, activeTab) => {
         );
         if (!hasCompanyKeyword) {
             missingFields = Array.from(new Set([...missingFields, 'contractorName']));
+        }
+
+        const contactPersonHasSpace = /\s|\u3000/.test((formData.contactPersonName || '').trim());
+        if (formData.contactPersonName && !contactPersonHasSpace) {
+            missingFields = Array.from(new Set([...missingFields, 'contactPersonName']));
         }
     }
 
@@ -599,7 +599,7 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
     const companyKeywords = ['株式会社', '有限会社', '合同会社', '会社'];
     const isCompanyName = (s: string) => companyKeywords.some(kw => (s || '').includes(kw));
 
-    const openNameSpaceModal = (fieldName: 'contractorName'|'contractorNameKana') => {
+    const openNameSpaceModal = (fieldName: string) => {
       setInvalidFields(prev => Array.from(new Set([...prev, fieldName])));
       setModalState({
         isOpen: true,
@@ -630,33 +630,41 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
       });
     };
 
-    const needsCompanyKeyword = (value: string) => {
-      if (formData.product !== 'フレッツ光トス') return false;
-      return !isCompanyName(value);
-    };
-    
     const handleNameBlur = useCallback((e) => {
-      const { value } = e.target;
+      const { value, name } = e.target;
       if (!value) return;
 
-      if (needsCompanyKeyword(value)) {
-        openCompanyKeywordModal();
+      const isFlets = formData.product === 'フレッツ光トス';
+
+      if (isFlets && name === 'contractorName') {
+        if (!isCompanyName(value)) {
+          openCompanyKeywordModal();
+        }
+        return;
+      }
+
+      if (isFlets && name === 'contactPersonName') {
+        if (!nameHasSpace(value)) {
+          openNameSpaceModal('contactPersonName');
+        }
         return;
       }
 
       if (!nameHasSpace(value) && !isCompanyName(value)) {
-          openNameSpaceModal('contractorName');
+          openNameSpaceModal(name);
       }
-    }, [setInvalidFields, setModalState, closeModal, formData.product, formData.contractorNameKana]);
+    }, [formData.product, isCompanyName, nameHasSpace, openCompanyKeywordModal, openNameSpaceModal]);
 
     const handleKanaBlur = useCallback((e) => {
       const { value } = e.target;
       if (!value) return;
 
+      if (formData.product === 'フレッツ光トス') return;
+
       if (!nameHasSpace(value) && !isCompanyName(value)) {
           openNameSpaceModal('contractorNameKana');
       }
-    }, [setInvalidFields, setModalState, closeModal, formData.product, formData.contractorName]);
+    }, [formData.product, isCompanyName, nameHasSpace, openNameSpaceModal]);
 
     const handleIdBlur = useCallback((e) => {
         const { name, value } = e.target;
