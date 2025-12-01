@@ -615,9 +615,6 @@ const AuHikariForm = () => {
 const FletsHikariTossForm = () => {
     const { formData, handleInputChange, handleIdBlur, handlePhoneBlur, handleNameBlur, handleKanaBlur, invalidFields } = useContext(AppContext);
 
-    const companyKeywords = ['株式会社', '有限会社', '合同会社', '会社'];
-    const contractorIsCompany = companyKeywords.some(kw => (formData.contractorName || '').includes(kw) || (formData.contractorNameKana || '').includes(kw));
-
     return (
         <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -637,7 +634,7 @@ const FletsHikariTossForm = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormInput label="③会社名" name="contractorName" value={formData.contractorName} onChange={handleInputChange} onBlur={handleNameBlur} isInvalid={invalidFields.includes('contractorName')} required />
                     <FormInput label="④会社名カナ" name="contractorNameKana" value={formData.contractorNameKana} onChange={handleInputChange} onBlur={handleKanaBlur} isInvalid={invalidFields.includes('contractorNameKana')} required />
-                    <FormInput label="⑤担当名(フルネーム必須)" name="contactPersonName" value={formData.contactPersonName} onChange={handleInputChange} onBlur={handleNameBlur} isInvalid={invalidFields.includes('contactPersonName')} required={contractorIsCompany} />
+                    <FormInput label="⑤担当名(フルネーム必須)" name="contactPersonName" value={formData.contactPersonName} onChange={handleInputChange} onBlur={handleNameBlur} isInvalid={invalidFields.includes('contactPersonName')} required />
                     <FormInput label="⑥連絡先(なるべく携帯)" name="phone" value={formData.phone} onChange={handleInputChange} onBlur={handlePhoneBlur} isInvalid={invalidFields.includes('phone')} required />
                     <FormInput label="⑦後確時間(平日10-19時)" name="postConfirmationTime" value={formData.postConfirmationTime} onChange={handleInputChange} isInvalid={invalidFields.includes('postConfirmationTime')} required className="md:col-span-2" placeholder="順次 または YYYY/MM/DD HH:mm" />
                 </div>

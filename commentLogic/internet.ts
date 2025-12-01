@@ -554,17 +554,14 @@ const generateGmoTokutokuComment = (formData: FormData): string => {
 const generateFletsHikariTossComment = (formData: FormData): string => {
     const {
         apName, greeting, customerId, fletsRegion, fletsPlan, fletsHasFixedPhone,
-        contractorName, contractorNameKana, contactPersonName, contactPerson, phone,
+        contractorName, contractorNameKana, contactPersonName, phone,
         postConfirmationTime, internetRemarks
     } = formData;
 
     const tag = "250811";
     const formattedPhone = formatPhoneNumberWithHyphens(phone);
 
-    const companyKeywords = ['株式会社', '有限会社', '合同会社', '会社'];
-    const contractorIsCompany = companyKeywords.some(kw => (contractorName || '').includes(kw) || (contractorNameKana || '').includes(kw));
-
-    const contactPersonValue = contractorIsCompany ? (contactPersonName || contactPerson || '') : '';
+    const contactPersonValue = contactPersonName || '';
 
     const commentLines = [
         `AP名：${apName || ''}`,
