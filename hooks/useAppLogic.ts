@@ -233,12 +233,22 @@ const getRequiredFields = (formData, activeTab) => {
             break;
     }
 
-    const missingFields = required.filter(field => {
+    let missingFields = required.filter(field => {
         const value = formData[field];
         if (typeof value === 'boolean') return false; // booleans are always "filled"
         return !value;
     });
-    
+
+    if (formData.product === 'フレッツ光トス') {
+        const companyKeywords = ['株式会社', '有限会社', '合同会社', '会社'];
+        const hasCompanyKeyword = companyKeywords.some(kw =>
+            (formData.contractorName || '').includes(kw) || (formData.contractorNameKana || '').includes(kw)
+        );
+        if (!hasCompanyKeyword) {
+            missingFields = Array.from(new Set([...missingFields, 'contractorName']));
+        }
+    }
+
     const missingLabels = missingFields.map(field => FIELD_LABELS[field] || field);
     
     return { missingFields, missingLabels };
