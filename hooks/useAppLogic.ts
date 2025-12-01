@@ -613,20 +613,55 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
         isErrorBanner: false, bannerMessage: ''
       });
     };
+
+    const openCompanyKeywordModal = () => {
+      setInvalidFields(prev => Array.from(new Set([...prev, 'contractorName', 'contractorNameKana'])));
+      setModalState({
+        isOpen: true,
+        title: '会社名の確認',
+        message: '会社名または会社名カナに「株式会社」「有限会社」「合同会社」「会社」を含めてください。',
+        confirmText: '修正する',
+        cancelText: '戻る',
+        type: 'warning',
+        onConfirm: closeModal,
+        onCancel: closeModal,
+        isErrorBanner: false,
+        bannerMessage: '',
+      });
+    };
+
+    const needsCompanyKeyword = (value: string, counterpart: string) => {
+      if (formData.product !== 'フレッツ光トス') return false;
+      return !isCompanyName(value) && !isCompanyName(counterpart);
+    };
     
     const handleNameBlur = useCallback((e) => {
       const { value } = e.target;
-      if (value && !nameHasSpace(value) && !isCompanyName(value)) {
+      if (!value) return;
+
+      if (needsCompanyKeyword(value, formData.contractorNameKana)) {
+        openCompanyKeywordModal();
+        return;
+      }
+
+      if (!nameHasSpace(value) && !isCompanyName(value)) {
           openNameSpaceModal('contractorName');
       }
-    }, [setInvalidFields, setModalState, closeModal]);
+    }, [setInvalidFields, setModalState, closeModal, formData.product, formData.contractorNameKana]);
 
     const handleKanaBlur = useCallback((e) => {
       const { value } = e.target;
-      if (value && !nameHasSpace(value) && !isCompanyName(value)) {
+      if (!value) return;
+
+      if (needsCompanyKeyword(formData.contractorName, value)) {
+        openCompanyKeywordModal();
+        return;
+      }
+
+      if (!nameHasSpace(value) && !isCompanyName(value)) {
           openNameSpaceModal('contractorNameKana');
       }
-    }, [setInvalidFields, setModalState, closeModal]);
+    }, [setInvalidFields, setModalState, closeModal, formData.product, formData.contractorName]);
 
     const handleIdBlur = useCallback((e) => {
         const { name, value } = e.target;
