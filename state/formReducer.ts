@@ -65,6 +65,11 @@ export const formReducer = (state: FormData, action: FormAction): FormData => {
       let newState = { ...state, ...updates };
 
       // --- Logic for dependent field updates ---
+
+      const combineAgencyAddress = (postal: string, addr: string, building: string) => {
+          const parts = [postal, addr, building].map(part => (part || '').trim()).filter(Boolean);
+          return parts.join(' ');
+      };
       
       // Sync recordId/customerId and update prefix
       if (name === 'recordId' || name === 'customerId' || name === 'agencyId') {
@@ -94,6 +99,23 @@ export const formReducer = (state: FormData, action: FormAction): FormData => {
           if (idValue.toLowerCase().startsWith('code:')) {
             newState.isVacancy = 'あり';
           }
+      }
+
+      // Sync contractor name across tabs (代行含む)
+      if (name === 'contractorName' || name === 'agencyContractorName') {
+          newState.contractorName = value;
+          newState.agencyContractorName = value;
+      }
+
+      // Sync move date across tabs (代行含む)
+      if (name === 'moveInDate' || name === 'agencyMoveDate') {
+          newState.moveInDate = value;
+          newState.agencyMoveDate = value;
+      }
+
+      // Sync move destination address into agency tab when base address parts change
+      if (name === 'postalCode' || name === 'address' || name === 'buildingInfo') {
+          newState.agencyNewAddress = combineAgencyAddress(newState.postalCode, newState.address, newState.buildingInfo);
       }
       
       // Handle 'apName' trimming
