@@ -4,6 +4,7 @@ import { generateElectricityCommentLogic } from '../commentLogic/electricity.ts'
 import { generateGasCommentLogic } from '../commentLogic/gas.ts';
 import { generateInternetCommentLogic } from '../commentLogic/internet.ts';
 import { generateWtsCommentLogic } from '../commentLogic/wts.ts';
+import { generateProxyCommentLogic } from '../commentLogic/proxy.ts';
 
 const FIELD_LABELS = {
     apName: '担当者/AP名', customerId: '顧客ID', recordId: 'レコードID', greeting: '名乗り',
@@ -44,6 +45,19 @@ const FIELD_LABELS = {
     wtsU20HighSchool: '高校生ヒアリング', wtsU20ParentalConsent: '親相談OKか',
     wtsCorporateInvoice: '請求書先', wtsEmail: 'メアド',
     mailingBuildingInfo: '現住所の物件名＋部屋番号',
+    // Proxy (代行)
+    proxyId: 'ID',
+    proxyElectricCompanyName: '電力会社名',
+    proxyElectricStartDate: '電気利用開始日',
+    proxyGasCompanyName: 'ガス会社名',
+    proxyGasStartDate: 'ガス開栓日',
+    proxyGasStartTime: 'ガス開栓時間',
+    proxyWaterStartDate: '水道利用開始日',
+    proxyOilCompanyName: '灯油会社名',
+    proxyOilStartDate: '灯油利用開始日',
+    proxyOilStartTime: '灯油開栓時間',
+    proxyOilPaymentMethod: '灯油支払い方法',
+    proxyServices: '代行希望',
 };
 
 
@@ -231,6 +245,31 @@ const getRequiredFields = (formData, activeTab) => {
             if (formData.wtsCustomerType === '法人') required.push('wtsCorporateInvoice');
             if (formData.wtsShippingDestination === 'その他') required.push('wtsShippingPostalCode', 'wtsShippingAddress');
             break;
+
+        case 'proxy': {
+            const hasServiceSelection = formData.proxyElectricity || formData.proxyGas || formData.proxyWater || formData.proxyOil;
+            required.push('proxyId', 'contractorName', 'moveInDate', 'address');
+            if (!hasServiceSelection) {
+                required.push('proxyServices');
+            }
+
+            if (formData.proxyElectricity) {
+                required.push('proxyElectricCompanyName', 'proxyElectricStartDate');
+            }
+
+            if (formData.proxyGas) {
+                required.push('proxyGasCompanyName', 'proxyGasStartDate', 'proxyGasStartTime');
+            }
+
+            if (formData.proxyWater) {
+                required.push('proxyWaterStartDate');
+            }
+
+            if (formData.proxyOil) {
+                required.push('proxyOilCompanyName', 'proxyOilStartDate', 'proxyOilStartTime', 'proxyOilPaymentMethod');
+            }
+            break;
+        }
     }
 
     const missingFields = required.filter(field => {
@@ -309,6 +348,7 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
                 case 'gas': newComment = generateGasCommentLogic(formData); break;
                 case 'internet': newComment = generateInternetCommentLogic(formData); break;
                 case 'wts': newComment = generateWtsCommentLogic(formData); break;
+                case 'proxy': newComment = generateProxyCommentLogic(formData); break;
             }
         } catch (error) {
             console.error("Error generating comment:", error);
@@ -691,6 +731,7 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
                     case 'gas': commentToCopy = generateGasCommentLogic(formDataForCopy); break;
                     case 'internet': commentToCopy = generateInternetCommentLogic(formDataForCopy); break;
                     case 'wts': commentToCopy = generateWtsCommentLogic(formDataForCopy); break;
+                    case 'proxy': commentToCopy = generateProxyCommentLogic(formDataForCopy); break;
                 }
             } catch (error) {
                 console.error("Error generating comment for copy:", error);

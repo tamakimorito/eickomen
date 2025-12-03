@@ -141,6 +141,23 @@ export type FormData = {
   wtsCorporateInvoice: string;
   wtsEmail: string;
   wtsMoveInAlready: boolean;
+
+  // --- Proxy (代行) Specific ---
+  proxyId: string;
+  proxyElectricity: boolean;
+  proxyGas: boolean;
+  proxyWater: boolean;
+  proxyOil: boolean;
+  proxyElectricCompanyName: string;
+  proxyElectricStartDate: string;
+  proxyGasCompanyName: string;
+  proxyGasStartDate: string;
+  proxyGasStartTime: string;
+  proxyWaterStartDate: string;
+  proxyOilCompanyName: string;
+  proxyOilStartDate: string;
+  proxyOilStartTime: string;
+  proxyOilPaymentMethod: string;
 };
 
 // Action types for form reducer

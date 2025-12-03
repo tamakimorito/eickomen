@@ -8,7 +8,8 @@ export const useFormLogic = () => {
 
     const handleInputChange = useCallback((e) => {
         const { name, type, value, checked } = e.target;
-        setInvalidFields(prev => prev.filter(item => item !== name));
+        const serviceFields = ['proxyElectricity', 'proxyGas', 'proxyWater', 'proxyOil'];
+        setInvalidFields(prev => prev.filter(item => item !== name && !(serviceFields.includes(name) && item === 'proxyServices')));
         
         const payloadValue = type === 'checkbox' ? checked : value;
         dispatch({ type: 'UPDATE_FIELD', payload: { name, value: payloadValue, type } });
