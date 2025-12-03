@@ -4,6 +4,7 @@ import InternetTab from './components/InternetTab.tsx';
 import ElectricityTab from './components/ElectricityTab.tsx';
 import GasTab from './components/GasTab.tsx';
 import WtsTab from './components/WtsTab.tsx';
+import AgencyTab from './components/AgencyTab.tsx';
 import GeneratedComment from './components/GeneratedComment.tsx';
 import Header from './components/Header.tsx';
 import { Toast } from './components/Toast.tsx';
@@ -11,13 +12,14 @@ import { Modal } from './components/Modal.tsx';
 import ManualModal from './components/ManualModal.tsx';
 import BugReportModal from './components/BugReportModal.tsx';
 import { FormInput, FormCheckbox } from './components/FormControls.tsx';
-import { BoltIcon, FireIcon, WifiIcon, CloudIcon, ChatBubbleBottomCenterTextIcon, XCircleIcon, XMarkIcon } from '@heroicons/react/24/solid';
+import { BoltIcon, FireIcon, WifiIcon, CloudIcon, ClipboardDocumentListIcon, ChatBubbleBottomCenterTextIcon, XCircleIcon, XMarkIcon } from '@heroicons/react/24/solid';
 
 const TABS = [
   { id: 'electricity', label: '電気', icon: BoltIcon },
   { id: 'gas', label: 'ガス', icon: FireIcon },
   { id: 'internet', label: 'インターネット', icon: WifiIcon },
   { id: 'wts', label: 'ウォーターサーバー', icon: CloudIcon },
+  { id: 'agency', label: '代行', icon: ClipboardDocumentListIcon },
 ];
 
 type TabProps = {
@@ -139,6 +141,7 @@ const App = () => {
                             {activeTab === 'gas' && <GasTab />}
                             {activeTab === 'internet' && <InternetTab />}
                             {activeTab === 'wts' && <WtsTab />}
+                            {activeTab === 'agency' && <AgencyTab />}
                         </div>
                     </div>
 

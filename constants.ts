@@ -141,6 +141,26 @@ export const INITIAL_FORM_DATA: FormData = {
   wtsCorporateInvoice: '',
   wtsEmail: '',
   wtsMoveInAlready: false,
+
+  // --- Agency Proxy Specific ---
+  agencyId: '',
+  agencyContractorName: '',
+  agencyMoveDate: '',
+  agencyNewAddress: '',
+  agencyRequestElectricity: false,
+  agencyRequestGas: false,
+  agencyRequestWater: false,
+  agencyRequestOil: false,
+  agencyElectricCompanyName: '',
+  agencyElectricStartDate: '',
+  agencyGasCompanyName: '',
+  agencyGasStartDate: '',
+  agencyGasStartTime: '',
+  agencyWaterStartDate: '',
+  agencyOilCompanyName: '',
+  agencyOilStartDate: '',
+  agencyOilStartTime: '',
+  agencyOilPaymentMethod: '',
 };
 
 export const BUG_REPORT_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxcxDeiLBs1ViBpWx6NhTWtemiiiWLydybw0piSVbxZpodzSQh2ebzyF66MeFinqou7HA/exec';
