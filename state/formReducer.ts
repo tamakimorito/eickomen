@@ -67,11 +67,12 @@ export const formReducer = (state: FormData, action: FormAction): FormData => {
       // --- Logic for dependent field updates ---
       
       // Sync recordId/customerId and update prefix
-      if (name === 'recordId' || name === 'customerId') {
+      if (name === 'recordId' || name === 'customerId' || name === 'agencyId') {
           const idValue = value || '';
           // Sync both fields
           newState.recordId = idValue;
           newState.customerId = idValue;
+          newState.agencyId = idValue;
           
           if (!newState.isSakaiRoute) {
               // Auto-determine prefix from ID for Elec/Gas tabs
