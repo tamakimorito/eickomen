@@ -141,6 +141,26 @@ export const INITIAL_FORM_DATA: FormData = {
   wtsCorporateInvoice: '',
   wtsEmail: '',
   wtsMoveInAlready: false,
+
+  // --- Delegation Specific ---
+  delegationId: '',
+  delegationContractorName: '',
+  delegationMoveDate: '',
+  delegationNewAddress: '',
+  delegationNeedsElectricity: false,
+  delegationNeedsGas: false,
+  delegationNeedsWater: false,
+  delegationNeedsKerosene: false,
+  delegationElectricCompany: '',
+  delegationElectricStartDate: '',
+  delegationGasCompany: '',
+  delegationGasStartDate: '',
+  delegationGasTimeSlot: '',
+  delegationWaterStartDate: '',
+  delegationKeroseneCompany: '',
+  delegationKeroseneStartDate: '',
+  delegationKeroseneTimeSlot: '',
+  delegationKerosenePayment: '',
 };
 
 export const BUG_REPORT_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxcxDeiLBs1ViBpWx6NhTWtemiiiWLydybw0piSVbxZpodzSQh2ebzyF66MeFinqou7HA/exec';
@@ -620,4 +640,17 @@ export const WTS_CARRIER_OPTIONS = [
     { value: 'LINEMO', label: 'LINEMO' },
     { value: 'AHAMO', label: 'AHAMO' },
     { value: 'その他', label: 'その他' },
+];
+
+// --- Delegation Tab ---
+export const DELEGATION_TIME_SLOT_OPTIONS = [
+    { value: '9-12', label: '9-12' },
+    { value: '13-15', label: '13-15' },
+    { value: '15-17', label: '15-17' },
+];
+
+export const DELEGATION_KEROSENE_PAYMENT_OPTIONS = [
+    { value: 'クレカ', label: 'クレカ' },
+    { value: '口座', label: '口座' },
+    { value: '請求書', label: '請求書' },
 ];

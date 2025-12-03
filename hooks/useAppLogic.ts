@@ -4,6 +4,7 @@ import { generateElectricityCommentLogic } from '../commentLogic/electricity.ts'
 import { generateGasCommentLogic } from '../commentLogic/gas.ts';
 import { generateInternetCommentLogic } from '../commentLogic/internet.ts';
 import { generateWtsCommentLogic } from '../commentLogic/wts.ts';
+import { generateDelegationCommentLogic } from '../commentLogic/delegation.ts';
 
 const FIELD_LABELS = {
     apName: '担当者/AP名', customerId: '顧客ID', recordId: 'レコードID', greeting: '名乗り',
@@ -44,6 +45,22 @@ const FIELD_LABELS = {
     wtsU20HighSchool: '高校生ヒアリング', wtsU20ParentalConsent: '親相談OKか',
     wtsCorporateInvoice: '請求書先', wtsEmail: 'メアド',
     mailingBuildingInfo: '現住所の物件名＋部屋番号',
+    // Delegation
+    delegationId: 'ID',
+    delegationContractorName: '契約者名義',
+    delegationMoveDate: '引っ越し予定日',
+    delegationNewAddress: '引っ越し先住所',
+    delegationServices: '代行希望',
+    delegationElectricCompany: '電力会社名',
+    delegationElectricStartDate: '電気利用開始日',
+    delegationGasCompany: 'ガス会社名',
+    delegationGasStartDate: 'ガス開栓日',
+    delegationGasTimeSlot: 'ガス開栓時間',
+    delegationWaterStartDate: '水道利用開始日',
+    delegationKeroseneCompany: '灯油会社名',
+    delegationKeroseneStartDate: '灯油利用開始日',
+    delegationKeroseneTimeSlot: '灯油開栓時間',
+    delegationKerosenePayment: '灯油支払い方法',
 };
 
 
@@ -231,6 +248,34 @@ const getRequiredFields = (formData, activeTab) => {
             if (formData.wtsCustomerType === '法人') required.push('wtsCorporateInvoice');
             if (formData.wtsShippingDestination === 'その他') required.push('wtsShippingPostalCode', 'wtsShippingAddress');
             break;
+
+        case 'delegation': {
+            required.push('delegationId', 'delegationContractorName', 'delegationMoveDate', 'delegationNewAddress');
+            const hasServiceSelection = [
+                formData.delegationNeedsElectricity,
+                formData.delegationNeedsGas,
+                formData.delegationNeedsWater,
+                formData.delegationNeedsKerosene,
+            ].some(Boolean);
+
+            if (!hasServiceSelection) {
+                required.push('delegationServices');
+            }
+
+            if (formData.delegationNeedsElectricity) {
+                required.push('delegationElectricCompany', 'delegationElectricStartDate');
+            }
+            if (formData.delegationNeedsGas) {
+                required.push('delegationGasCompany', 'delegationGasStartDate', 'delegationGasTimeSlot');
+            }
+            if (formData.delegationNeedsWater) {
+                required.push('delegationWaterStartDate');
+            }
+            if (formData.delegationNeedsKerosene) {
+                required.push('delegationKeroseneCompany', 'delegationKeroseneStartDate', 'delegationKeroseneTimeSlot', 'delegationKerosenePayment');
+            }
+            break;
+        }
     }
 
     const missingFields = required.filter(field => {
@@ -309,6 +354,7 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
                 case 'gas': newComment = generateGasCommentLogic(formData); break;
                 case 'internet': newComment = generateInternetCommentLogic(formData); break;
                 case 'wts': newComment = generateWtsCommentLogic(formData); break;
+                case 'delegation': newComment = generateDelegationCommentLogic(formData); break;
             }
         } catch (error) {
             console.error("Error generating comment:", error);
@@ -691,6 +737,7 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
                     case 'gas': commentToCopy = generateGasCommentLogic(formDataForCopy); break;
                     case 'internet': commentToCopy = generateInternetCommentLogic(formDataForCopy); break;
                     case 'wts': commentToCopy = generateWtsCommentLogic(formDataForCopy); break;
+                    case 'delegation': commentToCopy = generateDelegationCommentLogic(formDataForCopy); break;
                 }
             } catch (error) {
                 console.error("Error generating comment for copy:", error);
