@@ -141,6 +141,26 @@ export type FormData = {
   wtsCorporateInvoice: string;
   wtsEmail: string;
   wtsMoveInAlready: boolean;
+
+  // --- Delegation Specific ---
+  delegationId: string;
+  delegationContractorName: string;
+  delegationMoveDate: string;
+  delegationNewAddress: string;
+  delegationNeedsElectricity: boolean;
+  delegationNeedsGas: boolean;
+  delegationNeedsWater: boolean;
+  delegationNeedsKerosene: boolean;
+  delegationElectricCompany: string;
+  delegationElectricStartDate: string;
+  delegationGasCompany: string;
+  delegationGasStartDate: string;
+  delegationGasTimeSlot: string;
+  delegationWaterStartDate: string;
+  delegationKeroseneCompany: string;
+  delegationKeroseneStartDate: string;
+  delegationKeroseneTimeSlot: string;
+  delegationKerosenePayment: string;
 };
 
 // Action types for form reducer
