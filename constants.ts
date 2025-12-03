@@ -141,7 +141,36 @@ export const INITIAL_FORM_DATA: FormData = {
   wtsCorporateInvoice: '',
   wtsEmail: '',
   wtsMoveInAlready: false,
+
+  // --- Proxy (代行) Specific ---
+  proxyId: '',
+  proxyElectricity: false,
+  proxyGas: false,
+  proxyWater: false,
+  proxyOil: false,
+  proxyElectricCompanyName: '',
+  proxyElectricStartDate: '',
+  proxyGasCompanyName: '',
+  proxyGasStartDate: '',
+  proxyGasStartTime: '',
+  proxyWaterStartDate: '',
+  proxyOilCompanyName: '',
+  proxyOilStartDate: '',
+  proxyOilStartTime: '',
+  proxyOilPaymentMethod: '',
 };
+
+export const PROXY_TIME_SLOTS = [
+    { value: '9-12', label: '9-12' },
+    { value: '13-15', label: '13-15' },
+    { value: '15-17', label: '15-17' },
+];
+
+export const PROXY_OIL_PAYMENT_METHODS = [
+    { value: 'クレカ', label: 'クレカ' },
+    { value: '口座', label: '口座' },
+    { value: '請求書', label: '請求書' },
+];
 
 export const BUG_REPORT_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxcxDeiLBs1ViBpWx6NhTWtemiiiWLydybw0piSVbxZpodzSQh2ebzyF66MeFinqou7HA/exec';
 
