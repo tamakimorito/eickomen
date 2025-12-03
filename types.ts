@@ -120,7 +120,7 @@ export type FormData = {
   isSakaiRoute: boolean;
 
   // --- WTS Specific ---
-  wtsCustomerType: string; 
+  wtsCustomerType: string;
   wtsShippingDestination: string;
   wtsShippingPostalCode: string;
   wtsShippingAddress: string;
@@ -141,6 +141,27 @@ export type FormData = {
   wtsCorporateInvoice: string;
   wtsEmail: string;
   wtsMoveInAlready: boolean;
+
+  // --- Daiko (Agency) Specific ---
+  agencyId: string;
+  agencyApName: string;
+  agencyContractorName: string;
+  agencyMoveDate: string;
+  agencyNewAddress: string;
+  agencyElectricity: boolean;
+  agencyGas: boolean;
+  agencyWater: boolean;
+  agencyKerosene: boolean;
+  agencyElectricityCompany: string;
+  agencyElectricityStartDate: string;
+  agencyGasCompany: string;
+  agencyGasStartDate: string;
+  agencyGasTimeSlot: string;
+  agencyWaterStartDate: string;
+  agencyKeroseneCompany: string;
+  agencyKeroseneStartDate: string;
+  agencyKeroseneTimeSlot: string;
+  agencyKerosenePaymentMethod: string;
 };
 
 // Action types for form reducer

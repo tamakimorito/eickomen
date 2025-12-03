@@ -4,6 +4,7 @@ import { generateElectricityCommentLogic } from '../commentLogic/electricity.ts'
 import { generateGasCommentLogic } from '../commentLogic/gas.ts';
 import { generateInternetCommentLogic } from '../commentLogic/internet.ts';
 import { generateWtsCommentLogic } from '../commentLogic/wts.ts';
+import { generateAgencyCommentLogic } from '../commentLogic/agency.ts';
 
 const FIELD_LABELS = {
     apName: '担当者/AP名', customerId: '顧客ID', recordId: 'レコードID', greeting: '名乗り',
@@ -44,6 +45,23 @@ const FIELD_LABELS = {
     wtsU20HighSchool: '高校生ヒアリング', wtsU20ParentalConsent: '親相談OKか',
     wtsCorporateInvoice: '請求書先', wtsEmail: 'メアド',
     mailingBuildingInfo: '現住所の物件名＋部屋番号',
+    // Agency
+    agencyId: 'ID',
+    agencyApName: 'AP名',
+    agencyContractorName: '契約者名義',
+    agencyMoveDate: '引っ越し予定日',
+    agencyNewAddress: '引っ越し先住所',
+    agencyElectricityCompany: '電力会社名',
+    agencyElectricityStartDate: '電気利用開始日',
+    agencyGasCompany: 'ガス会社名',
+    agencyGasStartDate: 'ガス開栓日',
+    agencyGasTimeSlot: 'ガス開栓時間',
+    agencyWaterStartDate: '水道利用開始日',
+    agencyKeroseneCompany: '灯油会社名',
+    agencyKeroseneStartDate: '灯油利用開始日',
+    agencyKeroseneTimeSlot: '灯油開栓時間',
+    agencyKerosenePaymentMethod: '灯油支払い方法',
+    agencyServices: '代行希望',
 };
 
 
@@ -231,6 +249,29 @@ const getRequiredFields = (formData, activeTab) => {
             if (formData.wtsCustomerType === '法人') required.push('wtsCorporateInvoice');
             if (formData.wtsShippingDestination === 'その他') required.push('wtsShippingPostalCode', 'wtsShippingAddress');
             break;
+
+        case 'agency': {
+            required.push('agencyId', 'agencyApName', 'agencyContractorName', 'agencyMoveDate', 'agencyNewAddress');
+
+            const servicesSelected = [formData.agencyElectricity, formData.agencyGas, formData.agencyWater, formData.agencyKerosene].some(Boolean);
+            if (!servicesSelected) {
+                required.push('agencyServices');
+            }
+
+            if (formData.agencyElectricity) {
+                required.push('agencyElectricityCompany', 'agencyElectricityStartDate');
+            }
+            if (formData.agencyGas) {
+                required.push('agencyGasCompany', 'agencyGasStartDate', 'agencyGasTimeSlot');
+            }
+            if (formData.agencyWater) {
+                required.push('agencyWaterStartDate');
+            }
+            if (formData.agencyKerosene) {
+                required.push('agencyKeroseneCompany', 'agencyKeroseneStartDate', 'agencyKeroseneTimeSlot', 'agencyKerosenePaymentMethod');
+            }
+            break;
+        }
     }
 
     const missingFields = required.filter(field => {
@@ -309,6 +350,7 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
                 case 'gas': newComment = generateGasCommentLogic(formData); break;
                 case 'internet': newComment = generateInternetCommentLogic(formData); break;
                 case 'wts': newComment = generateWtsCommentLogic(formData); break;
+                case 'agency': newComment = generateAgencyCommentLogic(formData); break;
             }
         } catch (error) {
             console.error("Error generating comment:", error);

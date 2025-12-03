@@ -141,6 +141,27 @@ export const INITIAL_FORM_DATA: FormData = {
   wtsCorporateInvoice: '',
   wtsEmail: '',
   wtsMoveInAlready: false,
+
+  // --- Daiko (Agency) Specific ---
+  agencyId: '',
+  agencyApName: '',
+  agencyContractorName: '',
+  agencyMoveDate: '',
+  agencyNewAddress: '',
+  agencyElectricity: false,
+  agencyGas: false,
+  agencyWater: false,
+  agencyKerosene: false,
+  agencyElectricityCompany: '',
+  agencyElectricityStartDate: '',
+  agencyGasCompany: '',
+  agencyGasStartDate: '',
+  agencyGasTimeSlot: '',
+  agencyWaterStartDate: '',
+  agencyKeroseneCompany: '',
+  agencyKeroseneStartDate: '',
+  agencyKeroseneTimeSlot: '',
+  agencyKerosenePaymentMethod: '',
 };
 
 export const BUG_REPORT_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxcxDeiLBs1ViBpWx6NhTWtemiiiWLydybw0piSVbxZpodzSQh2ebzyF66MeFinqou7HA/exec';
@@ -310,6 +331,12 @@ export const PAYMENT_METHOD_OPTIONS_EXTENDED = [
     { value: '口座', label: '口座' },
 ];
 
+export const DAIKO_KEROSENE_PAYMENT_OPTIONS = [
+    { value: 'クレカ', label: 'クレカ' },
+    { value: '口座', label: '口座' },
+    { value: '請求書', label: '請求書' },
+];
+
 export const CROSS_PATH_ROUTER_OPTIONS = [
     { value: '4950円購入', label: '4950円購入' },
     { value: 'お客様で手配', label: 'お客様で手配' },
@@ -449,6 +476,8 @@ export const GAS_OPENING_TIME_SLOTS = [
     { value: '13-15', label: '13-15時' },
     { value: '15-17', label: '15-17時' },
 ];
+
+export const DAIKO_TIME_SLOTS = GAS_OPENING_TIME_SLOTS;
 
 export const TIME_SLOTS_SUTENE_SR = [
     { value: '9-12', label: '9-12時' },
