@@ -4,6 +4,7 @@ import { generateElectricityCommentLogic } from '../commentLogic/electricity.ts'
 import { generateGasCommentLogic } from '../commentLogic/gas.ts';
 import { generateInternetCommentLogic } from '../commentLogic/internet.ts';
 import { generateWtsCommentLogic } from '../commentLogic/wts.ts';
+import { generateAgencyCommentLogic } from '../commentLogic/agency.ts';
 
 const FIELD_LABELS = {
     apName: '担当者/AP名', customerId: '顧客ID', recordId: 'レコードID', greeting: '名乗り',
@@ -44,6 +45,12 @@ const FIELD_LABELS = {
     wtsU20HighSchool: '高校生ヒアリング', wtsU20ParentalConsent: '親相談OKか',
     wtsCorporateInvoice: '請求書先', wtsEmail: 'メアド',
     mailingBuildingInfo: '現住所の物件名＋部屋番号',
+    // Agency
+    agencyId: 'ID', agencyContractorName: '契約者名義', agencyMoveDate: '引っ越し予定日', agencyNewAddress: '引っ越し先住所',
+    agencyRequests: '代行希望', agencyElectricCompanyName: '電力会社名', agencyElectricStartDate: '電気利用開始日',
+    agencyGasCompanyName: 'ガス会社名', agencyGasStartDate: 'ガス開栓日', agencyGasStartTime: 'ガス開栓時間',
+    agencyWaterStartDate: '水道利用開始日', agencyOilCompanyName: '灯油会社名', agencyOilStartDate: '灯油利用開始日',
+    agencyOilStartTime: '灯油開栓時間', agencyOilPaymentMethod: '灯油支払い方法',
 };
 
 
@@ -231,6 +238,27 @@ const getRequiredFields = (formData, activeTab) => {
             if (formData.wtsCustomerType === '法人') required.push('wtsCorporateInvoice');
             if (formData.wtsShippingDestination === 'その他') required.push('wtsShippingPostalCode', 'wtsShippingAddress');
             break;
+
+        case 'agency': {
+            required.push('agencyId', 'agencyContractorName', 'agencyMoveDate', 'agencyNewAddress');
+            const hasRequestedService = formData.agencyRequestElectricity || formData.agencyRequestGas || formData.agencyRequestWater || formData.agencyRequestOil;
+            if (!hasRequestedService) {
+                required.push('agencyRequests');
+            }
+            if (formData.agencyRequestElectricity) {
+                required.push('agencyElectricCompanyName', 'agencyElectricStartDate');
+            }
+            if (formData.agencyRequestGas) {
+                required.push('agencyGasCompanyName', 'agencyGasStartDate', 'agencyGasStartTime');
+            }
+            if (formData.agencyRequestWater) {
+                required.push('agencyWaterStartDate');
+            }
+            if (formData.agencyRequestOil) {
+                required.push('agencyOilCompanyName', 'agencyOilStartDate', 'agencyOilStartTime', 'agencyOilPaymentMethod');
+            }
+            break;
+        }
     }
 
     const missingFields = required.filter(field => {
@@ -309,6 +337,7 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
                 case 'gas': newComment = generateGasCommentLogic(formData); break;
                 case 'internet': newComment = generateInternetCommentLogic(formData); break;
                 case 'wts': newComment = generateWtsCommentLogic(formData); break;
+                case 'agency': newComment = generateAgencyCommentLogic(formData); break;
             }
         } catch (error) {
             console.error("Error generating comment:", error);
@@ -691,6 +720,7 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
                     case 'gas': commentToCopy = generateGasCommentLogic(formDataForCopy); break;
                     case 'internet': commentToCopy = generateInternetCommentLogic(formDataForCopy); break;
                     case 'wts': commentToCopy = generateWtsCommentLogic(formDataForCopy); break;
+                    case 'agency': commentToCopy = generateAgencyCommentLogic(formDataForCopy); break;
                 }
             } catch (error) {
                 console.error("Error generating comment for copy:", error);
@@ -984,9 +1014,9 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
         }
 
         const fromInternetOrWts = ['internet', 'wts'].includes(activeTab);
-        const toElecOrGas = ['electricity', 'gas'].includes(tabId);
+        const toElecGasOrAgency = ['electricity', 'gas', 'agency'].includes(tabId);
 
-        if (fromInternetOrWts && toElecOrGas && activeTab !== tabId) {
+        if (fromInternetOrWts && toElecGasOrAgency && activeTab !== tabId) {
             setModalState({
                 isOpen: true,
                 title: '入力内容の確認',

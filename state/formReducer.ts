@@ -66,13 +66,14 @@ export const formReducer = (state: FormData, action: FormAction): FormData => {
 
       // --- Logic for dependent field updates ---
       
-      // Sync recordId/customerId and update prefix
-      if (name === 'recordId' || name === 'customerId') {
+      // Sync IDs across tabs and update prefix
+      if (name === 'recordId' || name === 'customerId' || name === 'agencyId') {
           const idValue = value || '';
-          // Sync both fields
+          // Sync all ID fields
           newState.recordId = idValue;
           newState.customerId = idValue;
-          
+          newState.agencyId = idValue;
+
           if (!newState.isSakaiRoute) {
               // Auto-determine prefix from ID for Elec/Gas tabs
               let prefix = 'それ以外';
@@ -82,7 +83,7 @@ export const formReducer = (state: FormData, action: FormAction): FormData => {
               else if (idValue.toLowerCase().startsWith('id:')) prefix = 'ID:';
               else if (idValue.toLowerCase().startsWith('no.')) prefix = 'No.';
               else if (/^S\d/.test(idValue)) prefix = 'S'; // Use regex to check for 'S' followed by a digit.
-              
+
               if (ELEC_ID_PREFIX_OPTIONS.some(opt => opt.value === prefix)) {
                   newState.elecRecordIdPrefix = prefix;
               }
@@ -103,7 +104,8 @@ export const formReducer = (state: FormData, action: FormAction): FormData => {
       // Logic for 'isSakaiRoute' checkbox
       if (name === 'isSakaiRoute' && type === 'checkbox') {
           newState.recordId = '';
-          newState.customerId = ''; 
+          newState.customerId = '';
+          newState.agencyId = '';
           if (value) { // value is the boolean 'checked'
               newState.greeting = 'ライフイン24';
               newState.elecRecordIdPrefix = 'サカイ';
