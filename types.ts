@@ -141,6 +141,25 @@ export type FormData = {
   wtsCorporateInvoice: string;
   wtsEmail: string;
   wtsMoveInAlready: boolean;
+
+  // --- Agency Proxy Specific ---
+  agencyContractorName: string;
+  agencyMoveDate: string;
+  agencyNewAddress: string;
+  agencyRequestElectricity: boolean;
+  agencyRequestGas: boolean;
+  agencyRequestWater: boolean;
+  agencyRequestOil: boolean;
+  agencyElectricCompanyName: string;
+  agencyElectricStartDate: string;
+  agencyGasCompanyName: string;
+  agencyGasStartDate: string;
+  agencyGasStartTime: string;
+  agencyWaterStartDate: string;
+  agencyOilCompanyName: string;
+  agencyOilStartDate: string;
+  agencyOilStartTime: string;
+  agencyOilPaymentMethod: string;
 };
 
 // Action types for form reducer
