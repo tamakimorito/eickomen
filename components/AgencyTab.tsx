@@ -99,7 +99,7 @@ const AgencyTab = () => {
             </div>
 
             {isElectricityRequested && (
-                <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
+                <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 shadow-sm">
                     <div className="font-bold text-gray-800 mb-3">電気</div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <FormInput
@@ -124,7 +124,7 @@ const AgencyTab = () => {
             )}
 
             {isGasRequested && (
-                <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
+                <div className="bg-orange-50 border border-orange-200 rounded-xl p-4 shadow-sm">
                     <div className="font-bold text-gray-800 mb-3">ガス</div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <FormInput
@@ -158,7 +158,7 @@ const AgencyTab = () => {
             )}
 
             {isWaterRequested && (
-                <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
+                <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 shadow-sm">
                     <div className="font-bold text-gray-800 mb-3">水道</div>
                     <FormDateInput
                         label="水道利用開始日"
@@ -173,7 +173,7 @@ const AgencyTab = () => {
             )}
 
             {isOilRequested && (
-                <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
+                <div className="bg-rose-50 border border-rose-200 rounded-xl p-4 shadow-sm">
                     <div className="font-bold text-gray-800 mb-3">灯油</div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <FormInput

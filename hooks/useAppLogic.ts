@@ -720,6 +720,7 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
                     case 'gas': commentToCopy = generateGasCommentLogic(formDataForCopy); break;
                     case 'internet': commentToCopy = generateInternetCommentLogic(formDataForCopy); break;
                     case 'wts': commentToCopy = generateWtsCommentLogic(formDataForCopy); break;
+                    case 'agency': commentToCopy = generateAgencyCommentLogic(formDataForCopy); break;
                 }
             } catch (error) {
                 console.error("Error generating comment for copy:", error);
@@ -1013,9 +1014,9 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
         }
 
         const fromInternetOrWts = ['internet', 'wts'].includes(activeTab);
-        const toElecOrGas = ['electricity', 'gas'].includes(tabId);
+        const toElecGasOrAgency = ['electricity', 'gas', 'agency'].includes(tabId);
 
-        if (fromInternetOrWts && toElecOrGas && activeTab !== tabId) {
+        if (fromInternetOrWts && toElecGasOrAgency && activeTab !== tabId) {
             setModalState({
                 isOpen: true,
                 title: '入力内容の確認',
