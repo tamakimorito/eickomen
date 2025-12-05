@@ -127,7 +127,9 @@
 - ジライフのヘッダは「【ジライフウォーター】 250811」。U20/法人の派生ヘッダは適用しない。
 - 通常（プレミアムウォーター）の value は"通常"を維持する（互換性）。
 - 賃貸ねっと【無料施策】では、タイプ未選択でもラック選択可能（マンション/マンション10Gの和集合）。ラックに「無し」は出さない。
-- **タブ遷移時の住所統合**: 電気/ガス → インターネット/WTS へタブ遷移する際、`mailingOption=現住所` の場合に限り、`mailingBuildingInfo` の値を `currentAddress` に重複なく結合する。
+- **タブ遷移時の住所統合**:
+  - 電気/ガス → インターネット：`mailingOption=現住所` の場合に限り、`mailingBuildingInfo` を `currentAddress` に重複なく結合。
+  - 電気/ガス → WTS：`mailingOption` の値に関わらず、`mailingBuildingInfo` を `currentAddress` に重複なく結合。
 - **住所系の数字は入力値を保持し、コピー時のみ半角正規化して出力する**（対象：address/currentAddress/buildingInfo/mailingBuildingInfo/wtsShippingAddress）。
 - **住所の数字判定は半角/全角の 0–9 を対象とする**（漢数字は対象外）。
 - **大阪ガス単品**：営業コメントの**電話番号・ガス事前連絡先・郵便番号はハイフン無し**で出力する。

@@ -506,6 +506,7 @@ export const TIME_SLOTS_TOHO_GAS_SETUP = [
 export const NICHIGAS_GAS_AREAS = [
   { value: '東京ガス', label: '東京ガス' },
   { value: '京葉ガス', label: '京葉ガス' },
+  { value: 'エナジー宇宙', label: 'エナジー宇宙' },
   { value: '京和ガス', label: '京和ガス' },
   { value: '東部ガス（水戸・土浦・守谷地区）', label: '東部ガス（水戸・土浦・守谷地区）' },
   { value: '東京ガス山梨', label: '東京ガス山梨' },

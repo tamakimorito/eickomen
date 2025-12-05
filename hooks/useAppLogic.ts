@@ -235,6 +235,7 @@ const getRequiredFields = (formData, activeTab) => {
             }
             if (!isSakaiRoute) required.push('customerId');
             if (formData.wtsCustomerType === 'U-20') required.push('wtsU20HighSchool', 'wtsU20ParentalConsent');
+            if (formData.wtsCustomerType === 'ジライフウォーター') required.push('contractorNameKana', 'email');
             if (formData.wtsCustomerType === '法人') required.push('wtsCorporateInvoice');
             if (formData.wtsShippingDestination === 'その他') required.push('wtsShippingPostalCode', 'wtsShippingAddress');
             break;
@@ -1004,7 +1005,9 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
             const base = (formData.currentAddress || '').trim();
             const extra = (formData.mailingBuildingInfo || '').trim();
 
-            if (mailingOpt === '現住所' && extra) {
+            const shouldMerge = tabId === 'wts' ? Boolean(extra) : mailingOpt === '現住所' && Boolean(extra);
+
+            if (shouldMerge) {
                 const alreadyHas = base.includes(extra);
                 if (!alreadyHas) {
                     const merged = base ? `${base} ${extra}` : extra;
