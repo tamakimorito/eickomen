@@ -107,13 +107,14 @@ const WtsTab = () => {
                         isInvalid={invalidFields.includes('contractorName')}
                         required
                     />
-                     <FormInput
+                    <FormInput
                         label="②フリガナ"
                         name="contractorNameKana"
                         value={formData.contractorNameKana}
                         onChange={handleInputChange}
                         onBlur={handleKanaBlur}
                         isInvalid={invalidFields.includes('contractorNameKana')}
+                        required={wtsCustomerType === 'ジライフウォーター'}
                     />
                      <FormDateInput
                         label="③生年月日"
@@ -141,6 +142,7 @@ const WtsTab = () => {
                         value={formData.email}
                         onChange={handleInputChange}
                         isInvalid={invalidFields.includes('email')}
+                        required={wtsCustomerType === 'ジライフウォーター'}
                     />
                     <div className="md:col-span-2">
                         <FormRadioGroup
