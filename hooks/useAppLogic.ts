@@ -524,50 +524,37 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
           const today = new Date();
           today.setHours(0, 0, 0, 0);
 
-           if (name === 'gasOpeningDate' && formData.elecProvider === 'すまいのでんき（ストエネ）' && formData.isGasSet === 'セット' && formData.address) {
-                const KANSAI_PREFECTURES = ['大阪', '兵庫', '京都', '奈良', '滋賀', '和歌山'];
-                const KANTO_PREFECTURES = ['東京', '神奈川', '千葉', '埼玉', '茨城', '栃木', '群馬', '山梨'];
+           if (
+             name === 'gasOpeningDate' &&
+             (
+               (formData.elecProvider === 'すまいのでんき（ストエネ）' && formData.isGasSet === 'セット') ||
+               formData.gasProvider === 'すまいのでんき（ストエネ）'
+             )
+           ) {
+                const selectedDate = new Date(normalized);
+                selectedDate.setHours(0, 0, 0, 0);
+                const startDate = new Date(2025, 11, 31); // 2025/12/31（JSの月は0=1月）
+                const endDate = new Date(2026, 0, 3); // 2026/01/03
+                startDate.setHours(0, 0, 0, 0);
+                endDate.setHours(0, 0, 0, 0);
 
-                let region = '';
-                if (KANSAI_PREFECTURES.some(pref => formData.address.includes(pref))) {
-                    region = 'Kansai';
-                } else if (KANTO_PREFECTURES.some(pref => formData.address.includes(pref))) {
-                    region = 'Kanto';
-                }
-
-                if (region) {
-                    const selectedDate = new Date(normalized);
-                    selectedDate.setHours(0, 0, 0, 0);
-                    let isBlocked = false;
-                    
-                    if (region === 'Kansai') {
-                        const startDate = new Date(2025, 11, 28); // Month is 0-indexed
-                        const endDate = new Date(2026, 0, 8);
-                        if (selectedDate >= startDate && selectedDate <= endDate) isBlocked = true;
-                    } else if (region === 'Kanto') {
-                        const startDate = new Date(2025, 11, 28);
-                        const endDate = new Date(2026, 0, 9);
-                        if (selectedDate >= startDate && selectedDate <= endDate) isBlocked = true;
-                    }
-
-                    if (isBlocked) {
-                        setModalState({
-                            isOpen: true,
-                            title: '入力エラー',
-                            message: 'ガス開栓不可日程となります。再入力してください。',
-                            confirmText: '修正する',
-                            cancelText: null,
-                            type: 'default',
-                            onConfirm: () => {
-                                dispatch({ type: 'UPDATE_FIELD', payload: { name: 'gasOpeningDate', value: '', type: 'text' }});
-                                closeModal();
-                            },
-                            onCancel: closeModal,
-                            isErrorBanner: false,
-                            bannerMessage: '',
-                        });
-                        return; // Stop further validation
-                    }
+                if (selectedDate >= startDate && selectedDate <= endDate) {
+                    setModalState({
+                        isOpen: true,
+                        title: '入力エラー',
+                        message: 'ガス開栓不可日程となります。再入力してください。',
+                        confirmText: '修正する',
+                        cancelText: null,
+                        type: 'default',
+                        onConfirm: () => {
+                            dispatch({ type: 'UPDATE_FIELD', payload: { name: 'gasOpeningDate', value: '', type: 'text' }});
+                            closeModal();
+                        },
+                        onCancel: closeModal,
+                        isErrorBanner: false,
+                        bannerMessage: '',
+                    });
+                    return; // Stop further validation
                 }
             }
 
@@ -613,7 +600,7 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
           }
       }
 
-    }, [dispatch, setModalState, closeModal, formData.elecProvider, formData.isGasSet, formData.address]);
+    }, [dispatch, setModalState, closeModal, formData.elecProvider, formData.isGasSet, formData.gasProvider]);
 
     const nameHasSpace = (s: string) => /\s|\u3000/.test(s?.trim() || '');
     const companyKeywords = ['株式会社', '有限会社', '合同会社', '会社'];
