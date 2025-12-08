@@ -196,12 +196,15 @@ export const FormDateInput = ({ label, name, value, onChange, isInvalid, onBlur,
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
     const formattedDate = `${year}/${month}/${day}`;
-    
+
     const syntheticEvent = {
         target: { name, value: formattedDate, type: 'text' },
     };
-    
+
     onChange(syntheticEvent);
+    if (onBlur) {
+      onBlur(syntheticEvent);
+    }
     setCalendarOpen(false);
   };
   
