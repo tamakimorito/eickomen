@@ -737,13 +737,13 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
                         closeModal();
                     },
                     onCancel: () => { // "No" clicked
-                        // Start 20-minute timer ONLY if user says no to immediate reset.
+                        // Start 15-minute timer ONLY if user says no to immediate reset.
                         if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
                         resetTimerRef.current = setTimeout(() => {
                             resetForm(true);
                             setToast({ message: 'フォームが自動リセットされました。', type: 'info' });
-                        }, 20 * 60 * 1000);
-                        setToast({ message: '入力を継続します。20分後にフォームは自動リセットされます。', type: 'info' });
+                        }, 15 * 60 * 1000);
+                        setToast({ message: '入力を継続します。15分後にフォームは自動リセットされます。', type: 'info' });
                         closeModal();
                     },
                     isErrorBanner: false,

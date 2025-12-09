@@ -312,7 +312,8 @@ const generateDefaultInternetComment = (formData: FormData): string => {
                             `③担当者名：${contactPerson || ''}様`,
                             `担当者（フリガナ）：${contactPersonKana || ''}`,
                             `④ビル調査希望：${buildingSurveyRequest || '無'}`,
-                            `⑤図面提出方法と送付先：${drawingSubmissionContact || '無'}`
+                            `⑤図面提出方法と送付先：${drawingSubmissionContact || '無'}`,
+                            `穴あけビス止めNG`
                         );
                     }
 
