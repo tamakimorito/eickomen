@@ -46,6 +46,8 @@ const DefaultInternetForm = () => {
     const isChintaiFree = formData.product === '賃貸ねっと【無料施策】';
     const is1G = formData.product === 'SoftBank光1G';
 
+    const existingLineLabel = isChintai ? 'ゼニガメ' : '既存回線';
+
     const age = useMemo(() => calculateAge(formData.dob), [formData.dob]);
     const isU25O60 = age !== null && (age <= 25 || age >= 60);
 
@@ -309,7 +311,7 @@ const DefaultInternetForm = () => {
                     )}
                     
                     {!isChintaiFree && (
-                        <FormSelect label="既存回線" name="existingLineStatus" value={formData.existingLineStatus} onChange={handleInputChange} onBlur={handleAnshinNorikaeBlur} options={EXISTING_LINE_STATUS_OPTIONS} isInvalid={invalidFields.includes('existingLineStatus')} required />
+                        <FormSelect label={existingLineLabel} name="existingLineStatus" value={formData.existingLineStatus} onChange={handleInputChange} onBlur={handleAnshinNorikaeBlur} options={EXISTING_LINE_STATUS_OPTIONS} isInvalid={invalidFields.includes('existingLineStatus')} required />
                     )}
                     {!isChintaiFree && formData.existingLineStatus === 'あり' && (
                         <FormInput label="回線会社" name="existingLineCompany" value={formData.existingLineCompany} onChange={handleInputChange} isInvalid={invalidFields.includes('existingLineCompany')} required />
