@@ -301,6 +301,7 @@ export const MOBILE_CARRIERS = [
     { value: 'docomo', label: 'docomo' },
     { value: 'au', label: 'au' },
     { value: 'Rakuten', label: '楽天モバイル' },
+    { value: '聞いてない', label: '聞いてない' },
     { value: 'その他', label: 'その他' },
 ];
 
