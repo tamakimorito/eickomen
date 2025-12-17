@@ -61,9 +61,12 @@ const getRequiredFields = (formData, activeTab) => {
     switch (activeTab) {
         case 'internet':
             required.push('product');
+            if (isSakaiRoute) {
+                required.push('recordId');
+            }
             if (product === 'GMOドコモ光') {
                  required.push(
-                    'housingType', 'customerId', 'gmoCompensation', 'gmoRouter', 'greeting', 
+                    'housingType', 'customerId', 'gmoCompensation', 'gmoRouter', 'greeting',
                     'contractorName', 'phone', 'existingLineCompany', 'gmoCallback1', 'gmoCallback2', 'gmoCallback3',
                     'gmoCallbackDate1', 'gmoCallbackDate2', 'gmoCallbackDate3'
                 );
@@ -120,15 +123,16 @@ const getRequiredFields = (formData, activeTab) => {
         case 'electricity': {
             const { elecProvider, recordId, hasContractConfirmation, mailingOption, isSakaiRoute, isGasSet } = formData;
             required.push('elecProvider', 'greeting', 'contractorName', 'contractorNameKana', 'dob', 'phone', 'postalCode', 'address', 'buildingInfo', 'moveInDate');
-            
+
             if (elecProvider !== '東京ガス電気セット' && !['すまいのでんき（ストエネ）', 'プラチナでんき（ジャパン）'].includes(elecProvider)) {
                 required.push('paymentMethod');
             }
-            if (!isSakaiRoute) required.push('recordId');
+            required.push('recordId');
             
             const isSuteneOrPlatinum = ['すまいのでんき（ストエネ）', 'プラチナでんき（ジャパン）'].includes(elecProvider);
             const isQenes = elecProvider === 'キューエネスでんき';
             const isRemix = elecProvider === 'リミックスでんき';
+            const isMinna = elecProvider === 'みんな電力';
             const isQenesItanji = isQenes && recordId?.toLowerCase().startsWith('id:');
 
             if (isSuteneOrPlatinum) {
@@ -142,16 +146,19 @@ const getRequiredFields = (formData, activeTab) => {
                 required.push('elecConfirmationTime');
             }
             
-            if (hasContractConfirmation !== 'なし' && !isQenesItanji && !isRemix && elecProvider !== 'ニチガス電気セット') {
+            if (hasContractConfirmation !== 'なし' && !isQenesItanji && !isRemix && elecProvider !== 'ニチガス電気セット' && elecProvider !== 'みんな電力') {
                 required.push('primaryProductStatus');
             }
 
             if (isRemix || isQenesItanji) {
                 required.push('attachedOption');
             }
-            
+
             if (['キューエネスでんき', 'ユーパワー UPOWER', 'HTBエナジー', 'リミックスでんき', 'ループでんき', '東急でんき'].includes(elecProvider)) {
                 required.push('email');
+            }
+            if (isMinna) {
+                required.push('gender', 'email');
             }
              if ((['すまいのでんき（ストエネ）', '東急でんき'].includes(elecProvider) && isGasSet === 'セット') || ['ニチガス電気セット', '東邦ガスセット', '東京ガス電気セット', '大阪ガス電気セット'].includes(elecProvider)) {
                 required.push('gasOpeningDate', 'gasOpeningTimeSlot');
@@ -189,8 +196,8 @@ const getRequiredFields = (formData, activeTab) => {
         case 'gas': {
             const { gasProvider, gasHasContractConfirmation } = formData;
             required.push('gasProvider', 'contractorName', 'contractorNameKana', 'dob', 'phone', 'postalCode', 'address', 'buildingInfo', 'gasOpeningDate');
-            
-            if (!isSakaiRoute) required.push('recordId');
+
+            required.push('recordId');
 
             if (gasProvider === '大阪ガス単品') {
                 required.push('greeting');
@@ -992,9 +999,10 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
             const base = (formData.currentAddress || '').trim();
             const extra = (formData.mailingBuildingInfo || '').trim();
 
-            const shouldMerge = tabId === 'wts' ? Boolean(extra) : mailingOpt === '現住所' && Boolean(extra);
+            const shouldMerge = Boolean(extra);
+            const respectMailingOption = tabId === 'wts' ? true : (mailingOpt === '' || mailingOpt === '現住所');
 
-            if (shouldMerge) {
+            if (shouldMerge && respectMailingOption) {
                 const alreadyHas = base.includes(extra);
                 if (!alreadyHas) {
                     const merged = base ? `${base} ${extra}` : extra;
