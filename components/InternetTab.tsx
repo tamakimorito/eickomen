@@ -206,10 +206,9 @@ const DefaultInternetForm = () => {
                 <FormInput
                     label="顧客ID" name="customerId" value={formData.customerId} onChange={handleInputChange}
                     onBlur={handleIdBlur}
-                    isInvalid={invalidFields.includes('customerId') || invalidFields.includes('recordId')} 
-                    required={!formData.isSakaiRoute}
-                    disabled={formData.isSakaiRoute}
-                    placeholder={formData.isSakaiRoute ? 'サカイ販路選択時は入力不要' : ''}
+                    isInvalid={invalidFields.includes('customerId') || invalidFields.includes('recordId')}
+                    required
+                    placeholder={formData.isSakaiRoute ? 'サカイ販路はレコードIDを入力' : ''}
                 />
                 <FormInput
                     label={(isChintai || isChintaiFree) ? "名乗り" : "名乗り（SMS届くので正確に）"}
