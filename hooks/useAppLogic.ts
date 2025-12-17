@@ -129,6 +129,7 @@ const getRequiredFields = (formData, activeTab) => {
             const isSuteneOrPlatinum = ['すまいのでんき（ストエネ）', 'プラチナでんき（ジャパン）'].includes(elecProvider);
             const isQenes = elecProvider === 'キューエネスでんき';
             const isRemix = elecProvider === 'リミックスでんき';
+            const isMinna = elecProvider === 'みんな電力';
             const isQenesItanji = isQenes && recordId?.toLowerCase().startsWith('id:');
 
             if (isSuteneOrPlatinum) {
@@ -149,9 +150,12 @@ const getRequiredFields = (formData, activeTab) => {
             if (isRemix || isQenesItanji) {
                 required.push('attachedOption');
             }
-            
+
             if (['キューエネスでんき', 'ユーパワー UPOWER', 'HTBエナジー', 'リミックスでんき', 'ループでんき', '東急でんき'].includes(elecProvider)) {
                 required.push('email');
+            }
+            if (isMinna) {
+                required.push('gender', 'email');
             }
              if ((['すまいのでんき（ストエネ）', '東急でんき'].includes(elecProvider) && isGasSet === 'セット') || ['ニチガス電気セット', '東邦ガスセット', '東京ガス電気セット', '大阪ガス電気セット'].includes(elecProvider)) {
                 required.push('gasOpeningDate', 'gasOpeningTimeSlot');
