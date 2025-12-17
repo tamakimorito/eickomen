@@ -398,6 +398,25 @@ ${attachedOptionLine}支払い方法：${paymentMethod || ''}
                 }
             }
             break;
+        case 'みんな電力':
+            comment = `【みんな電力/★インポートのみ】 ${tag}`;
+            comment += `\n名乗り：${greeting || ''}`;
+            comment += `\nレコードID：${recordId || ''}`;
+            comment += `\n担当者：${apName || ''}`;
+            comment += `\nプラン： PRE100プラン`;
+            comment += `\n契約者名義（漢字）：${contractorName || ''}`;
+            comment += `\n契約者名義（フリガナ）：${contractorNameKana || ''}`;
+            comment += `\n生年月日(西暦)：${dob || ''}`;
+            comment += `\n性別：${gender || ''}`;
+            comment += `\n電話番号：${formattedPhone || ''}`;
+            comment += `\n郵便番号：${formattedPostalCode || ''}`;
+            comment += `\n住所：${address || ''}`;
+            comment += `\n物件名：${buildingInfo || ''}`;
+            comment += `\n利用開始日：${moveInDate || ''}`;
+            comment += `\nメアド：${email || ''}`;
+            comment += `\n支払い方法：${paymentMethod || ''}`;
+            comment += `\n備考：${elecRemarks || ''}`;
+            break;
     }
 
     return comment;

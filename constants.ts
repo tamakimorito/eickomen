@@ -425,6 +425,7 @@ export const ELEC_PROVIDERS = [
   { value: 'キューエネスでんき', label: 'キューエネスでんき' },
   { value: 'リミックスでんき', label: 'リミックスでんき' },
   { value: 'HTBエナジー', label: 'HTBエナジー' },
+  { value: 'みんな電力', label: 'みんな電力' },
   { value: 'ニチガス電気セット', label: 'ニチガス電気セット' },
   { value: 'ユーパワー UPOWER', label: 'ユーパワー UPOWER' },
   { value: 'はぴe', label: 'はぴe' },
