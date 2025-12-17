@@ -68,11 +68,13 @@ export const generateElectricityCommentLogic = (formData: FormData): string => {
 
     const isSet = isGasSet === 'セット' || ['ニチガス電気セット', '東邦ガスセット', '東京ガス電気セット', '大阪ガス電気セット'].includes(elecProvider);
     
-    const noHyphenProviders = ['すまいのでんき（ストエネ）', 'プラチナでんき（ジャパン）'];
+    const noHyphenProviders = ['すまいのでんき（ストエネ）', 'プラチナでんき（ジャパン）', 'ニチガス電気セット'];
     const formattedPhone = noHyphenProviders.includes(elecProvider)
         ? (phone || '').replace(/\D/g, '')
         : formatPhoneNumberWithHyphens(phone);
-    const formattedGasPreContact = formatPhoneNumberWithHyphens(gasPreContact);
+    const formattedGasPreContact = elecProvider === 'ニチガス電気セット'
+        ? (gasPreContact || '').replace(/\D/g, '')
+        : formatPhoneNumberWithHyphens(gasPreContact);
     
     const formattedPostalCode = formatPostalCode(postalCode, elecProvider);
     const formattedCurrentPostalCode = formatPostalCode(currentPostalCode, elecProvider);
@@ -397,6 +399,25 @@ ${attachedOptionLine}支払い方法：${paymentMethod || ''}
                     comment += `\n備考：${elecRemarks}`;
                 }
             }
+            break;
+        case 'みんな電力':
+            comment = `【みんな電力/★インポートのみ】 ${tag}`;
+            comment += `\n名乗り：${greeting || ''}`;
+            comment += `\nレコードID：${recordId || ''}`;
+            comment += `\n担当者：${apName || ''}`;
+            comment += `\nプラン： PRE100プラン`;
+            comment += `\n契約者名義（漢字）：${contractorName || ''}`;
+            comment += `\n契約者名義（フリガナ）：${contractorNameKana || ''}`;
+            comment += `\n生年月日(西暦)：${dob || ''}`;
+            comment += `\n性別：${gender || ''}`;
+            comment += `\n電話番号：${formattedPhone || ''}`;
+            comment += `\n郵便番号：${formattedPostalCode || ''}`;
+            comment += `\n住所：${address || ''}`;
+            comment += `\n物件名：${buildingInfo || ''}`;
+            comment += `\n利用開始日：${moveInDate || ''}`;
+            comment += `\nメアド：${email || ''}`;
+            comment += `\n支払い方法：${paymentMethod || ''}`;
+            comment += `\n備考：${elecRemarks || ''}`;
             break;
     }
 

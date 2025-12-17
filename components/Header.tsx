@@ -11,8 +11,8 @@ const Header = ({ onManualOpen, onResetRequest }) => {
             </div>
             <div>
             <h1 className="text-2xl sm:text-3xl font-bold tracking-wider">営業コメント作成ツール～エイコメン～</h1>
-            <p className="text-xs text-blue-200 mt-1">Version: v1.56</p>
-            </div>
+            <p className="text-xs text-blue-200 mt-1">Version: v1.59</p>
+        </div>
         </div>
         <div className="flex items-center gap-x-3">
           <button 
