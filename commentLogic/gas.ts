@@ -60,7 +60,7 @@ export const generateGasCommentLogic = (formData: FormData): string => {
     let comment = '該当するテンプレートがありません。';
     const tag = "250811";
     
-    const noHyphenProviders = ['すまいのでんき（ストエネ）', '大阪ガス単品'];
+    const noHyphenProviders = ['すまいのでんき（ストエネ）', '大阪ガス単品', 'ニチガス単品'];
     const formattedPhone = noHyphenProviders.includes(gasProvider)
         ? (phone || '').replace(/\D/g, '')
         : formatPhoneNumberWithHyphens(phone);

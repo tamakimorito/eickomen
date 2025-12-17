@@ -62,9 +62,8 @@ const WtsTab = () => {
                     onChange={handleInputChange}
                     onBlur={handleIdBlur}
                     isInvalid={invalidFields.includes('customerId')}
-                    required={!isSakaiRoute}
-                    disabled={isSakaiRoute}
-                    placeholder={isSakaiRoute ? 'サカイ販路選択時は入力不要' : ''}
+                    required
+                    placeholder={isSakaiRoute ? 'サカイ販路はレコードIDを入力' : ''}
                     className="md:col-span-2"
                 />
             </div>
