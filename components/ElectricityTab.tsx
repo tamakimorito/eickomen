@@ -317,11 +317,10 @@ const ElectricityTab = () => {
                         label="レコードID" name="recordId" value={formData.recordId} onChange={handleInputChange}
                         onBlur={handleIdBlur}
                         isInvalid={invalidFields.includes('recordId')}
-                        required={!isSakaiRoute}
-                        disabled={isSakaiRoute}
-                        placeholder={isSakaiRoute ? 'サカイ販路選択時は入力不要' : '例: SR12345'}
+                        required
+                        placeholder="例: SR12345"
                     />
-                    {!isSakaiRoute && elecRecordIdPrefix && elecRecordIdPrefix !== 'サカイ' && (
+                    {elecRecordIdPrefix && elecRecordIdPrefix !== 'サカイ' && (
                        <p className="text-sm text-gray-500 mt-1">自動判定された販路: <span className="font-bold text-blue-600">{idPrefixDescription}</span></p>
                     )}
                 </div>

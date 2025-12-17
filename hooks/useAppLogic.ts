@@ -124,7 +124,7 @@ const getRequiredFields = (formData, activeTab) => {
             if (elecProvider !== '東京ガス電気セット' && !['すまいのでんき（ストエネ）', 'プラチナでんき（ジャパン）'].includes(elecProvider)) {
                 required.push('paymentMethod');
             }
-            if (!isSakaiRoute) required.push('recordId');
+            required.push('recordId');
             
             const isSuteneOrPlatinum = ['すまいのでんき（ストエネ）', 'プラチナでんき（ジャパン）'].includes(elecProvider);
             const isQenes = elecProvider === 'キューエネスでんき';
@@ -194,7 +194,7 @@ const getRequiredFields = (formData, activeTab) => {
             const { gasProvider, gasHasContractConfirmation } = formData;
             required.push('gasProvider', 'contractorName', 'contractorNameKana', 'dob', 'phone', 'postalCode', 'address', 'buildingInfo', 'gasOpeningDate');
             
-            if (!isSakaiRoute) required.push('recordId');
+            required.push('recordId');
 
             if (gasProvider === '大阪ガス単品') {
                 required.push('greeting');
@@ -992,11 +992,10 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
 
         // Add address consolidation logic here
         if (['internet', 'wts'].includes(tabId) && ['electricity', 'gas'].includes(activeTab)) {
-            const mailingOpt = (formData.mailingOption || '').trim();
             const base = (formData.currentAddress || '').trim();
             const extra = (formData.mailingBuildingInfo || '').trim();
 
-            const shouldMerge = tabId === 'wts' ? Boolean(extra) : mailingOpt === '現住所' && Boolean(extra);
+            const shouldMerge = Boolean(extra);
 
             if (shouldMerge) {
                 const alreadyHas = base.includes(extra);

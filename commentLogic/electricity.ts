@@ -68,11 +68,13 @@ export const generateElectricityCommentLogic = (formData: FormData): string => {
 
     const isSet = isGasSet === 'セット' || ['ニチガス電気セット', '東邦ガスセット', '東京ガス電気セット', '大阪ガス電気セット'].includes(elecProvider);
     
-    const noHyphenProviders = ['すまいのでんき（ストエネ）', 'プラチナでんき（ジャパン）'];
+    const noHyphenProviders = ['すまいのでんき（ストエネ）', 'プラチナでんき（ジャパン）', 'ニチガス電気セット'];
     const formattedPhone = noHyphenProviders.includes(elecProvider)
         ? (phone || '').replace(/\D/g, '')
         : formatPhoneNumberWithHyphens(phone);
-    const formattedGasPreContact = formatPhoneNumberWithHyphens(gasPreContact);
+    const formattedGasPreContact = elecProvider === 'ニチガス電気セット'
+        ? (gasPreContact || '').replace(/\D/g, '')
+        : formatPhoneNumberWithHyphens(gasPreContact);
     
     const formattedPostalCode = formatPostalCode(postalCode, elecProvider);
     const formattedCurrentPostalCode = formatPostalCode(currentPostalCode, elecProvider);
