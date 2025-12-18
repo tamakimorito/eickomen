@@ -1,23 +1,24 @@
 import React from 'react';
 import { BellIcon, QuestionMarkCircleIcon, ArrowPathIcon } from '@heroicons/react/24/solid';
+import { CURRENT_THEME } from '../theme.ts';
 
 const Header = ({ onManualOpen, onResetRequest }) => {
   return (
-    <header className="bg-gradient-to-r from-green-900 via-green-800 to-red-700 shadow-lg sticky top-0 z-20">
+    <header className={`${CURRENT_THEME.headerBg} shadow-lg sticky top-0 z-20`}>
       <div className="max-w-7xl mx-auto py-3 px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4 text-white">
         <div className="flex items-center gap-4">
-            <div className="bg-red-500 p-3 rounded-full shadow-md">
-            <BellIcon className="h-8 w-8 text-white" />
+            <div className={`${CURRENT_THEME.headerBadgeBg} p-3 rounded-full shadow-md`}>
+            <BellIcon className={`h-8 w-8 ${CURRENT_THEME.headerIcon}`} />
             </div>
             <div>
             <h1 className="text-2xl sm:text-3xl font-bold tracking-wider">営業コメント作成ツール～エイコメン～</h1>
-            <p className="text-xs text-green-100 mt-1">Version: v1.60</p>
+            <p className={`text-xs ${CURRENT_THEME.headerVersionText} mt-1`}>Version: v1.61</p>
             </div>
         </div>
         <div className="flex items-center gap-x-3">
           <button
               onClick={onResetRequest}
-              className="flex items-center gap-2 bg-red-600 text-white font-semibold py-2 px-3 rounded-lg hover:bg-red-500 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-200 shadow-sm"
+              className={`flex items-center gap-2 text-white font-semibold py-2 px-3 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 ${CURRENT_THEME.resetButton} shadow-sm`}
               aria-label="フォームをリセット（終話）"
             >
               <ArrowPathIcon className="h-5 w-5" />
@@ -25,7 +26,7 @@ const Header = ({ onManualOpen, onResetRequest }) => {
             </button>
             <button
               onClick={onManualOpen}
-              className="p-2 rounded-full hover:bg-green-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-200"
+              className={`p-2 rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 ${CURRENT_THEME.helpButton}`}
               aria-label="使い方を開く"
             >
               <QuestionMarkCircleIcon className="h-7 w-7" />
