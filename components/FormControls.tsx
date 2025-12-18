@@ -2,8 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { CalendarIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 
 export const FormInput = ({ label, name, value, onChange, className = '', isInvalid, ...props }) => {
-    const labelClasses = `block text-sm font-bold mb-1 ${isInvalid ? 'text-red-600' : 'text-gray-700'}`;
-    const inputClasses = `block w-full px-3 py-2 bg-white border rounded-lg shadow-sm placeholder-gray-400 focus:outline-none sm:text-sm ${isInvalid ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'}`;
+    const labelClasses = `block text-sm font-bold mb-1 ${isInvalid ? 'text-red-700' : 'text-red-600'}`;
+    const inputClasses = `block w-full px-3 py-2 bg-white border rounded-lg shadow-sm placeholder-gray-400 focus:outline-none sm:text-sm ${isInvalid ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-emerald-300 focus:ring-emerald-500 focus:border-emerald-500'}`;
     return (
         <div className={className}>
             <label htmlFor={name} className={labelClasses}>{label}{props.required && <span className="text-red-500 ml-1">*</span>}</label>
@@ -21,8 +21,8 @@ export const FormInput = ({ label, name, value, onChange, className = '', isInva
 };
 
 export const FormSelect = ({ label, name, value, onChange, options, className = '', isInvalid, ...props }) => {
-    const labelClasses = `block text-sm font-bold mb-1 ${isInvalid ? 'text-red-600' : 'text-gray-700'}`;
-    const selectClasses = `block w-full px-3 py-2 bg-white border rounded-lg shadow-sm focus:outline-none sm:text-sm ${isInvalid ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'}`;
+    const labelClasses = `block text-sm font-bold mb-1 ${isInvalid ? 'text-red-700' : 'text-red-600'}`;
+    const selectClasses = `block w-full px-3 py-2 bg-white border rounded-lg shadow-sm focus:outline-none sm:text-sm ${isInvalid ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-emerald-300 focus:ring-emerald-500 focus:border-emerald-500'}`;
 
     return(
         <div className={className}>
@@ -46,7 +46,7 @@ export const FormSelect = ({ label, name, value, onChange, options, className = 
 };
 
 export const FormRadioGroup = ({ label, name, value, onChange, options, className = '', isInvalid, ...props }) => {
-    const legendClasses = `block text-sm font-bold mb-2 ${isInvalid ? 'text-red-600' : 'text-gray-700'}`;
+    const legendClasses = `block text-sm font-bold mb-2 ${isInvalid ? 'text-red-700' : 'text-red-600'}`;
     
     const handleRadioClick = (e) => {
         const clickedValue = e.target.value;
@@ -80,9 +80,9 @@ export const FormRadioGroup = ({ label, name, value, onChange, options, classNam
                                 value={radioOption.value}
                                 checked={value === radioOption.value}
                                 onChange={handleRadioClick} // Use the custom handler
-                                className="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                                className="h-4 w-4 text-emerald-700 border-emerald-300 focus:ring-emerald-500"
                             />
-                            <label htmlFor={`${name}-${radioOption.value}`} className="ml-2 block text-sm text-gray-900">
+                            <label htmlFor={`${name}-${radioOption.value}`} className="ml-2 block text-sm text-emerald-900">
                                 {radioOption.label}
                             </label>
                         </div>
@@ -94,8 +94,8 @@ export const FormRadioGroup = ({ label, name, value, onChange, options, classNam
 };
 
 export const FormTextArea = ({ label, name, value, onChange, className = '', isInvalid, ...props }) => {
-    const labelClasses = `block text-sm font-bold mb-1 ${isInvalid ? 'text-red-600' : 'text-gray-700'}`;
-    const textareaClasses = `block w-full px-3 py-2 bg-white border rounded-lg shadow-sm placeholder-gray-400 focus:outline-none sm:text-sm ${isInvalid ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'}`;
+    const labelClasses = `block text-sm font-bold mb-1 ${isInvalid ? 'text-red-700' : 'text-red-600'}`;
+    const textareaClasses = `block w-full px-3 py-2 bg-white border rounded-lg shadow-sm placeholder-gray-400 focus:outline-none sm:text-sm ${isInvalid ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-emerald-300 focus:ring-emerald-500 focus:border-emerald-500'}`;
 
     return (
         <div className={className}>
@@ -114,7 +114,7 @@ export const FormTextArea = ({ label, name, value, onChange, className = '', isI
 };
 
 export const FormCheckbox = ({ label, name, checked, onChange, description, className = '', isInvalid, ...props }) => {
-    const labelClasses = `font-bold ${isInvalid ? 'text-red-600' : 'text-gray-700'}`;
+    const labelClasses = `font-bold ${isInvalid ? 'text-red-700' : 'text-red-600'}`;
     return (
         <div className={`relative flex items-start ${className}`}>
             <div className="flex items-center h-5">
@@ -124,7 +124,7 @@ export const FormCheckbox = ({ label, name, checked, onChange, description, clas
                 type="checkbox"
                 checked={checked}
                 onChange={onChange}
-                className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                className="h-4 w-4 text-emerald-700 border-emerald-300 rounded focus:ring-emerald-500"
                 {...props}
             />
             </div>
@@ -161,8 +161,8 @@ const CalendarPopover = ({ onDateSelect, initialDate }) => {
                 type="button"
                 onClick={() => onDateSelect(currentDate)}
                 className={`flex items-center justify-center w-9 h-9 text-sm rounded-full transition-colors ${
-                    isSelected ? 'bg-blue-600 text-white font-bold' : 
-                    isToday ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'
+                    isSelected ? 'bg-red-600 text-white font-bold' :
+                    isToday ? 'bg-emerald-100 text-emerald-800' : 'text-emerald-900 hover:bg-emerald-50'
                 }`}
             >
                 {day}
@@ -174,7 +174,7 @@ const CalendarPopover = ({ onDateSelect, initialDate }) => {
         <div className="absolute top-full mt-2 z-20 bg-white rounded-xl shadow-lg p-4 border border-gray-200 w-72">
             <div className="flex justify-between items-center mb-3">
                 <button type="button" onClick={() => setViewDate(new Date(year, month - 1, 1))} className="p-1.5 rounded-full hover:bg-gray-100"><ChevronLeftIcon className="h-5 w-5 text-gray-600"/></button>
-                <div className="font-bold text-gray-800">{`${year}年 ${month + 1}月`}</div>
+                <div className="font-bold text-red-800">{`${year}年 ${month + 1}月`}</div>
                 <button type="button" onClick={() => setViewDate(new Date(year, month + 1, 1))} className="p-1.5 rounded-full hover:bg-gray-100"><ChevronRightIcon className="h-5 w-5 text-gray-600"/></button>
             </div>
             <div className="grid grid-cols-7 text-center text-xs text-gray-500 font-semibold mb-2">

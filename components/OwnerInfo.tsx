@@ -7,13 +7,13 @@ const OwnerInfo = ({ isChintai }) => {
   const { formData, handleInputChange, invalidFields } = useContext(AppContext);
   
   return (
-    <div className="border-t-2 border-dashed border-blue-300 pt-6 mt-6 space-y-4">
-      <h3 className="text-lg font-bold text-blue-700 flex items-center gap-2">
+    <div className="border-t-2 border-dashed border-emerald-300 pt-6 mt-6 space-y-4">
+      <h3 className="text-lg font-bold text-red-700 flex items-center gap-2">
         <HomeModernIcon className="h-6 w-6" />
         {isChintai ? '管理会社情報' : 'オーナー情報（ファミリープラン用）'}
       </h3>
       {isChintai ? (
-        <div className="p-4 bg-blue-50/50 rounded-lg border border-blue-200 space-y-4">
+        <div className="p-4 bg-emerald-50/50 rounded-lg border border-emerald-200 space-y-4">
            <p className="text-sm text-red-600 font-bold">ファミリータイプはオーナー確認①②③必須！</p>
             <FormInput
               label="①管理会社名"
@@ -62,7 +62,7 @@ const OwnerInfo = ({ isChintai }) => {
             />
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-blue-50/50 rounded-lg border border-blue-200">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-emerald-50/50 rounded-lg border border-emerald-200">
             <FormInput
               label="管理会社"
               name="managementCompany"
