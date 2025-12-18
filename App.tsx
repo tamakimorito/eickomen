@@ -13,6 +13,7 @@ import ManualModal from './components/ManualModal.tsx';
 import BugReportModal from './components/BugReportModal.tsx';
 import { FormInput, FormCheckbox } from './components/FormControls.tsx';
 import { BoltIcon, FireIcon, WifiIcon, CloudIcon, ClipboardDocumentListIcon, ChatBubbleBottomCenterTextIcon, XCircleIcon, XMarkIcon } from '@heroicons/react/24/solid';
+import { CURRENT_THEME } from './theme.ts';
 
 const TABS = [
   { id: 'electricity', label: '電気', icon: BoltIcon },
@@ -34,9 +35,7 @@ const Tab: React.FC<TabProps> = ({ id, label, icon: Icon, activeTab, onTabChange
     <button
         onClick={() => onTabChange(id)}
         className={`flex items-center gap-2 px-3 sm:px-4 py-3 text-sm sm:text-base font-bold transition-colors duration-200 ease-in-out focus:outline-none -mb-px ${
-            activeTab === id
-            ? 'text-blue-700 border-b-4 border-blue-700'
-            : 'text-gray-500 hover:text-blue-600 border-b-4 border-transparent'
+            activeTab === id ? CURRENT_THEME.tabActive : CURRENT_THEME.tabInactive
         }`}
     >
         <Icon className="h-5 w-5"/>
