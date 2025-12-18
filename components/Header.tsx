@@ -3,29 +3,29 @@ import { BellIcon, QuestionMarkCircleIcon, ArrowPathIcon } from '@heroicons/reac
 
 const Header = ({ onManualOpen, onResetRequest }) => {
   return (
-    <header className="bg-blue-700 shadow-lg sticky top-0 z-20">
+    <header className="bg-gradient-to-r from-red-700 via-emerald-700 to-red-700 shadow-lg sticky top-0 z-20">
       <div className="max-w-7xl mx-auto py-3 px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4 text-white">
         <div className="flex items-center gap-4">
             <div className="bg-yellow-400 p-3 rounded-full shadow-md">
-            <BellIcon className="h-8 w-8 text-blue-800" />
+            <BellIcon className="h-8 w-8 text-emerald-900" />
             </div>
             <div>
             <h1 className="text-2xl sm:text-3xl font-bold tracking-wider">営業コメント作成ツール～エイコメン～</h1>
-            <p className="text-xs text-blue-200 mt-1">Version: v1.59</p>
+            <p className="text-xs text-emerald-100 mt-1">Version: v1.60</p>
             </div>
         </div>
         <div className="flex items-center gap-x-3">
-          <button 
+          <button
               onClick={onResetRequest}
-              className="flex items-center gap-2 bg-blue-600 text-white font-semibold py-2 px-3 rounded-lg hover:bg-blue-500 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white shadow-sm"
+              className="flex items-center gap-2 bg-red-600 text-white font-semibold py-2 px-3 rounded-lg hover:bg-red-500 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-100 shadow-sm"
               aria-label="フォームをリセット（終話）"
             >
               <ArrowPathIcon className="h-5 w-5" />
               <span className="hidden sm:inline">リセット</span>
             </button>
-            <button 
+            <button
               onClick={onManualOpen}
-              className="p-2 rounded-full hover:bg-blue-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white"
+              className="p-2 rounded-full hover:bg-emerald-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-100"
               aria-label="使い方を開く"
             >
               <QuestionMarkCircleIcon className="h-7 w-7" />
