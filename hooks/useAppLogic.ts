@@ -642,7 +642,7 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
         const { name, value } = e.target;
         const fieldName = name === 'customerId' ? 'customerId' : 'recordId';
 
-        if (fieldName === 'recordId' && formData.isSakaiRoute) {
+        if (formData.isSakaiRoute && (fieldName === 'recordId' || activeTab === 'internet')) {
             setInvalidFields(prev => prev.filter(f => f !== fieldName));
             return;
         }
@@ -670,7 +670,7 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
         } else {
              setInvalidFields(prev => prev.filter(f => f !== fieldName));
         }
-    }, [setModalState, closeModal, setInvalidFields, formData.isSakaiRoute]);
+    }, [setModalState, closeModal, setInvalidFields, formData.isSakaiRoute, activeTab]);
 
 
     const handleCopy = useCallback(() => {
