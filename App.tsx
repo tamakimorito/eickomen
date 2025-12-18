@@ -35,8 +35,8 @@ const Tab: React.FC<TabProps> = ({ id, label, icon: Icon, activeTab, onTabChange
         onClick={() => onTabChange(id)}
         className={`flex items-center gap-2 px-3 sm:px-4 py-3 text-sm sm:text-base font-bold transition-colors duration-200 ease-in-out focus:outline-none -mb-px ${
             activeTab === id
-            ? 'text-blue-700 border-b-4 border-blue-700'
-            : 'text-gray-500 hover:text-blue-600 border-b-4 border-transparent'
+            ? 'text-emerald-800 border-b-4 border-emerald-700'
+            : 'text-red-700 hover:text-emerald-700 border-b-4 border-transparent'
         }`}
     >
         <Icon className="h-5 w-5"/>
@@ -68,7 +68,7 @@ const App = () => {
     } = useContext(AppContext);
 
     return (
-        <div className="bg-gray-100 min-h-screen font-sans">
+        <div className="bg-gradient-to-br from-red-50 via-white to-green-50 min-h-screen font-sans">
             <Header onManualOpen={() => setIsManualOpen(true)} onResetRequest={handleResetRequest} />
 
             {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
