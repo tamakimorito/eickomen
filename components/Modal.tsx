@@ -16,22 +16,22 @@ export const Modal = ({
     type === 'warning' ? 'text-red-600 font-bold' : ''
   }`;
 
-  const blueButtonClasses = "w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold";
+  const festiveButtonClasses = "w-full px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-semibold";
   const grayButtonClasses = "w-full px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors font-semibold";
   const redButtonClasses = "w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold";
 
-  let confirmButtonClasses = blueButtonClasses;
+  let confirmButtonClasses = festiveButtonClasses;
   let cancelButtonClasses = grayButtonClasses;
   
   switch(type) {
       case 'warning':
-          // For warnings, if there are two buttons, the 'cancel' button is the primary action (blue).
-          // If only one button, it should be blue.
+          // For warnings, if there are two buttons, the 'cancel' button is the primary action (green).
+          // If only one button, it should be green.
           if (cancelText) {
             confirmButtonClasses = grayButtonClasses; // 'このまま進む' is secondary
-            cancelButtonClasses = blueButtonClasses;
+            cancelButtonClasses = festiveButtonClasses;
           } else {
-             confirmButtonClasses = blueButtonClasses;
+             confirmButtonClasses = festiveButtonClasses;
           }
           break;
       case 'danger':
@@ -41,7 +41,7 @@ export const Modal = ({
           break;
       default:
            // Default behavior
-          confirmButtonClasses = blueButtonClasses;
+          confirmButtonClasses = festiveButtonClasses;
           cancelButtonClasses = grayButtonClasses;
           break;
   }
