@@ -17,7 +17,7 @@ const BugReportModal = ({ isOpen, onClose, reportText, onReportTextChange, onSub
         <div className="flex justify-between items-center mb-4">
           <div className="flex items-center gap-3">
             <ChatBubbleBottomCenterTextIcon className="h-8 w-8 text-red-600" />
-            <h2 className="text-2xl font-bold text-gray-800">不具合・要望の報告</h2>
+            <h2 className="text-2xl font-bold text-red-800">不具合・要望の報告</h2>
           </div>
           <button onClick={onClose} className="p-2 rounded-full hover:bg-gray-200 transition-colors">
             <XMarkIcon className="h-6 w-6 text-gray-600" />
@@ -45,7 +45,7 @@ const BugReportModal = ({ isOpen, onClose, reportText, onReportTextChange, onSub
         <div className="mt-6 flex justify-end items-center gap-4">
             <button
               onClick={onClose}
-              className="px-6 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors font-semibold"
+              className="px-6 py-2 bg-gray-200 text-red-800 rounded-lg hover:bg-gray-300 transition-colors font-semibold"
             >
               キャンセル
             </button>

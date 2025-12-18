@@ -61,8 +61,8 @@ const AgencyTab = () => {
                 />
             </div>
 
-            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-                <div className="font-bold text-gray-800 mb-3">代行希望<span className="text-red-500 ml-1">*</span></div>
+            <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4">
+                <div className="font-bold text-red-800 mb-3">代行希望<span className="text-red-500 ml-1">*</span></div>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                     <FormCheckbox
                         label="電気"
@@ -100,8 +100,8 @@ const AgencyTab = () => {
             </div>
 
             {isElectricityRequested && (
-                <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 shadow-sm">
-                    <div className="font-bold text-gray-800 mb-3">電気</div>
+                <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 shadow-sm">
+                    <div className="font-bold text-red-800 mb-3">電気</div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <FormInput
                             label="電力会社名"
@@ -126,7 +126,7 @@ const AgencyTab = () => {
 
             {isGasRequested && (
                 <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 shadow-sm">
-                    <div className="font-bold text-gray-800 mb-3">ガス</div>
+                    <div className="font-bold text-red-800 mb-3">ガス</div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <FormInput
                             label="ガス会社名"
@@ -160,7 +160,7 @@ const AgencyTab = () => {
 
             {isWaterRequested && (
                 <div className="bg-teal-50 border border-teal-200 rounded-xl p-4 shadow-sm">
-                    <div className="font-bold text-gray-800 mb-3">水道</div>
+                    <div className="font-bold text-red-800 mb-3">水道</div>
                     <FormDateInput
                         label="水道利用開始日"
                         name="agencyWaterStartDate"
@@ -175,7 +175,7 @@ const AgencyTab = () => {
 
             {isOilRequested && (
                 <div className="bg-rose-50 border border-rose-200 rounded-xl p-4 shadow-sm">
-                    <div className="font-bold text-gray-800 mb-3">灯油</div>
+                    <div className="font-bold text-red-800 mb-3">灯油</div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <FormInput
                             label="灯油会社名"

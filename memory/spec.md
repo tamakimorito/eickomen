@@ -66,11 +66,17 @@
 改修時は営業コメントの一貫性を維持する。
 
 ### 5-5. memory を更新すること
-変更がある場合は必ず以下を更新、また、バージョンも更新（ヘッダなどに記載）する： 
+変更がある場合は必ず以下を更新、また、バージョンも更新（ヘッダなどに記載）する：
 
-- memory/changelog.md  
-- memory/rules.md  
+- memory/changelog.md
+- memory/rules.md
 - memory/spec.md（必要な場合のみ）
+
+### 5-6. 季節テーマ（クリスマス）と復元メモ
+- 現行テーマ：赤×緑を基調。ヘッダーは `bg-gradient-to-r from-emerald-800 via-green-700 to-red-700`、タブのアクティブ状態は `text-red-700 border-red-600`、非アクティブは `text-emerald-800 hover:text-red-600`。
+- フォーム系：ラベルは赤系（`text-red-600`）、通常フォーカスは緑系（`focus:ring-emerald-500` / `border-emerald-300`）。
+- セクション系：カード背景は `bg-emerald-50`、枠線は `border-emerald-200〜300`、見出しは `text-red-800` を基本とする。
+- 復元用（旧配色メモ）：ヘッダー `bg-blue-700`、タブのアクティブ `text-blue-700 border-blue-700`、フォーカスリングは `focus:ring-blue-500`、カード背景は `bg-white`＋`border-gray-200`、見出しは `text-gray-700` 系を使用していた。
 
 ## 8. まとめ
 エイコメンは **「複雑な商材ロジックを、誰でも正しく案内できるように標準化する“営業コメント生成アプリ”」**であり、  

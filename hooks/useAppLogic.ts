@@ -642,6 +642,11 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
         const { name, value } = e.target;
         const fieldName = name === 'customerId' ? 'customerId' : 'recordId';
 
+        if (fieldName === 'recordId' && formData.isSakaiRoute) {
+            setInvalidFields(prev => prev.filter(f => f !== fieldName));
+            return;
+        }
+
         if (value && !/[A-Za-z]/.test(value)) {
             // FIX: Added missing isErrorBanner and bannerMessage properties to match the modal state type, resolving a TypeScript error.
             setModalState({
@@ -665,7 +670,7 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
         } else {
              setInvalidFields(prev => prev.filter(f => f !== fieldName));
         }
-    }, [setModalState, closeModal, setInvalidFields]);
+    }, [setModalState, closeModal, setInvalidFields, formData.isSakaiRoute]);
 
 
     const handleCopy = useCallback(() => {

@@ -5,7 +5,7 @@ const ManualModal = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   const SectionTitle = ({ children, icon: Icon }: PropsWithChildren<{ icon?: React.ElementType }>) => (
-    <h3 className="text-lg font-bold text-blue-700 mt-6 mb-2 border-b-2 border-blue-200 pb-1 flex items-center gap-2">
+    <h3 className="text-lg font-bold text-red-700 mt-6 mb-2 border-b-2 border-emerald-200 pb-1 flex items-center gap-2">
       {Icon && <Icon className="h-5 w-5" />}
       {children}
     </h3>
@@ -16,7 +16,7 @@ const ManualModal = ({ isOpen, onClose }) => {
   );
   
   const SubTitle = ({ children }: PropsWithChildren) => (
-    <h4 className="font-bold text-gray-800 mt-3 mb-1">{children}</h4>
+    <h4 className="font-bold text-red-800 mt-3 mb-1">{children}</h4>
   );
 
   return (
@@ -30,8 +30,8 @@ const ManualModal = ({ isOpen, onClose }) => {
       >
         <div className="flex justify-between items-center mb-4">
           <div className="flex items-center gap-3">
-            <BookOpenIcon className="h-8 w-8 text-blue-600" />
-            <h2 className="text-2xl font-bold text-gray-800">エイコメンの使い方</h2>
+            <BookOpenIcon className="h-8 w-8 text-emerald-700" />
+            <h2 className="text-2xl font-bold text-red-800">エイコメンの使い方</h2>
           </div>
           <button onClick={onClose} className="p-2 rounded-full hover:bg-gray-200 transition-colors">
             <XMarkIcon className="h-6 w-6 text-gray-600" />
