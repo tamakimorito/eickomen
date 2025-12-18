@@ -13,9 +13,9 @@ export const Toast = ({ message, type, onClose }) => {
   }, [onClose]);
   
   const typeStyles = {
-    success: { bg: 'bg-green-500', icon: CheckCircleIcon },
-    error: { bg: 'bg-red-500', icon: XCircleIcon },
-    info: { bg: 'bg-blue-500', icon: InformationCircleIcon },
+    success: { bg: 'bg-green-600', icon: CheckCircleIcon },
+    error: { bg: 'bg-red-600', icon: XCircleIcon },
+    info: { bg: 'bg-green-500', icon: InformationCircleIcon },
   };
 
   const { bg, icon: Icon } = typeStyles[type] || typeStyles.info;
