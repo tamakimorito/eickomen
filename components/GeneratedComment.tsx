@@ -37,16 +37,16 @@ const GeneratedComment = () => {
   };
 
   return (
-    <div className="bg-white p-6 rounded-2xl shadow-xl border border-gray-200">
-      <div className="flex justify-between items-center border-b-2 border-dashed border-gray-200 pb-4 mb-4">
+    <div className="bg-white p-6 rounded-2xl shadow-xl border border-green-200">
+      <div className="flex justify-between items-center border-b-2 border-dashed border-green-200 pb-4 mb-4">
         <div className="flex items-center gap-3">
-            <PencilSquareIcon className="h-7 w-7 text-blue-700"/>
+            <PencilSquareIcon className="h-7 w-7 text-red-700"/>
             <h2 className="text-2xl font-bold text-gray-700">生成コメント</h2>
         </div>
         <div className="flex items-center gap-2">
            <button
               onClick={handleResetRequest}
-              className="flex items-center gap-2 bg-white text-gray-600 font-bold py-2 px-3 rounded-lg border border-gray-300 hover:bg-gray-100 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 shadow-sm hover:shadow-md"
+              className="flex items-center gap-2 bg-white text-gray-600 font-bold py-2 px-3 rounded-lg border border-green-200 hover:bg-green-50 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-400 shadow-sm hover:shadow-md"
               aria-label="フォームをリセット（終話）"
             >
               <ArrowPathIcon className="h-5 w-5" />
@@ -67,7 +67,7 @@ const GeneratedComment = () => {
         onFocus={handleFocus}
         onChange={(e) => setGeneratedComment(e.target.value)}
         rows={20}
-        className="w-full p-3 bg-blue-50/50 border border-blue-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out text-sm font-mono leading-relaxed"
+        className="w-full p-3 bg-green-50/50 border border-green-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition duration-150 ease-in-out text-sm font-mono leading-relaxed"
         placeholder="フォームに入力すると、ここにコメントが自動生成されます..."
       />
     </div>

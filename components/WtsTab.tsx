@@ -69,9 +69,9 @@ const WtsTab = () => {
             </div>
             
             {wtsCustomerType === 'U-20' && (
-                <div className="border-t-2 border-dashed border-blue-300 pt-6 space-y-4">
-                    <h3 className="text-lg font-bold text-blue-700">U-20プラン専用情報</h3>
-                    <div className="p-4 bg-blue-50/50 rounded-lg border border-blue-200 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="border-t-2 border-dashed border-green-300 pt-6 space-y-4">
+                    <h3 className="text-lg font-bold text-red-700">U-20プラン専用情報</h3>
+                    <div className="p-4 bg-green-50/50 rounded-lg border border-green-200 grid grid-cols-1 md:grid-cols-2 gap-4">
                          <FormSelect
                             label="※高校生ヒアリング"
                             name="wtsU20HighSchool"
@@ -94,8 +94,8 @@ const WtsTab = () => {
                 </div>
             )}
             
-            <div className="border-t-2 border-dashed border-blue-300 pt-6 space-y-4">
-                <h3 className="text-lg font-bold text-blue-700">契約詳細</h3>
+            <div className="border-t-2 border-dashed border-green-300 pt-6 space-y-4">
+                <h3 className="text-lg font-bold text-red-700">契約詳細</h3>
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormInput
                         label="①名義"
@@ -154,7 +154,7 @@ const WtsTab = () => {
                             required
                         />
                          {formData.wtsShippingDestination === 'その他' && (
-                            <div className="mt-2 p-4 bg-blue-50/50 rounded-lg border border-blue-200 grid grid-cols-1 gap-4">
+                            <div className="mt-2 p-4 bg-green-50/50 rounded-lg border border-green-200 grid grid-cols-1 gap-4">
                                 <FormInput
                                     label="発送先 郵便番号"
                                     name="wtsShippingPostalCode"
@@ -279,7 +279,7 @@ const WtsTab = () => {
                             required
                         />
                         {formData.wtsMailingAddress === '現住所' && (
-                            <div className="mt-2 p-4 bg-blue-50/50 rounded-lg border border-blue-200 grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="mt-2 p-4 bg-green-50/50 rounded-lg border border-green-200 grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <FormInput
                                     label="現住所の郵便番号" name="currentPostalCode" value={formData.currentPostalCode} onChange={handleInputChange}
                                     onBlur={(e) => handlePostalCodeBlur('currentPostalCode', e.target.value)}
@@ -349,7 +349,7 @@ const WtsTab = () => {
                     )}
                 </div>
             </div>
-            <div className="border-t-2 border-dashed border-blue-300 pt-6 space-y-4">
+            <div className="border-t-2 border-dashed border-green-300 pt-6 space-y-4">
                 <FormTextArea
                     label="備考"
                     name="wtsRemarks"
