@@ -5,7 +5,7 @@ const ManualModal = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   const SectionTitle = ({ children, icon: Icon }: PropsWithChildren<{ icon?: React.ElementType }>) => (
-    <h3 className="text-lg font-bold text-blue-700 mt-6 mb-2 border-b-2 border-blue-200 pb-1 flex items-center gap-2">
+    <h3 className="text-lg font-bold text-red-700 mt-6 mb-2 border-b-2 border-green-200 pb-1 flex items-center gap-2">
       {Icon && <Icon className="h-5 w-5" />}
       {children}
     </h3>
@@ -30,7 +30,7 @@ const ManualModal = ({ isOpen, onClose }) => {
       >
         <div className="flex justify-between items-center mb-4">
           <div className="flex items-center gap-3">
-            <BookOpenIcon className="h-8 w-8 text-blue-600" />
+            <BookOpenIcon className="h-8 w-8 text-green-700" />
             <h2 className="text-2xl font-bold text-gray-800">エイコメンの使い方</h2>
           </div>
           <button onClick={onClose} className="p-2 rounded-full hover:bg-gray-200 transition-colors">
@@ -101,7 +101,7 @@ const ManualModal = ({ isOpen, onClose }) => {
         <div className="mt-6 text-right">
             <button
               onClick={onClose}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+              className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold"
             >
               閉じる
             </button>
