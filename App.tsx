@@ -35,8 +35,8 @@ const Tab: React.FC<TabProps> = ({ id, label, icon: Icon, activeTab, onTabChange
         onClick={() => onTabChange(id)}
         className={`flex items-center gap-2 px-3 sm:px-4 py-3 text-sm sm:text-base font-bold transition-colors duration-200 ease-in-out focus:outline-none -mb-px ${
             activeTab === id
-            ? 'text-blue-700 border-b-4 border-blue-700'
-            : 'text-gray-500 hover:text-blue-600 border-b-4 border-transparent'
+            ? 'text-green-700 border-b-4 border-green-700'
+            : 'text-gray-500 hover:text-red-600 border-b-4 border-transparent'
         }`}
     >
         <Icon className="h-5 w-5"/>
