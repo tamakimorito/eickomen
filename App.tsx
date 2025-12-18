@@ -35,11 +35,11 @@ const Tab: React.FC<TabProps> = ({ id, label, icon: Icon, activeTab, onTabChange
         onClick={() => onTabChange(id)}
         className={`flex items-center gap-2 px-3 sm:px-4 py-3 text-sm sm:text-base font-bold transition-colors duration-200 ease-in-out focus:outline-none -mb-px ${
             activeTab === id
-            ? 'text-blue-700 border-b-4 border-blue-700'
-            : 'text-gray-500 hover:text-blue-600 border-b-4 border-transparent'
+            ? 'text-red-700 border-b-4 border-red-600 bg-white/50'
+            : 'text-green-700 hover:text-red-700 border-b-4 border-transparent'
         }`}
     >
-        <Icon className="h-5 w-5"/>
+        <Icon className={`h-5 w-5 ${activeTab === id ? 'text-red-700' : 'text-green-700'}`}/>
         <span className="hidden sm:inline">{label}</span>
     </button>
 );
@@ -68,7 +68,7 @@ const App = () => {
     } = useContext(AppContext);
 
     return (
-        <div className="bg-gray-100 min-h-screen font-sans">
+        <div className="min-h-screen font-sans bg-gradient-to-br from-green-50 via-white to-red-50">
             <Header onManualOpen={() => setIsManualOpen(true)} onResetRequest={handleResetRequest} />
 
             {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
@@ -110,7 +110,7 @@ const App = () => {
 
             <main className="max-w-7xl mx-auto py-6 sm:py-8 px-4 sm:px-6 lg:px-8">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <div className="bg-white p-6 rounded-2xl shadow-xl border border-gray-200">
+                    <div className="bg-green-50 p-6 rounded-2xl shadow-xl border border-green-200">
                         <div className="flex items-center justify-between mb-4">
                             <FormInput
                                 label="担当者/AP名"
@@ -131,8 +131,8 @@ const App = () => {
                                 className="pt-6"
                             />
                         </div>
-                        <div className="border-b-2 border-gray-200">
-                            <nav className="flex space-x-2 sm:space-x-4">
+                        <div className="border-b-2 border-green-300">
+                            <nav className="flex space-x-2 sm:space-x-4 bg-green-50/70 rounded-t-xl px-2">
                                 {TABS.map(tab => <Tab key={tab.id} id={tab.id} label={tab.label} icon={tab.icon} activeTab={activeTab} onTabChange={onTabChange} />)}
                             </nav>
                         </div>
@@ -153,7 +153,7 @@ const App = () => {
             
             <button
                 onClick={handleOpenBugReport}
-                className="fixed bottom-6 right-6 bg-red-600 text-white p-4 rounded-full shadow-lg hover:bg-red-700 transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                className="fixed bottom-6 right-6 bg-red-600 text-white p-4 rounded-full shadow-lg hover:bg-red-700 transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
                 aria-label="不具合・要望の報告"
             >
                 <ChatBubbleBottomCenterTextIcon className="h-7 w-7" />

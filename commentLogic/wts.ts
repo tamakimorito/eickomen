@@ -12,24 +12,9 @@ const formatDate = (dateStr) => {
     return dateStr;
 };
 
-const formatPhoneNumberWithHyphens = (phoneStr: string): string => {
+const formatDigitsOnlyPhone = (phoneStr: string): string => {
   if (!phoneStr) return '';
-  const digits = phoneStr.replace(/\D/g, '');
-
-  if (digits.length === 11) { // Mobile phones (e.g., 090-1234-5678)
-    return `${digits.substring(0, 3)}-${digits.substring(3, 7)}-${digits.substring(7)}`;
-  }
-  if (digits.length === 10) {
-    // Major cities with 2-digit area codes (e.g., Tokyo 03, Osaka 06)
-    const twoDigitAreaCodes = ['3', '6'];
-    if (digits.startsWith('0') && twoDigitAreaCodes.includes(digits.charAt(1))) {
-      return `${digits.substring(0, 2)}-${digits.substring(2, 6)}-${digits.substring(6)}`;
-    }
-    // Other landlines, typically 3-digit area codes (e.g., 011-234-5678)
-    return `${digits.substring(0, 3)}-${digits.substring(3, 6)}-${digits.substring(6)}`;
-  }
-  // Fallback for unexpected lengths
-  return phoneStr;
+  return phoneStr.replace(/\D/g, '');
 };
 
 const formatPostalCode = (postalCodeStr: string): string => {
@@ -52,7 +37,7 @@ export const generateWtsCommentLogic = (formData: FormData): string => {
     const idField = isSakaiRoute ? `レコードID：${recordId || ''}` : `顧客ID：${customerId || ''}`;
     const serverAndColor = `${wtsServerType || ''} ${wtsServerColor || ''}`.trim();
     
-    const formattedPhone = formatPhoneNumberWithHyphens(phone);
+    const formattedPhone = formatDigitsOnlyPhone(phone);
     const formattedShippingPostalCode = formatPostalCode(wtsShippingPostalCode);
     
     let header = `【プレミアムウォーター】 ${tag}`;

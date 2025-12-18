@@ -52,8 +52,8 @@ const MailingAddressSection = () => {
     };
 
     return (
-        <div className="border-t-2 border-dashed border-blue-300 pt-6 space-y-4">
-            <h3 className="text-lg font-bold text-blue-700">書面送付先</h3>
+        <div className="border-t-2 border-dashed border-green-400 pt-6 space-y-4">
+            <h3 className="text-lg font-bold text-red-700">書面送付先</h3>
             {config.description && <p className="text-sm text-gray-600 -mt-2">{config.description}</p>}
 
             {config.showOptions && (
@@ -69,7 +69,7 @@ const MailingAddressSection = () => {
             )}
             
             {config.showFields && (
-                 <div className="p-4 bg-blue-50/50 rounded-lg border border-blue-200 grid grid-cols-1 md:grid-cols-2 gap-4">
+                 <div className="p-4 bg-green-50 rounded-lg border border-green-200 grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormInput
                         label="現住所の郵便番号"
                         name="currentPostalCode"
@@ -211,14 +211,14 @@ const GasTab = () => {
                         placeholder="例: SR12345"
                     />
                     {gasRecordIdPrefix && gasRecordIdPrefix !== 'サカイ' && (
-                       <p className="text-sm text-gray-500 mt-1">自動判定された販路: <span className="font-bold text-blue-600">{idPrefixDescription}</span></p>
+            <p className="text-sm text-green-900 mt-1">自動判定された販路: <span className="font-bold text-red-700">{idPrefixDescription}</span></p>
                     )}
                 </div>
             </div>
 
-            <div className="border-t-2 border-dashed border-blue-300 pt-6 space-y-4">
-                 <h3 className="text-lg font-bold text-blue-700">契約条件</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 p-4 bg-blue-50/50 rounded-lg border border-blue-200">
+            <div className="border-t-2 border-dashed border-green-400 pt-6 space-y-4">
+                 <h3 className="text-lg font-bold text-red-700">契約条件</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 p-4 bg-green-50 rounded-lg border border-green-200">
                     {isSumainoGas && (
                          <>
                             <FormRadioGroup label="空室" name="gasIsVacancy" value={formData.gasIsVacancy} onChange={handleInputChange} options={YES_NO_OPTIONS} isInvalid={invalidFields.includes('gasIsVacancy')} />
@@ -233,8 +233,8 @@ const GasTab = () => {
                 </div>
             </div>
             
-            <div className="border-t-2 border-dashed border-blue-300 pt-6 space-y-4">
-                <h3 className="text-lg font-bold text-blue-700">契約者情報</h3>
+            <div className="border-t-2 border-dashed border-green-400 pt-6 space-y-4">
+                <h3 className="text-lg font-bold text-red-700">契約者情報</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {showGreeting && <FormInput label="名乗り" name="greeting" value={formData.greeting} onChange={handleInputChange} isInvalid={invalidFields.includes('greeting')} required={isOsakaGas} />}
                     <FormInput label="契約者名義（漢字）" name="contractorName" value={formData.contractorName} onChange={handleInputChange} onBlur={handleNameBlur} isInvalid={invalidFields.includes('contractorName')} required />
@@ -246,8 +246,8 @@ const GasTab = () => {
                 </div>
             </div>
 
-            <div className="border-t-2 border-dashed border-blue-300 pt-6 space-y-4">
-                <h3 className="text-lg font-bold text-blue-700">設置先情報</h3>
+            <div className="border-t-2 border-dashed border-green-400 pt-6 space-y-4">
+                <h3 className="text-lg font-bold text-red-700">設置先情報</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormInput label="郵便番号" name="postalCode" value={formData.postalCode} onChange={handleInputChange} onBlur={(e) => handlePostalCodeBlur('postalCode', e.target.value)} isInvalid={invalidFields.includes('postalCode')} required className="md:col-span-2" />
                     <FormInput label="住所" name="address" value={formData.address} onChange={handleInputChange} className="md:col-span-2" isInvalid={invalidFields.includes('address')} required />
@@ -274,9 +274,9 @@ const GasTab = () => {
                 </div>
             </div>
 
-                        <div className="border-t-2 border-dashed border-blue-300 pt-6 space-y-4">
-                <h3 className="text-lg font-bold text-blue-700">ガス利用開始情報</h3>
-                <div className="p-4 bg-blue-50/50 rounded-lg border border-blue-200 space-y-4">
+                        <div className="border-t-2 border-dashed border-green-400 pt-6 space-y-4">
+                <h3 className="text-lg font-bold text-red-700">ガス利用開始情報</h3>
+                <div className="p-4 bg-green-50 rounded-lg border border-green-200 space-y-4">
                      <FormDateInput
                         label="ガス利用開始日"
                         name="gasOpeningDate"
@@ -288,7 +288,7 @@ const GasTab = () => {
                         required
                     />
                     {needsWitness && (
-                         <div className="pt-4 mt-4 border-t border-blue-200">
+                         <div className="pt-4 mt-4 border-t border-green-200">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <FormSelect
                                     label="立会時間枠"
@@ -343,8 +343,8 @@ const GasTab = () => {
             
             {!isOsakaGas && <MailingAddressSection />}
 
-            <div className="border-t-2 border-dashed border-blue-300 pt-6 space-y-4">
-                <h3 className="text-lg font-bold text-blue-700">その他</h3>
+            <div className="border-t-2 border-dashed border-green-400 pt-6 space-y-4">
+                <h3 className="text-lg font-bold text-red-700">その他</h3>
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {showPaymentMethod && <FormSelect label="支払い方法" name="paymentMethod" value={formData.paymentMethod} onChange={handleInputChange} options={PAYMENT_METHOD_OPTIONS_EXTENDED} isInvalid={invalidFields.includes('paymentMethod')} />}
                     
