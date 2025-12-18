@@ -2,8 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { CalendarIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 
 export const FormInput = ({ label, name, value, onChange, className = '', isInvalid, ...props }) => {
-    const labelClasses = `block text-sm font-bold mb-1 ${isInvalid ? 'text-red-600' : 'text-gray-700'}`;
-    const inputClasses = `block w-full px-3 py-2 bg-white border rounded-lg shadow-sm placeholder-gray-400 focus:outline-none sm:text-sm ${isInvalid ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'}`;
+    const labelClasses = `block text-sm font-bold mb-1 ${isInvalid ? 'text-red-700' : 'text-red-600'}`;
+    const inputClasses = `block w-full px-3 py-2 bg-white border rounded-lg shadow-sm placeholder-gray-400 focus:outline-none sm:text-sm ${isInvalid ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-green-200 focus:ring-green-600 focus:border-green-600'}`;
     return (
         <div className={className}>
             <label htmlFor={name} className={labelClasses}>{label}{props.required && <span className="text-red-500 ml-1">*</span>}</label>
@@ -21,8 +21,8 @@ export const FormInput = ({ label, name, value, onChange, className = '', isInva
 };
 
 export const FormSelect = ({ label, name, value, onChange, options, className = '', isInvalid, ...props }) => {
-    const labelClasses = `block text-sm font-bold mb-1 ${isInvalid ? 'text-red-600' : 'text-gray-700'}`;
-    const selectClasses = `block w-full px-3 py-2 bg-white border rounded-lg shadow-sm focus:outline-none sm:text-sm ${isInvalid ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'}`;
+    const labelClasses = `block text-sm font-bold mb-1 ${isInvalid ? 'text-red-700' : 'text-red-600'}`;
+    const selectClasses = `block w-full px-3 py-2 bg-white border rounded-lg shadow-sm focus:outline-none sm:text-sm ${isInvalid ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-green-200 focus:ring-green-600 focus:border-green-600'}`;
 
     return(
         <div className={className}>
@@ -46,7 +46,7 @@ export const FormSelect = ({ label, name, value, onChange, options, className = 
 };
 
 export const FormRadioGroup = ({ label, name, value, onChange, options, className = '', isInvalid, ...props }) => {
-    const legendClasses = `block text-sm font-bold mb-2 ${isInvalid ? 'text-red-600' : 'text-gray-700'}`;
+    const legendClasses = `block text-sm font-bold mb-2 ${isInvalid ? 'text-red-700' : 'text-red-600'}`;
     
     const handleRadioClick = (e) => {
         const clickedValue = e.target.value;
@@ -80,7 +80,7 @@ export const FormRadioGroup = ({ label, name, value, onChange, options, classNam
                                 value={radioOption.value}
                                 checked={value === radioOption.value}
                                 onChange={handleRadioClick} // Use the custom handler
-                                className="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                                className="h-4 w-4 text-green-700 border-green-200 focus:ring-green-500"
                             />
                             <label htmlFor={`${name}-${radioOption.value}`} className="ml-2 block text-sm text-gray-900">
                                 {radioOption.label}
@@ -94,8 +94,8 @@ export const FormRadioGroup = ({ label, name, value, onChange, options, classNam
 };
 
 export const FormTextArea = ({ label, name, value, onChange, className = '', isInvalid, ...props }) => {
-    const labelClasses = `block text-sm font-bold mb-1 ${isInvalid ? 'text-red-600' : 'text-gray-700'}`;
-    const textareaClasses = `block w-full px-3 py-2 bg-white border rounded-lg shadow-sm placeholder-gray-400 focus:outline-none sm:text-sm ${isInvalid ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'}`;
+    const labelClasses = `block text-sm font-bold mb-1 ${isInvalid ? 'text-red-700' : 'text-red-600'}`;
+    const textareaClasses = `block w-full px-3 py-2 bg-white border rounded-lg shadow-sm placeholder-gray-400 focus:outline-none sm:text-sm ${isInvalid ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-green-200 focus:ring-green-600 focus:border-green-600'}`;
 
     return (
         <div className={className}>
@@ -124,7 +124,7 @@ export const FormCheckbox = ({ label, name, checked, onChange, description, clas
                 type="checkbox"
                 checked={checked}
                 onChange={onChange}
-                className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                className="h-4 w-4 text-green-700 border-green-200 rounded focus:ring-green-500"
                 {...props}
             />
             </div>
@@ -161,8 +161,8 @@ const CalendarPopover = ({ onDateSelect, initialDate }) => {
                 type="button"
                 onClick={() => onDateSelect(currentDate)}
                 className={`flex items-center justify-center w-9 h-9 text-sm rounded-full transition-colors ${
-                    isSelected ? 'bg-blue-600 text-white font-bold' : 
-                    isToday ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'
+                    isSelected ? 'bg-red-600 text-white font-bold shadow' :
+                    isToday ? 'bg-green-100 text-green-800' : 'text-gray-700 hover:bg-green-50'
                 }`}
             >
                 {day}

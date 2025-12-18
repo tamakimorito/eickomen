@@ -16,32 +16,30 @@ export const Modal = ({
     type === 'warning' ? 'text-red-600 font-bold' : ''
   }`;
 
-  const blueButtonClasses = "w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold";
-  const grayButtonClasses = "w-full px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors font-semibold";
-  const redButtonClasses = "w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold";
+  const greenButtonClasses = "w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold shadow";
+  const berryButtonClasses = "w-full px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-semibold shadow";
+  const grayButtonClasses = "w-full px-4 py-2 bg-emerald-50 text-green-800 rounded-lg hover:bg-emerald-100 transition-colors font-semibold";
 
-  let confirmButtonClasses = blueButtonClasses;
+  let confirmButtonClasses = greenButtonClasses;
   let cancelButtonClasses = grayButtonClasses;
   
   switch(type) {
       case 'warning':
-          // For warnings, if there are two buttons, the 'cancel' button is the primary action (blue).
-          // If only one button, it should be blue.
+          // For warnings, use green for安全推奨、赤で続行の強調。
           if (cancelText) {
-            confirmButtonClasses = grayButtonClasses; // 'このまま進む' is secondary
-            cancelButtonClasses = blueButtonClasses;
+            confirmButtonClasses = berryButtonClasses; // 'このまま進む' is caution
+            cancelButtonClasses = greenButtonClasses;
           } else {
-             confirmButtonClasses = blueButtonClasses;
+             confirmButtonClasses = greenButtonClasses;
           }
           break;
       case 'danger':
            // For danger, the 'confirm' button ('はい、リセットする') is the danger action (red).
-          confirmButtonClasses = redButtonClasses;
+          confirmButtonClasses = berryButtonClasses;
           cancelButtonClasses = grayButtonClasses;
           break;
       default:
-           // Default behavior
-          confirmButtonClasses = blueButtonClasses;
+          confirmButtonClasses = greenButtonClasses;
           cancelButtonClasses = grayButtonClasses;
           break;
   }
