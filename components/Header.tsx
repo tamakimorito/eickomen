@@ -11,7 +11,23 @@ const Header = ({ onManualOpen, onResetRequest }) => {
             </div>
             <div>
             <h1 className="text-2xl sm:text-3xl font-bold tracking-wider">営業コメント作成ツール～エイコメン～</h1>
-            <p className="text-xs text-green-100 mt-1">Version: v1.61</p>
+            <p className="text-xs text-green-100 mt-1">Version: v1.62</p>
+            </div>
+            <div className="hidden sm:flex items-center gap-2" aria-hidden="true">
+              {[
+                { icon: '🎅', label: 'Santa' },
+                { icon: '🦌', label: 'Reindeer' },
+                { icon: '🎄', label: 'Tree' },
+                { icon: '🧦', label: 'Stocking' },
+              ].map((item) => (
+                <span
+                  key={item.label}
+                  className="flex items-center justify-center h-10 w-10 bg-white/20 text-2xl rounded-xl border border-green-200 shadow-sm"
+                  title={item.label}
+                >
+                  {item.icon}
+                </span>
+              ))}
             </div>
         </div>
         <div className="flex items-center gap-x-3">

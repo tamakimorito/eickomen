@@ -136,6 +136,16 @@ const App = () => {
                                 {TABS.map(tab => <Tab key={tab.id} id={tab.id} label={tab.label} icon={tab.icon} activeTab={activeTab} onTabChange={onTabChange} />)}
                             </nav>
                         </div>
+                        <div className="mt-4 flex flex-wrap items-center gap-3 bg-white/80 border border-green-200 rounded-xl px-4 py-3 shadow-inner">
+                            <span className="text-lg sm:text-xl font-extrabold text-red-700">Merry Christmas!</span>
+                            <div className="flex items-center gap-2 text-2xl" aria-hidden="true">
+                                <span className="h-10 w-10 flex items-center justify-center bg-red-100 text-red-800 rounded-lg border border-red-200">🎅</span>
+                                <span className="h-10 w-10 flex items-center justify-center bg-green-100 text-green-800 rounded-lg border border-green-200">🎄</span>
+                                <span className="h-10 w-10 flex items-center justify-center bg-red-100 text-red-800 rounded-lg border border-red-200">🦌</span>
+                                <span className="h-10 w-10 flex items-center justify-center bg-green-100 text-green-800 rounded-lg border border-green-200">🎁</span>
+                            </div>
+                            <p className="text-sm text-red-800 font-semibold">華やかアイコンでホリデー感UP中！</p>
+                        </div>
                         <div className="mt-6 space-y-6">
                             {activeTab === 'electricity' && <ElectricityTab />}
                             {activeTab === 'gas' && <GasTab />}
