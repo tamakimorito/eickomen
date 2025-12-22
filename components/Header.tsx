@@ -2,6 +2,12 @@ import React from 'react';
 import { BellIcon, QuestionMarkCircleIcon, ArrowPathIcon } from '@heroicons/react/24/solid';
 
 const Header = ({ onManualOpen, onResetRequest }) => {
+  const holidayIcons = [
+    { emoji: '🎅', label: 'サンタ' },
+    { emoji: '🦌', label: 'トナカイ' },
+    { emoji: '🎄', label: 'クリスマスツリー' },
+  ];
+
   return (
     <header className="bg-red-700 shadow-lg sticky top-0 z-20">
       <div className="max-w-7xl mx-auto py-3 px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4 text-white">
@@ -11,7 +17,18 @@ const Header = ({ onManualOpen, onResetRequest }) => {
             </div>
             <div>
             <h1 className="text-2xl sm:text-3xl font-bold tracking-wider">営業コメント作成ツール～エイコメン～</h1>
-            <p className="text-xs text-green-100 mt-1">Version: v1.61</p>
+            <p className="text-xs text-green-100 mt-1">Version: v1.62</p>
+            <div className="flex items-center gap-2 mt-2" aria-hidden="true">
+              {holidayIcons.map(({ emoji, label }) => (
+                <span
+                  key={label}
+                  className="h-9 w-9 flex items-center justify-center rounded-full bg-white/20 text-xl shadow-sm border border-green-200"
+                  title={label}
+                >
+                  {emoji}
+                </span>
+              ))}
+            </div>
             </div>
         </div>
         <div className="flex items-center gap-x-3">
