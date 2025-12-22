@@ -608,6 +608,9 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
     const nameHasSpace = (s: string) => /\s|\u3000/.test(s?.trim() || '');
     const companyKeywords = ['株式会社', '有限会社', '合同会社', '会社'];
     const isCompanyName = (s: string) => companyKeywords.some(kw => (s || '').includes(kw));
+    const isCompanyContract = useCallback(() => {
+      return [formData.contractorName, formData.contractorNameKana].some(value => isCompanyName(value || ''));
+    }, [formData.contractorName, formData.contractorNameKana]);
 
     const openNameSpaceModal = (fieldName: 'contractorName'|'contractorNameKana') => {
       setInvalidFields(prev => Array.from(new Set([...prev, fieldName])));
@@ -626,17 +629,17 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
     
     const handleNameBlur = useCallback((e) => {
       const { value } = e.target;
-      if (value && !nameHasSpace(value) && !isCompanyName(value)) {
+      if (value && !nameHasSpace(value) && !isCompanyName(value) && !isCompanyContract()) {
           openNameSpaceModal('contractorName');
       }
-    }, [setInvalidFields, setModalState, closeModal]);
+    }, [setInvalidFields, setModalState, closeModal, isCompanyContract]);
 
     const handleKanaBlur = useCallback((e) => {
       const { value } = e.target;
-      if (value && !nameHasSpace(value) && !isCompanyName(value)) {
+      if (value && !nameHasSpace(value) && !isCompanyName(value) && !isCompanyContract()) {
           openNameSpaceModal('contractorNameKana');
       }
-    }, [setInvalidFields, setModalState, closeModal]);
+    }, [setInvalidFields, setModalState, closeModal, isCompanyContract]);
 
     const handleIdBlur = useCallback((e) => {
         const { name, value } = e.target;
