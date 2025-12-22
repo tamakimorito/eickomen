@@ -10,22 +10,11 @@ const Header = ({ onManualOpen, onResetRequest }) => {
             <BellIcon className="h-8 w-8 text-red-900" />
             </div>
             <div>
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-wider">営業コメント作成ツール～エイコメン～</h1>
-            <p className="text-xs text-green-100 mt-1">Version: v1.62</p>
-            <div className="flex items-center gap-2 mt-2 text-red-900">
-              <span className="inline-flex items-center gap-2 bg-green-200 px-3 py-1 rounded-full text-sm font-semibold shadow-sm">
-                <span role="img" aria-label="サンタ">🎅</span>
-                <span className="hidden sm:inline">Santa</span>
-              </span>
-              <span className="inline-flex items-center gap-2 bg-green-200 px-3 py-1 rounded-full text-sm font-semibold shadow-sm">
-                <span role="img" aria-label="トナカイ">🦌</span>
-                <span className="hidden sm:inline">Reindeer</span>
-              </span>
-              <span className="inline-flex items-center gap-2 bg-green-200 px-3 py-1 rounded-full text-sm font-semibold shadow-sm">
-                <span role="img" aria-label="クリスマスツリー">🎄</span>
-                <span className="hidden sm:inline">Tree</span>
-              </span>
-            </div>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-wider flex items-center gap-2">
+              営業コメント作成ツール～エイコメン～
+              <span className="inline-flex items-center justify-center h-8 w-8 rounded-full bg-green-200 text-red-900 text-xl shadow-sm" aria-label="クリスマスツリー">🎄</span>
+            </h1>
+            <p className="text-xs text-green-100 mt-1">Version: v1.63</p>
             </div>
         </div>
         <div className="flex items-center gap-x-3">
