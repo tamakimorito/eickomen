@@ -41,7 +41,23 @@ const GeneratedComment = () => {
       <div className="flex justify-between items-center border-b-2 border-dashed border-green-200 pb-4 mb-4">
         <div className="flex items-center gap-3">
             <PencilSquareIcon className="h-7 w-7 text-red-700"/>
-            <h2 className="text-2xl font-bold text-gray-700">生成コメント</h2>
+            <div className="flex flex-col gap-1">
+              <h2 className="text-2xl font-bold text-gray-700">生成コメント</h2>
+              <div className="flex items-center gap-2 text-sm text-green-800">
+                <span className="inline-flex items-center gap-1 bg-green-100 border border-green-300 px-2 py-1 rounded-full">
+                  <span role="img" aria-label="サンタ" className="text-base">🎅</span>
+                  <span className="hidden sm:inline">メモもサンタ品質で</span>
+                </span>
+                <span className="inline-flex items-center gap-1 bg-red-100 border border-red-300 px-2 py-1 rounded-full">
+                  <span role="img" aria-label="トナカイ" className="text-base">🦌</span>
+                  <span className="hidden sm:inline">急ぎのコピーもダッシュ</span>
+                </span>
+                <span className="inline-flex items-center gap-1 bg-green-200 border border-green-400 px-2 py-1 rounded-full">
+                  <span role="img" aria-label="クリスマスツリー" className="text-base">🎄</span>
+                  <span className="hidden sm:inline">ツリー級の整列感</span>
+                </span>
+              </div>
+            </div>
         </div>
         <div className="flex items-center gap-2">
            <button
