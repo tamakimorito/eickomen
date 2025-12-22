@@ -625,15 +625,23 @@ export const useAppLogic = ({ formData, dispatch, resetForm, setInvalidFields })
     };
     
     const handleNameBlur = useCallback((e) => {
-      const { value } = e.target;
-      if (value && !nameHasSpace(value) && !isCompanyName(value)) {
+      const { value, name } = e.target;
+      if (value && isCompanyName(value)) {
+          setInvalidFields(prev => prev.filter(x => x !== name));
+          return;
+      }
+      if (value && !nameHasSpace(value)) {
           openNameSpaceModal('contractorName');
       }
     }, [setInvalidFields, setModalState, closeModal]);
 
     const handleKanaBlur = useCallback((e) => {
-      const { value } = e.target;
-      if (value && !nameHasSpace(value) && !isCompanyName(value)) {
+      const { value, name } = e.target;
+      if (value && isCompanyName(value)) {
+          setInvalidFields(prev => prev.filter(x => x !== name));
+          return;
+      }
+      if (value && !nameHasSpace(value)) {
           openNameSpaceModal('contractorNameKana');
       }
     }, [setInvalidFields, setModalState, closeModal]);
