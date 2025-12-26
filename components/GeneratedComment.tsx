@@ -37,16 +37,16 @@ const GeneratedComment = () => {
   };
 
   return (
-    <div className="bg-white p-6 rounded-2xl shadow-xl border border-green-200">
-      <div className="flex justify-between items-center border-b-2 border-dashed border-green-200 pb-4 mb-4">
+    <div className="bg-white p-6 rounded-2xl shadow-xl border border-amber-200">
+      <div className="flex justify-between items-center border-b-2 border-dashed border-amber-200 pb-4 mb-4">
         <div className="flex items-center gap-3">
-            <PencilSquareIcon className="h-7 w-7 text-red-700"/>
+            <PencilSquareIcon className="h-7 w-7 text-rose-700"/>
             <h2 className="text-2xl font-bold text-gray-700">生成コメント</h2>
         </div>
         <div className="flex items-center gap-2">
            <button
               onClick={handleResetRequest}
-              className="flex items-center gap-2 bg-white text-gray-600 font-bold py-2 px-3 rounded-lg border border-green-200 hover:bg-green-50 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-400 shadow-sm hover:shadow-md"
+              className="flex items-center gap-2 bg-white text-gray-600 font-bold py-2 px-3 rounded-lg border border-amber-200 hover:bg-amber-50 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-rose-300 shadow-sm hover:shadow-md"
               aria-label="フォームをリセット（終話）"
             >
               <ArrowPathIcon className="h-5 w-5" />
@@ -54,7 +54,7 @@ const GeneratedComment = () => {
             </button>
             <button
               onClick={handleCopy}
-              className="flex items-center gap-2 bg-yellow-400 text-white font-bold py-2 px-4 rounded-lg hover:bg-yellow-500 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-400 shadow-md hover:shadow-lg"
+              className="flex items-center gap-2 bg-amber-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-amber-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-400 shadow-md hover:shadow-lg"
             >
               <ClipboardDocumentIcon className="h-5 w-5" />
               <span>コピー</span>
@@ -67,7 +67,7 @@ const GeneratedComment = () => {
         onFocus={handleFocus}
         onChange={(e) => setGeneratedComment(e.target.value)}
         rows={20}
-        className="w-full p-3 bg-green-50/50 border border-green-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition duration-150 ease-in-out text-sm font-mono leading-relaxed"
+        className="w-full p-3 bg-amber-50/60 border border-amber-200 rounded-xl focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition duration-150 ease-in-out text-sm font-mono leading-relaxed"
         placeholder="フォームに入力すると、ここにコメントが自動生成されます..."
       />
     </div>

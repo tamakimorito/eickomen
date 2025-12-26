@@ -79,6 +79,6 @@
 詳細仕様（個別商材の条件・UIの挙動・営業コメントの詳細構造）は別ファイルで管理し、本書はアプリの根本思想・目的・構造を伝えることを目的とする。
 
 ## 9. 季節テーマと復旧メモ
-- 2025/12 時点で UI をクリスマス調（赤×緑）に変更済み。ヘッダーは `bg-red-700`＋アイコン背景 `bg-green-400`、タブはアクティブ時に赤文字＋緑系背景、主要ボタンは赤/緑で統一、入力類のフォーカスは `focus:ring-green-500` 系、ラベルは赤系で強調。
-- 各セクションの枠線・背景は `border-green-200` / `bg-green-50` に統一し、見出しは `text-red-700` に寄せている。
+- 2025/12 時点で UI を日本のお正月調（紅×金）に変更済み。ヘッダーは `bg-rose-700`＋アイコン背景 `bg-amber-300`、タブはアクティブ時に紅文字＋金系背景、主要ボタンは紅/金で統一、入力類のフォーカスは `focus:ring-rose-500` 系、ラベルは紅系で強調。
+- 各セクションの枠線・背景は `border-amber-200` / `bg-amber-50` に統一し、見出しは `text-rose-700` に寄せている。
 - 旧テーマへ戻す場合は以下の代表値を差し戻す：ヘッダー背景 `bg-blue-700`、ベルアイコン背景 `bg-yellow-400`＋アイコン `text-blue-800`、タブのアクティブ色 `text-blue-700`／`border-blue-700`、フォームフォーカス `focus:ring-blue-500`／`border-gray-300`、ラベル `text-gray-700`、セクション枠 `border-gray-200`／背景 `bg-white`。対象ファイルは `Header.tsx`、`App.tsx`、`components/FormControls.tsx`、`components/GeneratedComment.tsx`、`index.html` など。
